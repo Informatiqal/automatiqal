@@ -1,0 +1,68 @@
+{
+  "name": "automatiqal",
+  "version": "0.0.1",
+  "description": "Automate Qlik deployments",
+  "author": {
+    "email": "info@informatiqal.com",
+    "name": "Informatiqal @informatiqal",
+    "url": "https://informatiqal.com"
+  },
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "start": "node dist/app.js",
+    "prestart": "npm run build-tsc",
+    "build-tsc": "tsc",
+    "build": "rollup -c",
+    "watch": "rollup -cw",
+    "docs": "npx typedoc src/index.doc.ts --name \"Automatiqal\" --excludePrivate --hideGenerator"
+  },
+  "keywords": [
+    "qlik",
+    "sense",
+    "qlik-sense",
+    "qlik sense",
+    "saas api",
+    "api",
+    "saas"
+  ],
+  "files": [
+    "dist",
+    "*.json",
+    "*.md",
+    "LICENSE",
+    "!CHANGELOG.md",
+    "!tsconfig.json",
+    "!tsconfig.test.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/informatiqal/automatiqal.git"
+  },
+  "bugs": {
+    "url": "https://github.com/informatiqal/automatiqal/issues"
+  },
+  "homepage": "https://informatiqal.com/automatiqal/",
+  "devDependencies": {
+    "@types/chai": "^4.2.19",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "^15.12.0",
+    "chai": "^4.3.4",
+    "dotenv": "^10.0.0",
+    "mocha": "^8.4.0",
+    "nyc": "^15.1.0",
+    "rollup": "^2.56.2",
+    "rollup-plugin-delete": "^2.0.0",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "ts-node": "^10.0.0",
+    "typedoc": "^0.21.5",
+    "typescript": "^4.3.2"
+  },
+  "dependencies": {
+    "events": "^3.3.0",
+    "qlik-repo-api": "^0.1.8",
+    "qlik-saas-api": "^0.0.20"
+  }
+}

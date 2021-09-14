@@ -1,3 +1,11 @@
+dist/
+out/
+.env
+test/playground.spec.ts
+temp.md
+.VSCodeCounter
+src/main.doc.ts
+.npmrc
 # Logs
 logs
 *.log
