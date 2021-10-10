@@ -2,7 +2,7 @@
 import { QlikRepoApi } from "../../qlik-repo-api/src/index";
 import { QlikSaaSApi } from "qlik-saas-api";
 
-import { IRunBookResult, Runner } from "./RunBook/Runner";
+import { IRunBookResult, ITaskResult, Runner } from "./RunBook/Runner";
 import { IRunBook } from "./RunBook/RunBook.interfaces";
 import { CustomError } from "./util/CustomError";
 import { EventsBus } from "./util/EventBus";
@@ -17,16 +17,13 @@ export class Automatiqal {
     this.runBook = runBook;
     this.emitter = new EventsBus();
 
+    // set default trace level if not provided in the run book
     if (!this.runBook.trace) this.runBook.trace = "error";
 
-    if (!runBook.tasks || runBook.tasks.length == 0)
-      throw new CustomError(1000, "RunBook");
+    // perform obvious checks before execution
+    this.initialChecks();
 
-    this.checkDuplicateTasks();
-
-    if (runBook.edition != "windows" && runBook.edition != "saas")
-      throw new CustomError(1001, "RunBook", { arg1: runBook.edition });
-
+    // if QSEoW - set up Qlik Repo client
     if (runBook.edition == "windows") {
       this.restInstance = new QlikRepoApi.client({
         port: runBook.environment.port,
@@ -37,12 +34,22 @@ export class Automatiqal {
       });
     }
 
+    // initialize the Runner
     this.runner = new Runner(this.runBook, this.restInstance);
   }
 
-  async run(): Promise<IRunBookResult[]> {
-    let a = 1;
+  async run(): Promise<ITaskResult[]> {
     return await this.runner.start();
+  }
+
+  private initialChecks() {
+    if (!this.runBook.tasks || this.runBook.tasks.length == 0)
+      throw new CustomError(1000, "RunBook");
+
+    this.checkDuplicateTasks();
+
+    if (this.runBook.edition != "windows" && this.runBook.edition != "saas")
+      throw new CustomError(1001, "RunBook", { arg1: this.runBook.edition });
   }
 
   private checkDuplicateTasks(): void {

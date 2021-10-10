@@ -1,6 +1,6 @@
 import { QlikRepoApi } from "qlik-repo-api";
 // import { QlikSaaSApi } from "qlik-saas-api";
-import { CustomError } from "../util/CustomError";
+// import { CustomError } from "../util/CustomError";
 import { IRunBook, ITask } from "./RunBook.interfaces";
 import { Task } from "./Task";
 import { Debugger } from "../util/Debugger";
@@ -11,6 +11,18 @@ export interface IRunBookResult {
   // result: ITaskResult;
   error?: boolean;
   errorMessage?: string;
+}
+
+export interface ITaskTimings {
+  start: string;
+  end: string;
+  totalSeconds: number;
+}
+
+export interface ITaskResult {
+  data: IRunBookResult[];
+  task: ITask;
+  timings: ITaskTimings;
 }
 
 export class Runner {
@@ -27,39 +39,52 @@ export class Runner {
     this.emitter = new EventsBus();
   }
 
-  async start(): Promise<IRunBookResult[]> {
-    return await Promise.all(
-      this.runBook.tasks.map(async (t) => {
-        // TODO: data should have type!
-        // get the data for the object on which the operation will be performed
-        // either from querying QRS (calling /XXX/filter)
-        // or from result of previous task
-        const data = !t.source
-          ? await this.getFilterItems(t)
-          : this.taskResults.find((a) => a.task == t.source);
+  async start(): Promise<ITaskResult[]> {
+    //return await Promise.all(
+    // this.runBook.tasks.forEach(async (t) => {
+    for (let t of this.runBook.tasks) {
+      // TODO: data should have type!
+      // get the data for the object on which the operation will be performed
+      // either from querying QRS (calling /XXX/filter)
+      // or from result of previous task
+      const data = !t.source
+        ? await this.getFilterItems(t)
+        : this.taskResults.find((a) => a.task.name == t.source);
 
-        // if no objects are found throw an error
-        // TODO: handle t.config.allowZero
-        if (data.length == 0)
-          throw new CustomError(1004, t.name, { arg1: t.name });
+      // process the task, push the result to taskResult variable
+      const timings: ITaskTimings = {
+        start: null,
+        end: null,
+        totalSeconds: -1,
+      };
 
-        // by default task will throw an error if multiple objects are returned and config is missing
-        if (data.length > 1 && !t.config)
-          throw new CustomError(1005, t.name, { arg1: t.name });
+      const task = new Task(t, this.instance, data);
+      timings.start = new Date().toISOString();
 
-        // multiple objects are returned and config.multiple is set to false
-        if (data.length > 1 && t.config && !t.config.multiple)
-          throw new CustomError(1006, t.name, { arg1: t.name });
+      await task.process().then((taskResult) => {
+        timings.end = new Date().toISOString();
+        timings.totalSeconds =
+          (new Date(timings.end).getTime() -
+            new Date(timings.start).getTime()) /
+          1000;
 
-        // if all good - process the task, push the result to taskResult variable
-        const task = new Task(t, this.instance, data);
-        return await task.process().then((taskResult) => {
-          this.emitter.emit("task:result", ...taskResult);
-          this.taskResults.push(...taskResult);
-          return taskResult;
-        });
-      })
-    ).then(() => this.taskResults);
+        const result: ITaskResult = {
+          task: t,
+          timings: timings,
+          data: taskResult,
+        };
+        this.emitter.emit("task:result", result);
+        this.taskResults.push(result);
+        return result;
+      });
+    }
+    //   this.runBook.tasks.map(async (t) => {
+
+    //   })
+    // )
+
+    //.then(() => this.taskResults);
+    return this.taskResults;
   }
 
   private async getFilterItems(task: ITask): Promise<any> {
@@ -73,6 +98,6 @@ export class Runner {
     });
 
     this.debug.print(task.name, data.length);
-    return data;
+    return { data };
   }
 }
