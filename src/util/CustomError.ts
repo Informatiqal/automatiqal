@@ -24,6 +24,7 @@ export class CustomError extends Error {
     1004: `Task "%{arg1}" will not run. 0 objects will be affected`,
     1005: `Task "%{arg1}" will be performed on multiple objects. Specify "config.multiple = true" to override`,
     1006: `Task "%{arg1}" will be performed on multiple objects. "config.multiple" is set to "false"`,
+    1007: `Task "%{arg1}" will not run. 0 objects will be affected and "config.allowZero" is set to "false"`,
   };
 
   constructor(code: number, taskName: string, params?: IErrorParams) {

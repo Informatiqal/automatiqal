@@ -34,16 +34,21 @@ export class Task {
 
     // if no objects are found throw an error
     // TODO: handle t.config.allowZero
-    if (this.objectsData.data.length == 0)
-      throw new CustomError(1004, this.task.name, { arg1: this.task.name });
+    if (this.objectsData.data.length == 0) {
+      if (!this.task.config)
+        throw new CustomError(1004, this.task.name, { arg1: this.task.name });
+
+      if (this.task.config.allowZero == false)
+        throw new CustomError(1004, this.task.name, { arg1: this.task.name });
+    }
 
     // by default task will throw an error if multiple objects are returned and config is missing
-    if (this.objectsData.length > 1 && !this.task.config)
+    if (this.objectsData.data.length > 1 && !this.task.config)
       throw new CustomError(1005, this.task.name, { arg1: this.task.name });
 
     // multiple objects are returned and config.multiple is set to false
     if (
-      this.objectsData.length > 1 &&
+      this.objectsData.data.length > 1 &&
       this.task.config &&
       !this.task.config.multiple
     )

@@ -8,6 +8,9 @@ export type WinOperations =
   | "app.publish"
   | "app.switch"
   | "app.get"
+  | "stream.get"
+  | "stream.remove"
+  | "stream.update"
   | "continue"
   | "debug";
 
@@ -19,6 +22,7 @@ export interface ITask {
   source?: string;
   //   onError?: ITask[];
   details?: TaskDetails;
+  onError?: ITask[];
   // | ITaskDetailsStream
   // | ITaskDetailsApp
   // | ITaskDetailsCustomProp
