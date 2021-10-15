@@ -1,6 +1,14 @@
+import { type } from "os";
+
 export type SaaSOperations = "";
 
 export type WinOperations =
+  | "about.apiDefaults"
+  | "about.apiDescription"
+  | "about.apiRelations"
+  | "about.enums"
+  | "about.openApi|"
+  | "about.get"
   | "app.upload"
   | "app.remove"
   | "app.update"
@@ -17,12 +25,15 @@ export type WinOperations =
 export interface ITask {
   name: string;
   description?: string;
-  operation: WinOperations | SaaSOperations;
+  operation?: WinOperations | SaaSOperations;
   filter?: string;
   source?: string;
   //   onError?: ITask[];
   details?: TaskDetails;
-  onError?: ITask[];
+  onError?: {
+    exit?: boolean;
+    tasks: ITask[];
+  };
   // | ITaskDetailsStream
   // | ITaskDetailsApp
   // | ITaskDetailsCustomProp
