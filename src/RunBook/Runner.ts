@@ -119,7 +119,13 @@ export class Runner {
     // if (a.length == 1) {
     // }
 
-    const data = await this.instance[`${a[0]}s`].getFilter({
+    if (a[0].substring(a[0].length - 1) == "y") {
+      a[0] = `${a[0].substring(0, a[0].length - 1)}ies`;
+    } else {
+      a[0] = `${a[0]}s`;
+    }
+
+    const data = await this.instance[`${a[0]}`].getFilter({
       filter: task.filter,
     });
 

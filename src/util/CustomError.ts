@@ -25,6 +25,9 @@ export class CustomError extends Error {
     1005: `Task "%{arg1}" will be performed on multiple objects. Specify "config.multiple = true" to override`,
     1006: `Task "%{arg1}" will be performed on multiple objects. "config.multiple" is set to "false"`,
     1007: `Task "%{arg1}" aborted. 0 objects will be affected and "config.allowZero" is set to "false"`,
+    1008: `Task "%{arg1}" aborted. Task "filter" is provided but the filter is empty`,
+    1009: `Task "%{arg1}" aborted. Task "source" is provided but the filter is empty"`,
+    1010: `Task "%{arg1}" aborted. Task "operation" is required"`,
   };
 
   constructor(code: number, taskName: string, params?: IErrorParams) {

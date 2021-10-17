@@ -1,4 +1,11 @@
-import { type } from "os";
+import { ICertificateExportParameters } from "qlik-repo-api/dist/Certificate";
+import {
+  IVirtualProxyUpdate,
+  IVirtualProxyCreate,
+} from "qlik-repo-api/dist/Proxy.interface";
+// import { winOperations } from "../RunBook/Task";
+// const operations = [...winOperations.map((m) => m.name)] as const;
+// export type WinOperations = typeof operations[number];
 
 export type SaaSOperations = "";
 
@@ -7,7 +14,7 @@ export type WinOperations =
   | "about.apiDescription"
   | "about.apiRelations"
   | "about.enums"
-  | "about.openApi|"
+  | "about.openApi"
   | "about.get"
   | "app.upload"
   | "app.remove"
@@ -17,9 +24,16 @@ export type WinOperations =
   | "app.switch"
   | "app.get"
   | "stream.get"
+  | "certificate.export"
   | "stream.remove"
   | "stream.update"
+  | "virtualProxy.create"
+  | "virtualProxy.update"
+  | "node.get"
   | "continue"
+  | "tag.create"
+  | "tag.update"
+  | "tag.remove"
   | "debug";
 
 export interface ITask {
@@ -32,7 +46,9 @@ export interface ITask {
   details?: TaskDetails;
   onError?: {
     exit?: boolean;
-    tasks: ITask[];
+    continue?: boolean;
+    ignore?: boolean;
+    tasks?: ITask[];
   };
   // | ITaskDetailsStream
   // | ITaskDetailsApp
@@ -70,7 +86,20 @@ export interface IRunBook {
   tasks: ITask[];
 }
 
-type TaskDetails = IAppPublish | IAppUpdate;
+export interface IAppUpload {
+  name: string;
+  file: Buffer;
+  keepData?: boolean;
+  excludeDataConnections?: boolean;
+}
+
+type TaskDetails =
+  | IAppPublish
+  | IAppUpdate
+  | IVirtualProxyUpdate
+  | IVirtualProxyCreate
+  | IAppUpload
+  | ICertificateExportParameters;
 
 interface IAppPublish {
   name?: string;
