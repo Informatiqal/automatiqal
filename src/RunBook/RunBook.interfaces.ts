@@ -1,8 +1,16 @@
 import { ICertificateExportParameters } from "qlik-repo-api/dist/Certificate";
 import {
+  ICustomPropertyCreate,
+  ICustomPropertyUpdate,
+} from "qlik-repo-api/dist/CustomProperties";
+import {
   IVirtualProxyUpdate,
   IVirtualProxyCreate,
 } from "qlik-repo-api/dist/Proxy.interface";
+import {
+  ISystemRuleCreate,
+  ISystemRuleUpdate,
+} from "qlik-repo-api/dist/SystemRule.interface";
 // import { winOperations } from "../RunBook/Task";
 // const operations = [...winOperations.map((m) => m.name)] as const;
 // export type WinOperations = typeof operations[number];
@@ -16,24 +24,36 @@ export type WinOperations =
   | "about.enums"
   | "about.openApi"
   | "about.get"
-  | "app.upload"
-  | "app.remove"
-  | "app.update"
-  | "app.copy"
-  | "app.publish"
-  | "app.switch"
-  | "app.get"
   | "stream.get"
-  | "certificate.export"
+  | "stream.create"
   | "stream.remove"
   | "stream.update"
+  | "tag.get"
+  | "tag.create"
+  | "tag.remove"
+  | "tag.update"
+  | "customProperty.get"
+  | "customProperty.create"
+  | "customProperty.remove"
+  | "customProperty.update"
+  | "systemRule.get"
+  | "systemRule.create"
+  | "systemRule.remove"
+  | "systemRule.update"
+  | "app.copy"
+  | "app.export"
+  | "app.get"
+  | "app.publish"
+  | "app.remove"
+  | "app.switch"
+  | "app.update"
+  | "app.upload"
+  | "app.uploadAndReplace"
+  | "certificate.export"
   | "virtualProxy.create"
   | "virtualProxy.update"
   | "node.get"
   | "continue"
-  | "tag.create"
-  | "tag.update"
-  | "tag.remove"
   | "debug";
 
 export interface ITask {
@@ -99,6 +119,10 @@ type TaskDetails =
   | IVirtualProxyUpdate
   | IVirtualProxyCreate
   | IAppUpload
+  | ISystemRuleCreate
+  | ISystemRuleUpdate
+  | ICustomPropertyCreate
+  | ICustomPropertyUpdate
   | ICertificateExportParameters;
 
 interface IAppPublish {

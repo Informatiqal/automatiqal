@@ -33,6 +33,22 @@ export const winOperations: {
   { name: "tag.create", isNonSource: true, type: "Tag", isPlural: true },
   { name: "tag.update", isNonSource: false, type: "Tag" },
   { name: "tag.remove", isNonSource: false, type: "Tag" },
+  {
+    name: "customProperty.create",
+    isNonSource: true,
+    type: "CustomProperty",
+    isPlural: true,
+  },
+  {
+    name: "customProperty.update",
+    isNonSource: false,
+    type: "CustomProperty",
+  },
+  {
+    name: "customProperty.remove",
+    isNonSource: false,
+    type: "CustomProperty",
+  },
 ];
 
 // TODO: add all required tasks
@@ -62,21 +78,34 @@ export class Task {
   // TODO: can this be simplified?!
   async process(): Promise<IRunBookResult[]> {
     const a = this.task.operation.split(".");
+    const op = winOperations.filter((o) => o.name == this.task.operation)[0];
 
     // some tasks have to be "renamed" to match the corresponding method
     // for example:
     //    virtualProxy -> virtualProxies
     //    customProperty -> customProperties
-    if (a[0].substring(a[0].length - 1) == "y")
+    if (a[0].substring(a[0].length - 1) == "y" && op.isPlural)
       a[0] = `${a[0].substring(0, a[0].length - 1)}ies`;
 
     // if the task do NOT require initial data (filter or source)
     // for example about.*, app.import etc
     if (this.isNoSource) {
       if (nonSourceOperationsPlural.indexOf(this.task.operation) == -1)
-        return await this.instance[a[0]][a[1]](this.task.details || {});
+        return await this.instance[a[0]]
+          [a[1]](this.task.details || {})
+          .catch((e) => {
+            e.message = `REST communication error! ${e.message}`;
+            e.stack = "";
+            throw e;
+          });
 
-      return await this.instance[`${a[0]}s`][a[1]](this.task.details || {});
+      return await this.instance[`${a[0]}s`]
+        [a[1]](this.task.details || {})
+        .catch((e) => {
+          e.message = `REST communication error! ${e.message}`;
+          e.stack = "";
+          throw e;
+        });
     }
 
     // if the task require initial data
@@ -91,7 +120,7 @@ export class Task {
     // loop though all elements and call the method in each element
     return await Promise.all(
       this.objectsData.data.map(async (obj) => {
-        // let a1 = 1;
+        let a1 = 1;
         return obj[a[1]](this.task.details);
       })
     );

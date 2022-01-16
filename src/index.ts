@@ -1,5 +1,4 @@
-// import { QlikRepoApi } from "qlik-repo-api";
-import { QlikRepoApi } from "../../qlik-repo-api/src/index";
+import { QlikRepoApi } from "qlik-repo-api";
 import { QlikSaaSApi } from "qlik-saas-api";
 
 import { IRunBookResult, ITaskResult, Runner } from "./RunBook/Runner";
