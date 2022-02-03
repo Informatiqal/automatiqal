@@ -2,64 +2,10 @@ import { IRunBookResult } from "./Runner";
 import { ITask } from "./RunBook.interfaces";
 import { CustomError } from "../util/CustomError";
 import { Debugger } from "../util/Debugger";
+import { WinOperations } from "../util/WinOperations";
 import { QlikRepoApi } from "qlik-repo-api";
 
-export const winOperations: {
-  name: string;
-  isNonSource: boolean;
-  type?: string;
-  isPlural?: boolean;
-}[] = [
-  { name: "about.apiDefaults", isNonSource: true },
-  { name: "about.apiDescription", isNonSource: true },
-  { name: "about.apiRelations", isNonSource: true },
-  { name: "about.enums", isNonSource: true },
-  { name: "about.openApi", isNonSource: true },
-  { name: "about.get", isNonSource: true },
-  { name: "app.upload", isNonSource: true, type: "App", isPlural: true },
-  { name: "app.remove", isNonSource: false, type: "App" },
-  { name: "app.update", isNonSource: false, type: "App" },
-  { name: "app.copy", isNonSource: false, type: "App" },
-  { name: "app.publish", isNonSource: false, type: "App" },
-  { name: "app.switch", isNonSource: false, type: "App" },
-  { name: "app.get", isNonSource: false, type: "App" },
-  { name: "stream.get", isNonSource: false, type: "Stream" },
-  { name: "certificate.export", isNonSource: true },
-  { name: "stream.remove", isNonSource: false, type: "Stream" },
-  { name: "stream.update", isNonSource: false, type: "Stream" },
-  { name: "virtualProxy.create", isNonSource: true, type: "VirtualProxy" },
-  { name: "virtualProxy.update", isNonSource: false, type: "VirtualProxy" },
-  { name: "node.get", isNonSource: false, type: "Node" },
-  { name: "tag.create", isNonSource: true, type: "Tag", isPlural: true },
-  { name: "tag.update", isNonSource: false, type: "Tag" },
-  { name: "tag.remove", isNonSource: false, type: "Tag" },
-  {
-    name: "customProperty.create",
-    isNonSource: true,
-    type: "CustomProperty",
-    isPlural: true,
-  },
-  {
-    name: "customProperty.update",
-    isNonSource: false,
-    type: "CustomProperty",
-  },
-  {
-    name: "customProperty.remove",
-    isNonSource: false,
-    type: "CustomProperty",
-  },
-];
-
-// TODO: add all required tasks
-export const nonSourceOperations = winOperations
-  .filter((o) => o.isNonSource == true)
-  .map((o) => o.name);
-
-export const nonSourceOperationsPlural = winOperations
-  .filter((o) => o.isPlural == true)
-  .map((o) => o.name);
-
+const winOperations = new WinOperations();
 export class Task {
   task: ITask;
   instance: QlikRepoApi.client;
@@ -78,7 +24,7 @@ export class Task {
   // TODO: can this be simplified?!
   async process(): Promise<IRunBookResult[]> {
     const a = this.task.operation.split(".");
-    const op = winOperations.filter((o) => o.name == this.task.operation)[0];
+    const op = winOperations.filter(this.task.operation);
 
     // some tasks have to be "renamed" to match the corresponding method
     // for example:
@@ -90,9 +36,12 @@ export class Task {
     // if the task do NOT require initial data (filter or source)
     // for example about.*, app.import etc
     if (this.isNoSource) {
-      if (nonSourceOperationsPlural.indexOf(this.task.operation) == -1)
+      if (
+        winOperations.nonSourceOperationsPlural.indexOf(this.task.operation) ==
+        -1
+      )
         return await this.instance[a[0]]
-          [a[1]](this.task.details || {})
+          [a[1]](this.task.details || {}, this.task.options)
           .catch((e) => {
             e.message = `REST communication error! ${e.message}`;
             e.stack = "";
@@ -100,7 +49,7 @@ export class Task {
           });
 
       return await this.instance[`${a[0]}s`]
-        [a[1]](this.task.details || {})
+        [a[1]](this.task.details || {}, this.task.options)
         .catch((e) => {
           e.message = `REST communication error! ${e.message}`;
           e.stack = "";
@@ -114,14 +63,17 @@ export class Task {
     // check if the previous data is an array
     // and if its not then call the method directly
     if (!Array.isArray(this.objectsData.data))
-      return await this.objectsData.data[a[1]](this.task.details || {});
+      return await this.objectsData.data[a[1]](
+        this.task.details || {},
+        this.task.options
+      );
 
     // if the previous data is an array
     // loop though all elements and call the method in each element
     return await Promise.all(
       this.objectsData.data.map(async (obj) => {
         let a1 = 1;
-        return obj[a[1]](this.task.details);
+        return obj[a[1]](this.task.details, this.task.options);
       })
     );
   }
@@ -135,7 +87,7 @@ export class Task {
     if (this.task.filter && this.task.source == "")
       throw new CustomError(1009, this.task.name);
 
-    if (nonSourceOperations.indexOf(this.task.operation) > -1) {
+    if (winOperations.nonSourceOperations.indexOf(this.task.operation) > -1) {
       this.isNoSource = true;
       return;
     }

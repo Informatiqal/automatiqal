@@ -63,6 +63,10 @@ export interface ITask {
   filter?: string;
   source?: string;
   //   onError?: ITask[];
+  options?: {
+    appendCustomProperties?: boolean;
+    appendTags?: boolean;
+  };
   details?: TaskDetails;
   onError?: {
     exit?: boolean;
@@ -101,6 +105,8 @@ export interface IRunBook {
     authentication: {
       user_dir: string;
       user_name: string;
+      cert?: string;
+      key?: string;
     };
   };
   tasks: ITask[];

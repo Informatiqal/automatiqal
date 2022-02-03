@@ -19,7 +19,7 @@ export class CustomError extends Error {
   messages: { [key: string]: string } = {
     1000: `Nothing to process. No tasks are specified`,
     1001: `Invalid edition value. Valid editions are "windows" or "saas". Provided value "%{arg1}"`,
-    1002: `Duplicate task name(s). Duplicated names: %{arg1}`,
+    1002: `Initial checks: Task names duplications. Duplicated names: %{arg1}`,
     1003: `No "source" or "filter" is provided for task "%{arg1}"`,
     1004: `Task "%{arg1}" aborted. 0 objects will be affected`,
     1005: `Task "%{arg1}" will be performed on multiple objects. Specify "config.multiple = true" to override`,
@@ -28,6 +28,10 @@ export class CustomError extends Error {
     1008: `Task "%{arg1}" aborted. Task "filter" is provided but the filter is empty`,
     1009: `Task "%{arg1}" aborted. Task "source" is provided but the filter is empty"`,
     1010: `Task "%{arg1}" aborted. Task "operation" is required"`,
+    1011: `Task "%{arg1}" aborted. %{arg2}`,
+    1012: `Task "%{arg1}" aborted. "operation" property is missing`,
+    1013: `Initial checks: Non existing operations found: %{arg1}`,
+    1014: `Initial checks: Source/filter for tasks is required: %{arg1}`,
   };
 
   constructor(code: number, taskName: string, params?: IErrorParams) {
@@ -59,6 +63,7 @@ export class CustomError extends Error {
       }
     }
 
+    this.emitter.emit("runbook:log", `FAILED! ${this.taskName}`);
     this.emitter.emit("error", this.message);
   }
 }

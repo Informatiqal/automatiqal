@@ -1,6 +1,6 @@
 {
   "name": "automatiqal",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Automate Qlik deployments",
   "author": {
     "email": "info@informatiqal.com",
@@ -17,7 +17,9 @@
     "build-tsc": "tsc",
     "build": "rollup -c",
     "watch": "rollup -cw",
-    "docs": "npx typedoc src/index.doc.ts --name \"Automatiqal\" --excludePrivate --hideGenerator"
+    "docs": "npx typedoc src/index.doc.ts --name \"Automatiqal\" --excludePrivate --hideGenerator --darkHighlightTheme dark-plus",
+    "test": "set TS_NODE_PROJECT=tsconfig.test.json&mocha --require ts-node/register test/**/*.spec.ts",
+    "test-badge": "set TS_NODE_PROJECT=tsconfig.test.json&mocha --reporter .\\node_modules\\mocha-badge-generator\\src --reporter-options=badge_format=svg,badge_output=badge.svg --require ts-node/register test/**/*.spec.ts"
   },
   "keywords": [
     "qlik",
@@ -51,18 +53,18 @@
     "@types/node": "^15.12.0",
     "chai": "^4.3.4",
     "dotenv": "^10.0.0",
-    "mocha": "^8.4.0",
+    "mocha": "^8.1.3",
     "nyc": "^15.1.0",
     "rollup": "^2.56.2",
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-typescript2": "^0.30.0",
     "ts-node": "^10.0.0",
-    "typedoc": "^0.21.5",
+    "typedoc": "^0.22.11",
     "typescript": "^4.3.2"
   },
   "dependencies": {
     "events": "^3.3.0",
-    "qlik-repo-api": "^0.1.10",
+    "qlik-repo-api": "^0.1.13",
     "qlik-saas-api": "^0.0.20"
   }
 }

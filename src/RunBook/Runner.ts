@@ -2,10 +2,13 @@ import { QlikRepoApi } from "qlik-repo-api";
 // import { QlikSaaSApi } from "qlik-saas-api";
 // import { CustomError } from "../util/CustomError";
 import { IRunBook, ITask } from "./RunBook.interfaces";
-import { Task, nonSourceOperations } from "./Task";
+import { Task } from "./Task";
 import { Debugger } from "../util/Debugger";
 import { EventsBus } from "../util/EventBus";
+import { CustomError } from "../util/CustomError";
+import { WinOperations } from "../util/WinOperations";
 
+const winOperations = new WinOperations();
 export interface IRunBookResult {
   task: string;
   // result: ITaskResult;
@@ -53,7 +56,7 @@ export class Runner {
   private async getFilterItems(task: ITask): Promise<any> {
     const a = task.operation.split(".");
 
-    if (nonSourceOperations.indexOf(task.operation) > -1) {
+    if (winOperations.nonSourceOperations.indexOf(task.operation) > -1) {
       this.debug.print(task.name, "0");
       return {};
     }
@@ -77,12 +80,18 @@ export class Runner {
   }
 
   private async taskProcessing(t: ITask) {
+    if (!t.operation) throw new CustomError(1012, t.name, { arg1: t.name });
     // TODO: data should have type!
     // get the data for the object on which the operation will be performed
     // either from querying QRS (calling /XXX/filter)
     // or from result of previous task
     const data = !t.source
-      ? await this.getFilterItems(t)
+      ? await this.getFilterItems(t).catch((e) => {
+          throw new CustomError(1011, t.name, {
+            arg1: t.name,
+            arg2: e.message,
+          });
+        })
       : this.taskResults.find((a) => a.task.name == t.source);
 
     // process the task, push the result to taskResult variable
@@ -110,6 +119,7 @@ export class Runner {
           status: "completed",
         };
         this.emitter.emit("task:result", result);
+        this.emitter.emit("runbook:log", `${task.task.name} complete`);
         this.taskResults.push(result);
         this.emitter.emit("runbook:result", this.taskResults);
         return result;
