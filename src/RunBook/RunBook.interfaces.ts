@@ -54,6 +54,7 @@ export type WinOperations =
   | "virtualProxy.update"
   | "node.get"
   | "continue"
+  | "contentLibrary.getAll"
   | "debug";
 
 export interface ITask {
@@ -66,7 +67,10 @@ export interface ITask {
   options?: {
     appendCustomProperties?: boolean;
     appendTags?: boolean;
+    multiple?: boolean;
+    allowZero?: boolean;
   };
+  location?: string;
   details?: TaskDetails;
   onError?: {
     exit?: boolean;
@@ -82,12 +86,6 @@ export interface ITask {
   // | ITaskDetailsReloadTask
   // | ITaskDetailsVirtualProxy
   // | ITaskDetailsUser;
-  config?: {
-    multiple?: boolean;
-    allowZero?: boolean;
-    // createStream?: boolean;
-    // skipData?: boolean;
-  };
 }
 
 export type TraceLevels = "error" | "debug";
@@ -103,10 +101,11 @@ export interface IRunBook {
     port?: number;
     proxy?: string;
     authentication: {
-      user_dir: string;
-      user_name: string;
+      user_dir?: string;
+      user_name?: string;
       cert?: string;
       key?: string;
+      token?: string;
     };
   };
   tasks: ITask[];

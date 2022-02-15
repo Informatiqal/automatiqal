@@ -26,7 +26,7 @@ export interface ITaskResult {
   data: IRunBookResult[];
   task: ITask;
   timings: ITaskTimings;
-  status: "completed" | "error" | "skip";
+  status: "Completed" | "Error" | "Skip";
 }
 
 export class Runner {
@@ -116,7 +116,7 @@ export class Runner {
           task: t,
           timings: timings,
           data: taskResult,
-          status: "completed",
+          status: "Completed",
         };
         this.emitter.emit("task:result", result);
         this.emitter.emit("runbook:log", `${task.task.name} complete`);
@@ -127,7 +127,7 @@ export class Runner {
     } catch (e) {
       this.taskResults.push({
         task: t,
-        status: "error",
+        status: "Error",
         data: [],
         timings: { start: "", end: "", totalSeconds: -1 },
       });

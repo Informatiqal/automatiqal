@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.0.6] - 2022-02-15
+
+### Added
+
+- check for invalid custom property name (when created)
+- multiple task related changes
+  - handle `export` and `exportMany` operations (including saving the files)
+- more error messages
+- a lot more operations are supported
+
 ## [0.0.5] - 2022-02-03
 
 ### Added

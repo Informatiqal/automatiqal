@@ -72,6 +72,18 @@ export class Automatiqal {
       errors.push(e.context);
     }
 
+    try {
+      this.checkCustomPropertiesName();
+    } catch (e) {
+      errors.push(e.context);
+    }
+
+    try {
+      this.checkCorrectSource();
+    } catch (e) {
+      errors.push(e.context);
+    }
+
     if (errors.length > 0) throw new Error(errors.join("\n"));
 
     if (this.runBook.edition != "windows" && this.runBook.edition != "saas")
@@ -130,4 +142,28 @@ export class Automatiqal {
         arg1: nonExistingOps.join(", "),
       });
   }
+
+  private checkCustomPropertiesName() {
+    const cpRelatesTasks = this.runBook.tasks.filter(
+      (t) =>
+        t.operation == "customProperty.update" ||
+        t.operation == "customProperty.create"
+    );
+
+    const incorrectValues = cpRelatesTasks
+      .map((t) => {
+        const a = /^[A-Za-z0-9_]+$/.test((t.details as any).name);
+        if (a == false) return (t.details as any).name;
+
+        return undefined;
+      })
+      .filter((v) => v != undefined);
+
+    if (incorrectValues.length > 0)
+      throw new CustomError(1015, "RunBook", {
+        arg1: incorrectValues.join(", "),
+      });
+  }
+
+  private checkCorrectSource() {}
 }
