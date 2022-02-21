@@ -61,6 +61,21 @@ const customProperty: IWinOperation[] = [
   },
 ];
 
+const compositeTrigger: IWinOperation[] = [
+  {
+    name: "compositeTrigger.remove",
+    isNonSource: false,
+    type: "CompositeTrigger",
+    isPlural: false,
+  },
+  {
+    name: "compositeTrigger.update",
+    isNonSource: false,
+    type: "CompositeTrigger",
+    isPlural: false,
+  },
+];
+
 const contentLibrary: IWinOperation[] = [
   { name: "contentLibrary.get", isNonSource: false, type: "ContentLibrary" },
   {
@@ -258,19 +273,31 @@ const reloadTask: IWinOperation[] = [
     name: "reloadTask.addTriggerSchema",
     isNonSource: false,
     type: "ReloadTask",
+    isPlural: true,
+  },
+  {
+    name: "reloadTask.addTriggerComposite",
+    isNonSource: false,
+    type: "ReloadTask",
     isPlural: false,
   },
   {
     name: "reloadTask.addTriggerMany",
     isNonSource: false,
     type: "ReloadTask",
-    isPlural: false,
+    isPlural: true,
   },
   {
     name: "reloadTask.create",
     isNonSource: true,
     type: "ReloadTask",
     isPlural: true,
+  },
+  {
+    name: "reloadTask.remove",
+    isNonSource: false,
+    type: "ReloadTask",
+    isPlural: false,
   },
   {
     name: "reloadTask.get",
@@ -438,6 +465,7 @@ const winOperations: IWinOperation[] = [
   ...app,
   ...certificate,
   ...contentLibrary,
+  ...compositeTrigger,
   ...customProperty,
   ...dataConnection,
   ...extension,

@@ -1,4 +1,5 @@
 import { ICertificateExportParameters } from "qlik-repo-api/dist/Certificate";
+import { ITaskCreateTriggerComposite } from "qlik-repo-api/dist/Task.interface";
 import {
   ICustomPropertyCreate,
   ICustomPropertyUpdate,
@@ -24,25 +25,11 @@ export type WinOperations =
   | "about.enums"
   | "about.openApi"
   | "about.get"
-  | "stream.get"
-  | "stream.create"
-  | "stream.remove"
-  | "stream.update"
-  | "tag.get"
-  | "tag.create"
-  | "tag.remove"
-  | "tag.update"
-  | "customProperty.get"
-  | "customProperty.create"
-  | "customProperty.remove"
-  | "customProperty.update"
-  | "systemRule.get"
-  | "systemRule.create"
-  | "systemRule.remove"
-  | "systemRule.update"
   | "app.copy"
-  | "app.export"
   | "app.get"
+  | "app.getAll"
+  | "app.export"
+  | "app.exportMany"
   | "app.publish"
   | "app.remove"
   | "app.switch"
@@ -50,11 +37,88 @@ export type WinOperations =
   | "app.upload"
   | "app.uploadAndReplace"
   | "certificate.export"
-  | "virtualProxy.create"
-  | "virtualProxy.update"
-  | "node.get"
-  | "continue"
+  | "certificate.distributionPathGet"
+  | "contentLibrary.get"
   | "contentLibrary.getAll"
+  | "contentLibrary.importFile"
+  | "contentLibrary.importFileMany"
+  | "contentLibrary.removeFile"
+  | "contentLibrary.removeFileMany"
+  | "contentLibrary.importForApp"
+  | "contentLibrary.export"
+  | "contentLibrary.exportMany"
+  | "contentLibrary.create"
+  | "contentLibrary.update"
+  | "contentLibrary.remove"
+  | "compositeTrigger.remove"
+  | "compositeTrigger.update"
+  | "customProperty.create"
+  | "customProperty.update"
+  | "customProperty.remove"
+  | "dataConnection.get"
+  | "dataConnection.getAll"
+  | "dataConnection.create"
+  | "dataConnection.remove"
+  | "dataConnection.update"
+  | "extension.get"
+  | "extension.getAll"
+  | "extension.import"
+  | "extension.remove"
+  | "extension.update"
+  | "externalTask.addTriggerSchema"
+  | "externalTask.addTriggerMany"
+  | "externalTask.create"
+  | "externalTask.get"
+  | "externalTask.getAll"
+  | "externalTask.start"
+  | "externalTask.startSynchronous"
+  | "externalTask.update"
+  | "externalTask.waitExecution"
+  | "externalTask.remove"
+  | "node.get"
+  | "node.getAll"
+  | "reloadTask.addTriggerSchema"
+  | "reloadTask.addTriggerComposite"
+  | "reloadTask.addTriggerMany"
+  | "reloadTask.create"
+  | "reloadTask.get"
+  | "reloadTask.getAll"
+  | "reloadTask.start"
+  | "reloadTask.startSynchronous"
+  | "reloadTask.update"
+  | "reloadTask.waitExecution"
+  | "reloadTask.remove"
+  | "stream.create"
+  | "stream.get"
+  | "stream.getAll"
+  | "stream.remove"
+  | "stream.update"
+  | "systemRule.create"
+  | "systemRule.get"
+  | "systemRule.getAll"
+  | "systemRule.remove"
+  | "systemRule.licenseCreate"
+  | "systemRule.update"
+  | "tag.create"
+  | "tag.createMany"
+  | "tag.remove"
+  | "tag.update"
+  | "task.get"
+  | "task.getAll"
+  | "task.start"
+  | "task.startSynchronous"
+  | "task.stop"
+  | "virtualProxy.get"
+  | "virtualProxy.getAll"
+  | "virtualProxy.create"
+  | "virtualProxy.remove"
+  | "virtualProxy.update"
+  | "user.get"
+  | "user.getAll"
+  | "user.create"
+  | "user.remove"
+  | "user.update"
+  | "continue"
   | "debug";
 
 export interface ITask {
@@ -63,6 +127,7 @@ export interface ITask {
   operation?: WinOperations | SaaSOperations;
   filter?: string;
   source?: string;
+  skip?: boolean;
   //   onError?: ITask[];
   options?: {
     appendCustomProperties?: boolean;
@@ -94,7 +159,7 @@ export type QlikEditions = "saas" | "windows";
 export interface IRunBook {
   name: string;
   description: string;
-  edition: QlikEditions;
+  edition?: QlikEditions;
   trace?: TraceLevels;
   environment: {
     host: string;
@@ -128,7 +193,8 @@ type TaskDetails =
   | ISystemRuleUpdate
   | ICustomPropertyCreate
   | ICustomPropertyUpdate
-  | ICertificateExportParameters;
+  | ICertificateExportParameters
+  | ITaskCreateTriggerComposite;
 
 interface IAppPublish {
   name?: string;

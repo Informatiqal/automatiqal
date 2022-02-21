@@ -47,7 +47,7 @@ export class Runner {
     //return await Promise.all(
     // this.runBook.tasks.forEach(async (t) => {
     for (let t of this.runBook.tasks) {
-      await this.taskProcessing(t);
+      if (!t.skip) await this.taskProcessing(t);
     }
 
     return this.taskResults;

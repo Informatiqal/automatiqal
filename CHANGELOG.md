@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.7] - 2022-02-XX
+
+### Added
+
+- `skip` parameter can be added to each task. If `skip` is set to `true` then the task will be ignored
+- updated list with allowed operations
+- `environment` parameter is optional. It defaults to `windows` is missing [#5](https://github.com/Informatiqal/automatiqal/issues/5)
+
 ## [0.0.6] - 2022-02-15
 
 ### Added

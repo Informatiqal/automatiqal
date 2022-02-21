@@ -4,9 +4,9 @@ NOT AFFILIATED WITH QLIK
 
 # Automatiqal
 
-`Automatiqal` is a `NodeJS` package that helps automating the interactions with `Qlik Repository API` and Qlik SaaS (both are REST API)
+`Automatiqal` is a `NodeJS` package that helps automating the interactions with `Qlik Repository API`.
 
-`Automatiqal` accepts formatted JSON objects as an input (more on it below) and process the described automation tasks
+`Automatiqal` accepts formatted JSON objects as an input (more on it below) and process the described automation tasks.
 
 ---
 
@@ -81,7 +81,7 @@ const runBookConfig: IRunBook = {
       },
     },
     {
-      name: "App tag",
+      name: "Tag application",
       operation: "app.update",
       filter: "name eq 'Automatiqal'",
       details: {
@@ -100,4 +100,4 @@ const result = await automatiqal.run();
 `Automatiqal` can be used by itself and imported in any app/package via `npm`. But there are couple products, from `Automatiqal` "family" where this package is used:
 
 - [Automatiqal CLI](https://github.com/Informatiqal/automatiqal-cli) - describe the automation tasks in json/yaml file and the CLI will run the process
-- [Automatiqal Runner](https://github.com/Informatiqal/automatiqal-cli) - long running process that is constantly monitoring specific folder and as soon as new (runbook) file appears there it will start processing it.
+- [Automatiqal Runner](https://github.com/Informatiqal/automatiqal-runner) (WIP) - long running process that is constantly monitoring specific folder and as soon as new (runbook) file appears there it will start processing it.

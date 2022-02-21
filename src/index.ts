@@ -86,6 +86,8 @@ export class Automatiqal {
 
     if (errors.length > 0) throw new Error(errors.join("\n"));
 
+    if (!this.runBook.edition) this.runBook.edition = "windows";
+
     if (this.runBook.edition != "windows" && this.runBook.edition != "saas")
       throw new CustomError(1001, "RunBook", { arg1: this.runBook.edition });
   }

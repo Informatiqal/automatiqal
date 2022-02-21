@@ -22,6 +22,7 @@ export class Task {
   }
 
   // TODO: can this be simplified?!
+  // .. This definitely requires refactoring!!!
   async process(): Promise<IRunBookResult[]> {
     const a = this.task.operation.split(".");
     const op = winOperations.filter(this.task.operation);
@@ -60,6 +61,7 @@ export class Task {
 
     // if the task do NOT require initial data (filter or source)
     // for example about.*, app.import etc
+
     if (this.isNoSource) {
       if (
         winOperations.nonSourceOperationsPlural.indexOf(this.task.operation) ==
@@ -87,18 +89,42 @@ export class Task {
     // if the task require initial data
     if (a[1] == "get" || a[1] == "getAll") return this.objectsData.data; //.map((d) => d.details);
 
-    if (!Array.isArray(this.objectsData.data))
+    // Tasks ... again.
+    // It task create or update we have to pass the apps
+    // data from the filter or source result
+    // and call the task method not the object (App) method
+    // if (
+    //   (a[0] == "reloadTask" || a[0] == "externalTask") &&
+    //   (a[1] == "create" || a[1] == "update")
+    // ) {
+    //   const appData = !Array.isArray(this.objectsData.data)
+    //     ? [this.objectsData.data]
+    //     : this.objectsData.data;
+
+    //   return await Promise.all(
+    //     appData.map((app) => {
+    //       return this.instance[`${a[0]}s`][a[1]]({
+    //         ...this.task.details,
+    //         id: appData[0].details.id,
+    //       });
+    //     })
+    //   );
+    // }
+
+    if (!Array.isArray(this.objectsData.data)) {
       // check if the previous data is an array
       // and if its not then call the method directly
       return await this.objectsData.data[a[1]](
         this.task.details || {},
         this.task.options
       );
+    }
 
     // if the previous data is an array
     // loop though all elements and call the method in each element
     return await Promise.all(
       this.objectsData.data.map(async (obj) => {
+        // let a1 = 1;
         return obj[a[1]](this.task.details, this.task.options);
       })
     );
