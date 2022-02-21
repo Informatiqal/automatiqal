@@ -124,7 +124,7 @@ export type WinOperations =
 export interface ITask {
   name: string;
   description?: string;
-  operation?: WinOperations | SaaSOperations;
+  operation: WinOperations | SaaSOperations;
   filter?: string;
   source?: string;
   skip?: boolean;
@@ -183,7 +183,7 @@ export interface IAppUpload {
   excludeDataConnections?: boolean;
 }
 
-type TaskDetails =
+export type TaskDetails =
   | IAppPublish
   | IAppUpdate
   | IVirtualProxyUpdate

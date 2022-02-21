@@ -1,6 +1,13 @@
 # Changelog
 
-## [0.0.7] - 2022-02-XX
+## [0.0.8] - 2022-02-21
+
+### Changed
+
+- `operation` parameter for tasks is mandatory
+- documentation preparations
+
+## [0.0.7] - 2022-02-21
 
 ### Added
 

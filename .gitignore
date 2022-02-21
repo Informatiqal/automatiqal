@@ -6,6 +6,7 @@ temp.md
 .VSCodeCounter
 src/main.doc.ts
 .npmrc
+src/index.doc.ts
 # Logs
 logs
 *.log
