@@ -8,15 +8,29 @@ import { EventsBus } from "./util/EventBus";
 import { WinOperations } from "./util/WinOperations";
 
 const winOperations = new WinOperations();
+
+type initialChecksNames =
+  | "checkDuplicateTasks"
+  | "checkWrongOperation"
+  | "checkMissingSource"
+  | "checkCustomPropertiesName"
+  | "checkCorrectSource";
+
 export class Automatiqal {
   private runBook: IRunBook;
   private restInstance: QlikRepoApi.client | QlikSaaSApi.client;
   private runner: Runner;
+  private initialChecksList: initialChecksNames[];
   emitter: EventsBus;
 
-  constructor(runBook: IRunBook, httpsAgent?: any) {
+  constructor(
+    runBook: IRunBook,
+    httpsAgent?: any,
+    initialChecksList?: initialChecksNames[]
+  ) {
     this.runBook = runBook;
     this.emitter = new EventsBus();
+    this.initialChecksList = initialChecksList;
 
     // set default trace level if not provided in the run book
     if (!this.runBook.trace) this.runBook.trace = "error";
@@ -54,34 +68,91 @@ export class Automatiqal {
 
     let errors: string[] = [];
 
-    try {
-      this.checkDuplicateTasks();
-    } catch (e) {
-      errors.push(e.context);
+    if (!this.initialChecksList) {
+      console.log(
+        `INFO: No "initialChecksList" specified. Running all initial checks ...`
+      );
     }
 
-    try {
-      this.checkWrongOperation();
-    } catch (e) {
-      errors.push(e.context);
+    if (this.initialChecksList) {
+      console.log(
+        `INFO: "initialChecksList" specified. Running only ${this.initialChecksList.join(
+          `, `
+        )}`
+      );
     }
 
-    try {
-      this.checkMissingSource();
-    } catch (e) {
-      errors.push(e.context);
-    }
+    // TODO: anyway to solve this in a different way?
+    if (!this.initialChecksList || this.initialChecksList.length == 0) {
+      try {
+        this.checkDuplicateTasks();
+      } catch (e) {
+        errors.push(e.context);
+      }
 
-    try {
-      this.checkCustomPropertiesName();
-    } catch (e) {
-      errors.push(e.context);
-    }
+      try {
+        this.checkWrongOperation();
+      } catch (e) {
+        errors.push(e.context);
+      }
 
-    try {
-      this.checkCorrectSource();
-    } catch (e) {
-      errors.push(e.context);
+      try {
+        this.checkMissingSource();
+      } catch (e) {
+        errors.push(e.context);
+      }
+
+      try {
+        this.checkCustomPropertiesName();
+      } catch (e) {
+        errors.push(e.context);
+      }
+
+      try {
+        this.checkCorrectSource();
+      } catch (e) {
+        errors.push(e.context);
+      }
+    } else {
+      if (this.initialChecksList.includes("checkDuplicateTasks")) {
+        try {
+          this.checkDuplicateTasks();
+        } catch (e) {
+          errors.push(e.context);
+        }
+      }
+
+      if (this.initialChecksList.includes("checkWrongOperation")) {
+        try {
+          this.checkWrongOperation();
+        } catch (e) {
+          errors.push(e.context);
+        }
+      }
+
+      if (this.initialChecksList.includes("checkMissingSource")) {
+        try {
+          this.checkMissingSource();
+        } catch (e) {
+          errors.push(e.context);
+        }
+      }
+
+      if (this.initialChecksList.includes("checkCustomPropertiesName")) {
+        try {
+          this.checkCustomPropertiesName();
+        } catch (e) {
+          errors.push(e.context);
+        }
+      }
+
+      if (this.initialChecksList.includes("checkCorrectSource")) {
+        try {
+          this.checkCorrectSource();
+        } catch (e) {
+          errors.push(e.context);
+        }
+      }
     }
 
     if (errors.length > 0) throw new Error(errors.join("\n"));
@@ -167,5 +238,35 @@ export class Automatiqal {
       });
   }
 
-  private checkCorrectSource() {}
+  private checkCorrectSource() {
+    // for tasks that are using "source" property
+    // check if the sourced tasks is of the same type
+    // as the current task. For example:
+    // if the sourced task is "app.get"
+    // and the current ask is "stream.update"
+    // its obvious that error will be returned from Qlik.
+    // No point of running the whole runbook if its known
+    // from the beginning that the task will fail
+
+    // TODO: any exclusions from this rule?
+    const tasksReturnTypes = winOperations.opTypes;
+
+    const opMismatchTasks = this.runBook.tasks
+      .filter((t) => t.hasOwnProperty("source"))
+      .filter((t) => {
+        const sourceTask = this.runBook.tasks.filter(
+          (ts) => ts.name == t.source
+        )[0];
+        const sourceReturnType = tasksReturnTypes[sourceTask.operation];
+
+        return sourceReturnType != tasksReturnTypes[t.operation];
+      })
+      .map((t) => `"${t.name}"`);
+
+    if (opMismatchTasks.length > 0) {
+      throw new CustomError(1016, "RunBook", {
+        arg1: opMismatchTasks.join(", "),
+      });
+    }
+  }
 }

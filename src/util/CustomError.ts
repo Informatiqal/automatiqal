@@ -33,6 +33,7 @@ export class CustomError extends Error {
     1013: `Initial checks: Non existing operations found: %{arg1}`,
     1014: `Initial checks: Source/filter for tasks is required: %{arg1}`,
     1015: `Initial checks: Wrong custom properties names: %{arg1}`,
+    1016: `Initial checks: Mismatch source and operation: %{arg1}`,
   };
 
   constructor(code: number, taskName: string, params?: IErrorParams) {

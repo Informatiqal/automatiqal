@@ -143,14 +143,6 @@ export interface ITask {
     ignore?: boolean;
     tasks?: ITask[];
   };
-  // | ITaskDetailsStream
-  // | ITaskDetailsApp
-  // | ITaskDetailsCustomProp
-  // | ITaskDetailsSecurityRule
-  // | ITaskDetailsContentLibrary
-  // | ITaskDetailsReloadTask
-  // | ITaskDetailsVirtualProxy
-  // | ITaskDetailsUser;
 }
 
 export type TraceLevels = "error" | "debug";
@@ -183,6 +175,7 @@ export interface IAppUpload {
   excludeDataConnections?: boolean;
 }
 
+// TODO: add all the missing types
 export type TaskDetails =
   | IAppPublish
   | IAppUpdate

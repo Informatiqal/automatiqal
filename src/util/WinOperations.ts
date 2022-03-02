@@ -6,12 +6,12 @@ interface IWinOperation {
 }
 
 const about: IWinOperation[] = [
-  { name: "about.apiDefaults", isNonSource: true },
-  { name: "about.apiDescription", isNonSource: true },
-  { name: "about.apiRelations", isNonSource: true },
-  { name: "about.enums", isNonSource: true },
-  { name: "about.openApi", isNonSource: true },
-  { name: "about.get", isNonSource: true },
+  { name: "about.apiDefaults", isNonSource: true, type: "About" },
+  { name: "about.apiDescription", isNonSource: true, type: "About" },
+  { name: "about.apiRelations", isNonSource: true, type: "About" },
+  { name: "about.enums", isNonSource: true, type: "About" },
+  { name: "about.openApi", isNonSource: true, type: "About" },
+  { name: "about.get", isNonSource: true, type: "About" },
 ];
 
 const app: IWinOperation[] = [
@@ -484,7 +484,18 @@ export class WinOperations {
   nonSourceOperations: string[];
   nonSourceOperationsPlural: string[];
   names: string[];
+  allOperations: IWinOperation[];
+  opTypes: { [key: string]: string };
   constructor() {
+    this.allOperations = winOperations;
+
+    let b: { [key: string]: string } = {};
+    for (let o of winOperations) {
+      b[o.name] = o.type;
+    }
+
+    this.opTypes = b;
+
     // TODO: add all required tasks
     this.nonSourceOperations = winOperations
       .filter((o) => o.isNonSource == true)

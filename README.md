@@ -16,7 +16,7 @@ NOT AFFILIATED WITH QLIK
 
 ## How to use
 
-First install from `npm`
+First install from `npm`:
 
 > `npm install --save automatiqal`
 

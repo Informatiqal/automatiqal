@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.9] - 2022-03-02
+
+### Added
+
+- option to specify which initial checks to be performed (default is all) [#8](https://github.com/Informatiqal/automatiqal/issues/8)
+- initial checks for source type - check if the `operation` of the current task is the same type as the `source` task [#2](https://github.com/Informatiqal/automatiqal/issues/2)
+
 ## [0.0.8] - 2022-02-21
 
 ### Changed
