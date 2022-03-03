@@ -26,7 +26,7 @@ export interface ITaskResult {
   data: IRunBookResult[];
   task: ITask;
   timings: ITaskTimings;
-  status: "Completed" | "Error" | "Skip";
+  status: "Completed" | "Error" | "Skip" | "Error (Force exit)";
 }
 
 export class Runner {
@@ -39,8 +39,8 @@ export class Runner {
     this.runBook = runBook;
     this.instance = instance;
     this.taskResults = [];
-    this.debug = new Debugger(this.runBook.trace);
     this.emitter = new EventsBus();
+    this.debug = new Debugger(this.runBook.trace, this.emitter);
   }
 
   async start(): Promise<ITaskResult[]> {
@@ -57,7 +57,7 @@ export class Runner {
     const a = task.operation.split(".");
 
     if (winOperations.nonSourceOperations.indexOf(task.operation) > -1) {
-      this.debug.print(task.name, "0");
+      // this.debug.print(task.name, "0");
       return {};
     }
 
@@ -75,7 +75,7 @@ export class Runner {
       filter: task.filter,
     });
 
-    this.debug.print(task.name, data.length);
+    // this.debug.print(task.name, data.length);
     return { data };
   }
 
@@ -133,10 +133,19 @@ export class Runner {
       });
       this.emitter.emit("runbook:result", this.taskResults);
 
-      // TODO: handle onError block section (if any)
-      if (t.onError) {
-        // let a = 1;
-        if (t.onError.ignore) return;
+      // ignore the error and continue with the next task
+      // (outside the onError block)
+      if (t.onError && t.onError.ignore) return;
+
+      // throw custom error if onError.exit is provided
+      if (t.onError && t.onError.exit) throw new CustomError(1017, t.name);
+
+      // if there are any tasks specified in onError block
+      // loop through them and run them as regular tasks
+      if (t.onError && t.onError.tasks.length > 0) {
+        for (let onErrorTask of t.onError.tasks) {
+          if (!onErrorTask.skip) await this.taskProcessing(onErrorTask);
+        }
       }
 
       if (!t.onError) throw e;

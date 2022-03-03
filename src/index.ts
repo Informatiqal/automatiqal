@@ -6,6 +6,7 @@ import { IRunBook, ITask } from "./RunBook/RunBook.interfaces";
 import { CustomError } from "./util/CustomError";
 import { EventsBus } from "./util/EventBus";
 import { WinOperations } from "./util/WinOperations";
+// import { Debugger } from "./util/Debugger";
 
 const winOperations = new WinOperations();
 
@@ -21,6 +22,7 @@ export class Automatiqal {
   private restInstance: QlikRepoApi.client | QlikSaaSApi.client;
   private runner: Runner;
   private initialChecksList: initialChecksNames[];
+  // debug: Debugger;
   emitter: EventsBus;
 
   constructor(
@@ -31,6 +33,7 @@ export class Automatiqal {
     this.runBook = runBook;
     this.emitter = new EventsBus();
     this.initialChecksList = initialChecksList;
+    // this.debug = new Debugger(this.runBook.trace, this.emitter);
 
     // set default trace level if not provided in the run book
     if (!this.runBook.trace) this.runBook.trace = "error";
@@ -68,19 +71,20 @@ export class Automatiqal {
 
     let errors: string[] = [];
 
-    if (!this.initialChecksList) {
-      console.log(
-        `INFO: No "initialChecksList" specified. Running all initial checks ...`
-      );
-    }
+    // if (!this.initialChecksList || this.initialChecks.length == 0) {
+    //   this.debug.print(
+    //     "",
+    //     `No "initialChecksList" specified. Running all initial checks ...`
+    //   );
+    // }
 
-    if (this.initialChecksList) {
-      console.log(
-        `INFO: "initialChecksList" specified. Running only ${this.initialChecksList.join(
-          `, `
-        )}`
-      );
-    }
+    // if (this.initialChecksList && this.initialChecks.length > 0)
+    //   this.debug.print(
+    //     "",
+    //     `"initialChecksList" specified. Running only ${this.initialChecksList.join(
+    //       `, `
+    //     )}`
+    //   );
 
     // TODO: anyway to solve this in a different way?
     if (!this.initialChecksList || this.initialChecksList.length == 0) {
