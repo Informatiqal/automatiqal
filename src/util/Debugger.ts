@@ -1,11 +1,14 @@
+import { EventsBus } from "./EventBus";
 import { TraceLevels } from "../RunBook/RunBook.interfaces";
 
 // TODO: this needs to be singleton
 export class Debugger {
   private static instance: Debugger;
+  private emitter: EventsBus;
   trace: TraceLevels;
-  constructor(trace?: TraceLevels) {
+  constructor(trace?: TraceLevels, emitter?: EventsBus) {
     this.trace = trace;
+    this.emitter = emitter;
 
     if (Debugger.instance) {
       return Debugger.instance;
@@ -17,8 +20,7 @@ export class Debugger {
   print(taskName: string, message: string): void {
     if (this.trace == "debug") {
       const time = this.getDateTime();
-
-      console.log(`DEBUG ${time}, ${taskName} - ${message}`);
+      this.emitter.emit("debug", `DEBUG ${time}, ${message}`);
     }
   }
 

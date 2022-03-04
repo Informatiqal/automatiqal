@@ -139,7 +139,7 @@ export interface ITask {
   details?: TaskDetails;
   onError?: {
     exit?: boolean;
-    continue?: boolean;
+    // continue?: boolean;
     ignore?: boolean;
     tasks?: ITask[];
   };

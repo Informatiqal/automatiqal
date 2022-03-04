@@ -17,10 +17,11 @@ type initialChecksNames =
   | "checkCorrectSource";
 
 export class Automatiqal {
-  private runBook: IRunBook;
-  private restInstance: QlikRepoApi.client | QlikSaaSApi.client;
-  private runner: Runner;
-  private initialChecksList: initialChecksNames[];
+  #runBook: IRunBook;
+  #tasksListFlat: ITask[];
+  #restInstance: QlikRepoApi.client | QlikSaaSApi.client;
+  #runner: Runner;
+  #initialChecksList: initialChecksNames[];
   emitter: EventsBus;
 
   constructor(
@@ -28,19 +29,23 @@ export class Automatiqal {
     httpsAgent?: any,
     initialChecksList?: initialChecksNames[]
   ) {
-    this.runBook = runBook;
+    this.#runBook = runBook;
+    this.#tasksListFlat = this.flatTask(this.#runBook.tasks);
     this.emitter = new EventsBus();
-    this.initialChecksList = initialChecksList;
+    this.#initialChecksList = initialChecksList;
 
     // set default trace level if not provided in the run book
-    if (!this.runBook.trace) this.runBook.trace = "error";
+    if (!this.#runBook.trace) this.#runBook.trace = "error";
+
+    // default the runbook to QSEoW edition
+    if (!this.#runBook.edition) this.#runBook.edition = "windows";
 
     // perform obvious checks before execution
     this.initialChecks();
 
     // if QSEoW - set up Qlik Repo client
     if (runBook.edition == "windows") {
-      this.restInstance = new QlikRepoApi.client({
+      this.#restInstance = new QlikRepoApi.client({
         port: runBook.environment.port,
         httpsAgent: httpsAgent,
         host: runBook.environment.host,
@@ -49,41 +54,27 @@ export class Automatiqal {
       });
     }
 
-    if (runBook.edition == "saas") {
-      console.log("TBA");
-      process.exit(1);
-    }
+    if (runBook.edition == "saas") throw new CustomError(1019, "");
 
     // initialize the Runner
-    this.runner = new Runner(this.runBook, this.restInstance);
+    this.#runner = new Runner(this.#runBook, this.#restInstance);
   }
 
   async run(): Promise<ITaskResult[]> {
-    return await this.runner.start();
+    return await this.#runner.start();
   }
 
   private initialChecks() {
-    if (!this.runBook.tasks || this.runBook.tasks.length == 0)
+    if (!this.#runBook.tasks || this.#runBook.tasks.length == 0)
       throw new CustomError(1000, "RunBook");
+
+    if (this.#runBook.edition != "windows" && this.#runBook.edition != "saas")
+      throw new CustomError(1001, "RunBook", { arg1: this.#runBook.edition });
 
     let errors: string[] = [];
 
-    if (!this.initialChecksList) {
-      console.log(
-        `INFO: No "initialChecksList" specified. Running all initial checks ...`
-      );
-    }
-
-    if (this.initialChecksList) {
-      console.log(
-        `INFO: "initialChecksList" specified. Running only ${this.initialChecksList.join(
-          `, `
-        )}`
-      );
-    }
-
     // TODO: anyway to solve this in a different way?
-    if (!this.initialChecksList || this.initialChecksList.length == 0) {
+    if (!this.#initialChecksList || this.#initialChecksList.length == 0) {
       try {
         this.checkDuplicateTasks();
       } catch (e) {
@@ -114,7 +105,7 @@ export class Automatiqal {
         errors.push(e.context);
       }
     } else {
-      if (this.initialChecksList.includes("checkDuplicateTasks")) {
+      if (this.#initialChecksList.includes("checkDuplicateTasks")) {
         try {
           this.checkDuplicateTasks();
         } catch (e) {
@@ -122,7 +113,7 @@ export class Automatiqal {
         }
       }
 
-      if (this.initialChecksList.includes("checkWrongOperation")) {
+      if (this.#initialChecksList.includes("checkWrongOperation")) {
         try {
           this.checkWrongOperation();
         } catch (e) {
@@ -130,7 +121,7 @@ export class Automatiqal {
         }
       }
 
-      if (this.initialChecksList.includes("checkMissingSource")) {
+      if (this.#initialChecksList.includes("checkMissingSource")) {
         try {
           this.checkMissingSource();
         } catch (e) {
@@ -138,7 +129,7 @@ export class Automatiqal {
         }
       }
 
-      if (this.initialChecksList.includes("checkCustomPropertiesName")) {
+      if (this.#initialChecksList.includes("checkCustomPropertiesName")) {
         try {
           this.checkCustomPropertiesName();
         } catch (e) {
@@ -146,7 +137,7 @@ export class Automatiqal {
         }
       }
 
-      if (this.initialChecksList.includes("checkCorrectSource")) {
+      if (this.#initialChecksList.includes("checkCorrectSource")) {
         try {
           this.checkCorrectSource();
         } catch (e) {
@@ -156,15 +147,10 @@ export class Automatiqal {
     }
 
     if (errors.length > 0) throw new Error(errors.join("\n"));
-
-    if (!this.runBook.edition) this.runBook.edition = "windows";
-
-    if (this.runBook.edition != "windows" && this.runBook.edition != "saas")
-      throw new CustomError(1001, "RunBook", { arg1: this.runBook.edition });
   }
 
   private checkDuplicateTasks(): void {
-    const duplicateTasks = this.runBook.tasks
+    const duplicateTasks = this.#tasksListFlat
       .map((t) => `"${t.name}"`)
       .filter(
         (
@@ -180,7 +166,7 @@ export class Automatiqal {
   }
 
   private checkMissingSource() {
-    const missingSource = this.runBook.tasks
+    const missingSource = this.#tasksListFlat
       .filter((t) => !t.source && !t.filter)
       .map((t) => {
         const i = winOperations.nonSourceOperations.indexOf(t.operation);
@@ -199,7 +185,7 @@ export class Automatiqal {
   }
 
   private checkWrongOperation() {
-    const nonExistingOps = this.runBook.tasks
+    const nonExistingOps = this.#tasksListFlat
       .map((t) => {
         const i = winOperations.names.indexOf(t.operation);
 
@@ -217,7 +203,7 @@ export class Automatiqal {
   }
 
   private checkCustomPropertiesName() {
-    const cpRelatesTasks = this.runBook.tasks.filter(
+    const cpRelatesTasks = this.#tasksListFlat.filter(
       (t) =>
         t.operation == "customProperty.update" ||
         t.operation == "customProperty.create"
@@ -251,12 +237,18 @@ export class Automatiqal {
     // TODO: any exclusions from this rule?
     const tasksReturnTypes = winOperations.opTypes;
 
-    const opMismatchTasks = this.runBook.tasks
+    const opMismatchTasks = this.#tasksListFlat
       .filter((t) => t.hasOwnProperty("source"))
       .filter((t) => {
-        const sourceTask = this.runBook.tasks.filter(
+        const sourceTask = this.#tasksListFlat.filter(
           (ts) => ts.name == t.source
         )[0];
+
+        if (!sourceTask)
+          throw new CustomError(1018, "RunBook", {
+            arg1: t.source,
+          });
+
         const sourceReturnType = tasksReturnTypes[sourceTask.operation];
 
         return sourceReturnType != tasksReturnTypes[t.operation];
@@ -268,5 +260,20 @@ export class Automatiqal {
         arg1: opMismatchTasks.join(", "),
       });
     }
+  }
+
+  private flatTask(tasks: ITask[]) {
+    let flatTasks: ITask[] = [];
+    for (let task of tasks) {
+      if (!task.skip) {
+        flatTasks.push(task);
+
+        if (task.onError && task.onError.tasks.length > 0) {
+          flatTasks = [...flatTasks, ...this.flatTask(task.onError.tasks)];
+        }
+      }
+    }
+
+    return flatTasks.reduce((acc, val) => acc.concat(val), []) as ITask[];
   }
 }
