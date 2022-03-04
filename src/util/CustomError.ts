@@ -35,6 +35,8 @@ export class CustomError extends Error {
     1015: `Initial checks: Wrong custom properties names: %{arg1}`,
     1016: `Initial checks: Mismatch source and operation: %{arg1}`,
     1017: `User defined exit. Encountered "onError.exit"`,
+    1018: `Missing source task "%{arg1}"`,
+    1019: `SaaS edition is not supported yet`,
   };
 
   constructor(code: number, taskName: string, params?: IErrorParams) {
