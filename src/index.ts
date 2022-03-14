@@ -17,7 +17,7 @@ type initialChecksNames =
   | "checkCorrectSource";
 
 export class Automatiqal {
-  #runBook: IRunBook;
+  runBook: IRunBook;
   #tasksListFlat: ITask[];
   #restInstance: QlikRepoApi.client | QlikSaaSApi.client;
   #runner: Runner;
@@ -29,35 +29,44 @@ export class Automatiqal {
     httpsAgent?: any,
     initialChecksList?: initialChecksNames[]
   ) {
-    this.#runBook = runBook;
-    this.#tasksListFlat = this.flatTask(this.#runBook.tasks);
+    this.runBook = runBook;
+    this.#tasksListFlat = this.#flatTask(this.runBook.tasks);
     this.emitter = new EventsBus();
     this.#initialChecksList = initialChecksList;
 
     // set default trace level if not provided in the run book
-    if (!this.#runBook.trace) this.#runBook.trace = "error";
+    if (!this.runBook.trace) this.runBook.trace = "error";
 
     // default the runbook to QSEoW edition
-    if (!this.#runBook.edition) this.#runBook.edition = "windows";
+    if (!this.runBook.edition) this.runBook.edition = "windows";
 
     // perform obvious checks before execution
     this.initialChecks();
 
     // if QSEoW - set up Qlik Repo client
     if (runBook.edition == "windows") {
-      this.#restInstance = new QlikRepoApi.client({
-        port: runBook.environment.port,
-        httpsAgent: httpsAgent,
-        host: runBook.environment.host,
-        proxy: runBook.environment.proxy ? runBook.environment.proxy : "",
-        authentication: runBook.environment.authentication,
-      });
+      if (httpsAgent) {
+        this.#restInstance = new QlikRepoApi.client({
+          port: runBook.environment.port,
+          httpsAgent: httpsAgent,
+          host: runBook.environment.host,
+          proxy: runBook.environment.proxy ? runBook.environment.proxy : "",
+          authentication: runBook.environment.authentication,
+        });
+      } else {
+        this.#restInstance = new QlikRepoApi.client({
+          port: runBook.environment.port,
+          host: runBook.environment.host,
+          proxy: runBook.environment.proxy ? runBook.environment.proxy : "",
+          authentication: runBook.environment.authentication,
+        });
+      }
     }
 
     if (runBook.edition == "saas") throw new CustomError(1019, "");
 
     // initialize the Runner
-    this.#runner = new Runner(this.#runBook, this.#restInstance);
+    this.#runner = new Runner(this.runBook, this.#restInstance);
   }
 
   async run(): Promise<ITaskResult[]> {
@@ -65,49 +74,49 @@ export class Automatiqal {
   }
 
   private initialChecks() {
-    if (!this.#runBook.tasks || this.#runBook.tasks.length == 0)
+    if (!this.runBook.tasks || this.runBook.tasks.length == 0)
       throw new CustomError(1000, "RunBook");
 
-    if (this.#runBook.edition != "windows" && this.#runBook.edition != "saas")
-      throw new CustomError(1001, "RunBook", { arg1: this.#runBook.edition });
+    if (this.runBook.edition != "windows" && this.runBook.edition != "saas")
+      throw new CustomError(1001, "RunBook", { arg1: this.runBook.edition });
 
     let errors: string[] = [];
 
     // TODO: anyway to solve this in a different way?
     if (!this.#initialChecksList || this.#initialChecksList.length == 0) {
       try {
-        this.checkDuplicateTasks();
+        this.#checkDuplicateTasks();
       } catch (e) {
         errors.push(e.context);
       }
 
       try {
-        this.checkWrongOperation();
+        this.#checkWrongOperation();
       } catch (e) {
         errors.push(e.context);
       }
 
       try {
-        this.checkMissingSource();
+        this.#checkMissingSource();
       } catch (e) {
         errors.push(e.context);
       }
 
       try {
-        this.checkCustomPropertiesName();
+        this.#checkCustomPropertiesName();
       } catch (e) {
         errors.push(e.context);
       }
 
       try {
-        this.checkCorrectSource();
+        this.#checkCorrectSource();
       } catch (e) {
         errors.push(e.context);
       }
     } else {
       if (this.#initialChecksList.includes("checkDuplicateTasks")) {
         try {
-          this.checkDuplicateTasks();
+          this.#checkDuplicateTasks();
         } catch (e) {
           errors.push(e.context);
         }
@@ -115,7 +124,7 @@ export class Automatiqal {
 
       if (this.#initialChecksList.includes("checkWrongOperation")) {
         try {
-          this.checkWrongOperation();
+          this.#checkWrongOperation();
         } catch (e) {
           errors.push(e.context);
         }
@@ -123,7 +132,7 @@ export class Automatiqal {
 
       if (this.#initialChecksList.includes("checkMissingSource")) {
         try {
-          this.checkMissingSource();
+          this.#checkMissingSource();
         } catch (e) {
           errors.push(e.context);
         }
@@ -131,7 +140,7 @@ export class Automatiqal {
 
       if (this.#initialChecksList.includes("checkCustomPropertiesName")) {
         try {
-          this.checkCustomPropertiesName();
+          this.#checkCustomPropertiesName();
         } catch (e) {
           errors.push(e.context);
         }
@@ -139,7 +148,7 @@ export class Automatiqal {
 
       if (this.#initialChecksList.includes("checkCorrectSource")) {
         try {
-          this.checkCorrectSource();
+          this.#checkCorrectSource();
         } catch (e) {
           errors.push(e.context);
         }
@@ -149,7 +158,7 @@ export class Automatiqal {
     if (errors.length > 0) throw new Error(errors.join("\n"));
   }
 
-  private checkDuplicateTasks(): void {
+  #checkDuplicateTasks(): void {
     const duplicateTasks = this.#tasksListFlat
       .map((t) => `"${t.name}"`)
       .filter(
@@ -165,7 +174,7 @@ export class Automatiqal {
       });
   }
 
-  private checkMissingSource() {
+  #checkMissingSource() {
     const missingSource = this.#tasksListFlat
       .filter((t) => !t.source && !t.filter)
       .map((t) => {
@@ -184,7 +193,7 @@ export class Automatiqal {
       });
   }
 
-  private checkWrongOperation() {
+  #checkWrongOperation() {
     const nonExistingOps = this.#tasksListFlat
       .map((t) => {
         const i = winOperations.names.indexOf(t.operation);
@@ -202,7 +211,7 @@ export class Automatiqal {
       });
   }
 
-  private checkCustomPropertiesName() {
+  #checkCustomPropertiesName() {
     const cpRelatesTasks = this.#tasksListFlat.filter(
       (t) =>
         t.operation == "customProperty.update" ||
@@ -224,7 +233,7 @@ export class Automatiqal {
       });
   }
 
-  private checkCorrectSource() {
+  #checkCorrectSource() {
     // for tasks that are using "source" property
     // check if the sourced tasks is of the same type
     // as the current task. For example:
@@ -262,14 +271,14 @@ export class Automatiqal {
     }
   }
 
-  private flatTask(tasks: ITask[]) {
+  #flatTask(tasks: ITask[]) {
     let flatTasks: ITask[] = [];
     for (let task of tasks) {
       if (!task.skip) {
         flatTasks.push(task);
 
         if (task.onError && task.onError.tasks.length > 0) {
-          flatTasks = [...flatTasks, ...this.flatTask(task.onError.tasks)];
+          flatTasks = [...flatTasks, ...this.#flatTask(task.onError.tasks)];
         }
       }
     }

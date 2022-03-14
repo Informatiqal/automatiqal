@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.0.11] - 2022-03-14
+
+### Fixed
+
+- `runBook` content is exposed in `Automatiqal` instance
+- all internal/private methods are now really private and are not visible anymore in the instance (`#methodName`)
+
+## [0.0.10] - 2022-03-04
+
+- `onError` implementation - tasks accept `onError` workflow that is executed if the task returns an error
+- initial checks are performed for `onError` tasks as well
+- initial checks are NOT performed for tasks with `skip: true`
+
+### Fixed
+
 ## [0.0.9] - 2022-03-02
 
 ### Added
