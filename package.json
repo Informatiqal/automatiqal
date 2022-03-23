@@ -34,10 +34,11 @@
     "dist",
     "*.json",
     "*.md",
+    "CHANGELOG.md",
     "LICENSE",
-    "!CHANGELOG.md",
     "!tsconfig.json",
-    "!tsconfig.test.json"
+    "!tsconfig.test.json",
+    "!renovate.json"
   ],
   "repository": {
     "type": "git",
