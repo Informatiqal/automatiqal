@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.12] - 2022-03-23
+
+### Fixed
+
+- rollback TypeScript version to `4.5.5`. Some issue with `4.6.2` was preventing normal execution
+
 ## [0.0.11] - 2022-03-14
 
 ### Fixed
