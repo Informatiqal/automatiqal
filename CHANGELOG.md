@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.13] - 2022-05-22
+
+### Fixed
+
+- `options.multiple` is applied correctly [#7](https://github.com/Informatiqal/automatiqal/issues/7)
+- dependencies updates
+
 ## [0.0.12] - 2022-03-23
 
 ### Fixed

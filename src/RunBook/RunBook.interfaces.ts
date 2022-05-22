@@ -1,17 +1,15 @@
-import { ICertificateExportParameters } from "qlik-repo-api/dist/Certificate";
-import { ITaskCreateTriggerComposite } from "qlik-repo-api/dist/Task.interface";
+import {} from "qlik-repo-api/dist/types/interfaces";
 import {
   ICustomPropertyCreate,
   ICustomPropertyUpdate,
-} from "qlik-repo-api/dist/CustomProperties";
-import {
+  ICertificateExportParameters,
+  ITaskCreateTriggerComposite,
   IVirtualProxyUpdate,
   IVirtualProxyCreate,
-} from "qlik-repo-api/dist/Proxy.interface";
-import {
   ISystemRuleCreate,
   ISystemRuleUpdate,
-} from "qlik-repo-api/dist/SystemRule.interface";
+} from "qlik-repo-api/dist/types/interfaces";
+
 // import { winOperations } from "../RunBook/Task";
 // const operations = [...winOperations.map((m) => m.name)] as const;
 // export type WinOperations = typeof operations[number];

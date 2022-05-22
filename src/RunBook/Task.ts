@@ -156,20 +156,21 @@ export class Task {
         throw new CustomError(1007, this.task.name, { arg1: this.task.name });
     }
 
-    // by default task will throw an error if multiple objects are returned and config is missing
+    // by default the task will throw an error if multiple objects are returned and config is missing
     if (
       this.objectsData.data.length > 1 &&
-      !this.task.options &&
-      (!this.task.operation.indexOf(".get") ||
-        !this.task.operation.indexOf(".getAll"))
+      !this.task.hasOwnProperty("options") &&
+      this.task.operation.indexOf(".get") == -1 &&
+      this.task.operation.indexOf(".getAll") == -1
     )
       throw new CustomError(1005, this.task.name, { arg1: this.task.name });
 
-    // multiple objects are returned and config.multiple is set to false
+    // multiple objects are returned and config.multiple is set to false or missing
     if (
       this.objectsData.data.length > 1 &&
       this.task.options &&
-      !this.task.options.multiple
+      (!this.task.options.hasOwnProperty("multiple") ||
+        this.task.options.multiple == false)
     )
       throw new CustomError(1006, this.task.name, { arg1: this.task.name });
   }

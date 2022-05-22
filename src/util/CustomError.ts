@@ -23,7 +23,7 @@ export class CustomError extends Error {
     1003: `No "source" or "filter" is provided for task "%{arg1}"`,
     1004: `Task "%{arg1}" aborted. 0 objects will be affected`,
     1005: `Task "%{arg1}" will be performed on multiple objects. Specify "options.multiple = true" to override`,
-    1006: `Task "%{arg1}" will be performed on multiple objects. "options.multiple" is set to "false"`,
+    1006: `Task "%{arg1}" will be performed on multiple objects. "options.multiple" is set to "false" or it is missing`,
     1007: `Task "%{arg1}" aborted. 0 objects will be affected and "options.allowZero" is set to "false"`,
     1008: `Task "%{arg1}" aborted. Task "filter" is provided but the filter is empty`,
     1009: `Task "%{arg1}" aborted. Task "source" is provided but the filter is empty"`,
