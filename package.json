@@ -49,10 +49,10 @@
   },
   "homepage": "https://informatiqal.com/automatiqal/",
   "devDependencies": {
-    "@types/chai": "4.3.3",
-    "@types/mocha": "10.0.0",
-    "@types/node": "17.0.35",
-    "chai": "4.3.6",
+    "@types/chai": "4.3.4",
+    "@types/mocha": "10.0.1",
+    "@types/node": "18.11.10",
+    "chai": "4.3.7",
     "dotenv": "16.0.3",
     "mocha": "10.1.0",
     "nyc": "15.1.0",
@@ -61,12 +61,12 @@
     "rollup-plugin-typescript2": "0.34.1",
     "ts-node": "10.9.1",
     "tslib": "2.4.0",
-    "typedoc": "0.23.17",
-    "typescript": "4.5.5"
+    "typedoc": "0.23.21",
+    "typescript": "^4.7.4"
   },
   "dependencies": {
     "events": "^3.3.0",
     "qlik-repo-api": "^0.3.0",
-    "qlik-saas-api": "^0.4.0"
+    "qlik-saas-api": "^0.5.0"
   }
 }
