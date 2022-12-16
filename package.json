@@ -66,7 +66,7 @@
   },
   "dependencies": {
     "events": "^3.3.0",
-    "qlik-repo-api": "^0.3.0",
+    "qlik-repo-api": "^0.4.0",
     "qlik-saas-api": "^0.5.0"
   }
 }
