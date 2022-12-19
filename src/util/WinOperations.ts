@@ -200,6 +200,15 @@ const extension: IWinOperation[] = [
   },
 ];
 
+const proxy = [
+  {
+    name: "proxy.update",
+    isNonSource: false,
+    type: "ProxyService",
+    isPlural: false,
+  },
+];
+
 const externalTask: IWinOperation[] = [
   {
     name: "externalTask.addTriggerSchema",
@@ -478,6 +487,7 @@ const winOperations: IWinOperation[] = [
   ...task,
   ...virtualProxy,
   ...user,
+  ...proxy,
 ];
 
 export class WinOperations {

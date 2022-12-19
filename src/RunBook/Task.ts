@@ -136,7 +136,7 @@ export class Task {
     if (this.task.filter && this.task.filter == "")
       throw new CustomError(1008, this.task.name);
 
-    if (this.task.filter && this.task.source == "")
+    if (this.task.source && this.task.source == "")
       throw new CustomError(1009, this.task.name);
 
     if (winOperations.nonSourceOperations.indexOf(this.task.operation) > -1) {

@@ -14,12 +14,14 @@ type initialChecksNames =
   | "checkWrongOperation"
   | "checkMissingSource"
   | "checkCustomPropertiesName"
-  | "checkCorrectSource";
+  | "checkCorrectSource"
+  | "checkValidTaskName";
 
 export class Automatiqal {
   runBook: IRunBook;
   #tasksListFlat: ITask[];
-  #restInstance: QlikRepoApi.client | QlikSaaSApi.client;
+  #taskNames: string[];
+  #restInstance: QlikRepoApi.client; //| QlikSaaSApi.client;
   #runner: Runner;
   #initialChecksList: initialChecksNames[];
   emitter: EventsBus;
@@ -31,6 +33,7 @@ export class Automatiqal {
   ) {
     this.runBook = runBook;
     this.#tasksListFlat = this.#flatTask(this.runBook.tasks);
+    this.#taskNames = this.#tasksListFlat.map((t) => t.name);
     this.emitter = new EventsBus();
     this.#initialChecksList = initialChecksList;
 
@@ -91,6 +94,12 @@ export class Automatiqal {
       }
 
       try {
+        this.#checkMissingInlineVariableTask();
+      } catch (e) {
+        errors.push(e.context);
+      }
+
+      try {
         this.#checkWrongOperation();
       } catch (e) {
         errors.push(e.context);
@@ -110,6 +119,12 @@ export class Automatiqal {
 
       try {
         this.#checkCorrectSource();
+      } catch (e) {
+        errors.push(e.context);
+      }
+
+      try {
+        this.#checkValidTaskName();
       } catch (e) {
         errors.push(e.context);
       }
@@ -153,6 +168,14 @@ export class Automatiqal {
           errors.push(e.context);
         }
       }
+
+      if (this.#initialChecksList.includes("checkValidTaskName")) {
+        try {
+          this.#checkValidTaskName();
+        } catch (e) {
+          errors.push(e.context);
+        }
+      }
     }
 
     if (errors.length > 0) throw new Error(errors.join("\n"));
@@ -191,6 +214,27 @@ export class Automatiqal {
       throw new CustomError(1014, "RunBook", {
         arg1: missingSource.join(", "),
       });
+  }
+
+  // if the inline variables task names exists in the runbook
+  // https://github.com/Informatiqal/automatiqal-cli/issues/92
+  #checkMissingInlineVariableTask() {
+    const regEx = /(?<=\$\${)(.*?)(?=})/;
+    if (regEx.test(JSON.stringify(this.#tasksListFlat))) {
+      const inlineSourceTaskNames = Array.from(
+        new Set(JSON.stringify(this.#tasksListFlat).match(regEx))
+      );
+
+      const missingTasks = inlineSourceTaskNames.filter((i) => {
+        const [inlineTaskName, _] = i.split("#");
+        return !this.#taskNames.includes(inlineTaskName);
+      });
+
+      if (missingTasks.length > 0)
+        throw new CustomError(1020, "RunBook", {
+          arg1: missingTasks.join(", "),
+        });
+    }
   }
 
   #checkWrongOperation() {
@@ -269,6 +313,24 @@ export class Automatiqal {
         arg1: opMismatchTasks.join(", "),
       });
     }
+  }
+
+  // tasks name should not contain "#"
+  // https://github.com/Informatiqal/automatiqal-cli/issues/92#issuecomment-1296805065
+  #checkValidTaskName() {
+    const nonValidTaskNames = this.#tasksListFlat
+      .map((t) => {
+        if (t.name.indexOf("#") > -1) return t;
+
+        return { name: "VALID" } as ITask;
+      })
+      .filter((t) => t.name != "VALID")
+      .map((t) => `"${t.name}"`);
+
+    if (nonValidTaskNames.length > 0)
+      throw new CustomError(1022, "RunBook", {
+        arg1: nonValidTaskNames.join(", "),
+      });
   }
 
   #flatTask(tasks: ITask[]) {

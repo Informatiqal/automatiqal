@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.0.14] - 2022-12-16
+
+- inline/source details variables [Informatiqal/automatiqal-cli#92](https://github.com/Informatiqal/automatiqal-cli/issues/92)
+
 ## [0.0.13] - 2022-05-22
 
 ### Fixed
@@ -9,13 +13,9 @@
 
 ## [0.0.12] - 2022-03-23
 
-### Fixed
-
 - rollback TypeScript version to `4.5.5`. Some issue with `4.6.2` was preventing normal execution
 
 ## [0.0.11] - 2022-03-14
-
-### Fixed
 
 - `runBook` content is exposed in `Automatiqal` instance
 - all internal/private methods are now really private and are not visible anymore in the instance (`#methodName`)
@@ -26,11 +26,7 @@
 - initial checks are performed for `onError` tasks as well
 - initial checks are NOT performed for tasks with `skip: true`
 
-### Fixed
-
 ## [0.0.9] - 2022-03-02
-
-### Added
 
 - option to specify which initial checks to be performed (default is all) [#8](https://github.com/Informatiqal/automatiqal/issues/8)
 - initial checks for source type - check if the `operation` of the current task is the same type as the `source` task [#2](https://github.com/Informatiqal/automatiqal/issues/2)
@@ -52,8 +48,6 @@
 
 ## [0.0.6] - 2022-02-15
 
-### Added
-
 - check for invalid custom property name (when created)
 - multiple task related changes
   - handle `export` and `exportMany` operations (including saving the files)
@@ -62,25 +56,18 @@
 
 ## [0.0.5] - 2022-02-03
 
-### Added
-
 - task options are supported (`appendCustomProperties` and `appendTags`)
 - perform checks before run anything:
+
   - check for duplicate task names
   - check if all presented operations actually exists
   - check if all tasks have filter/source (for operations that require them)
-
-### Fixed
 
 - various small fixes
 
 ## [0.0.4] - 2021-10-XX
 
-### Fixed
-
 ## [0.0.3] - 2021-10-17
-
-### Fixed
 
 - handle more operation types
 - handle operations which do not require initial data

@@ -12,6 +12,7 @@ const winOperations = new WinOperations();
 export interface IRunBookResult {
   task: string;
   // result: ITaskResult;
+  details: any;
   error?: boolean;
   errorMessage?: string;
 }
@@ -23,7 +24,7 @@ export interface ITaskTimings {
 }
 
 export interface ITaskResult {
-  data: IRunBookResult[];
+  data: IRunBookResult[] | IRunBookResult;
   task: ITask;
   timings: ITaskTimings;
   status: "Completed" | "Error" | "Skip" | "Error (Force exit)";
@@ -35,6 +36,8 @@ export class Runner {
   debug: Debugger;
   private taskResults: ITaskResult[];
   private emitter: EventsBus;
+  // private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/; // match values - $${xxxx}
+  private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/g; // match ALL values - $${xxxx}
   constructor(runBook: IRunBook, instance) {
     this.runBook = runBook;
     this.instance = instance;
@@ -102,6 +105,12 @@ export class Runner {
     };
 
     try {
+      if (
+        t.details &&
+        this.inlineVariablesRegex.test(JSON.stringify(t.details))
+      )
+        t.details = this.replaceInlineVariables(t.details, t.name);
+
       const task = new Task(t, this.instance, data);
       timings.start = new Date().toISOString();
 
@@ -150,5 +159,55 @@ export class Runner {
 
       if (!t.onError) throw e;
     }
+  }
+
+  // if at least one of the details prop values
+  // is an inline variable $${xxx} then
+  // replace its value with the id(s) from
+  // the prev task result
+  private replaceInlineVariables(details, taskName) {
+    Object.entries(details).map(([key, value]) => {
+      if (this.inlineVariablesRegex.test(JSON.stringify(value))) {
+        const prevTaskName = JSON.stringify(value).match(
+          this.inlineVariablesRegex
+        );
+
+        const prevTaskIds = prevTaskName.map((d) =>
+          this.getPropertyFromTaskResult(d)
+        );
+        if (Array.isArray(value)) {
+          details[key] = [...prevTaskIds];
+        }
+
+        if (typeof value == "string") {
+          if (prevTaskIds.length > 0)
+            throw new CustomError(1021, "", {
+              arg1: value,
+              arg2: key,
+              arg3: taskName,
+            });
+          details[key] = prevTaskIds.join("");
+        }
+      }
+    });
+
+    return details;
+  }
+
+  private getPropertyFromTaskResult(taskName: string) {
+    const [name, property] = taskName.split("#");
+
+    const taskResult = this.taskResults.filter((r) => r.task.name == name)[0];
+
+    // if property is used then return its value
+    // else return ID as default
+    if (Array.isArray(taskResult.data))
+      return (taskResult.data as IRunBookResult[]).map(
+        (d) => d.details[property ? property : "id"]
+      );
+
+    return [
+      (taskResult.data as IRunBookResult).details[property ? property : "id"],
+    ];
   }
 }

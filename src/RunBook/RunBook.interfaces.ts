@@ -1,4 +1,3 @@
-import {} from "qlik-repo-api/dist/types/interfaces";
 import {
   ICustomPropertyCreate,
   ICustomPropertyUpdate,
@@ -8,7 +7,11 @@ import {
   IVirtualProxyCreate,
   ISystemRuleCreate,
   ISystemRuleUpdate,
+  IProxyUpdate,
 } from "qlik-repo-api/dist/types/interfaces";
+
+import { IConfig } from "qlik-rest-api/dist/interfaces/interfaces";
+// import {  } from "qlik-saas-api/dist/types/Common";
 
 // import { winOperations } from "../RunBook/Task";
 // const operations = [...winOperations.map((m) => m.name)] as const;
@@ -111,6 +114,7 @@ export type WinOperations =
   | "virtualProxy.create"
   | "virtualProxy.remove"
   | "virtualProxy.update"
+  | "proxy.update"
   | "user.get"
   | "user.getAll"
   | "user.create"
@@ -118,6 +122,8 @@ export type WinOperations =
   | "user.update"
   | "continue"
   | "debug";
+
+export type TAddRemoveSet = "add" | "remove" | "set";
 
 export interface ITask {
   name: string;
@@ -132,6 +138,10 @@ export interface ITask {
     appendTags?: boolean;
     multiple?: boolean;
     allowZero?: boolean;
+    whitelistOperation?: TAddRemoveSet;
+    virtualProxiesOperation?: TAddRemoveSet;
+    tagOperations?: TAddRemoveSet;
+    customPropertyOperations?: TAddRemoveSet;
   };
   location?: string;
   details?: TaskDetails;
@@ -155,13 +165,13 @@ export interface IRunBook {
     host: string;
     port?: number;
     proxy?: string;
-    authentication: {
-      user_dir?: string;
-      user_name?: string;
-      cert?: string;
-      key?: string;
-      token?: string;
-    };
+    authentication: IConfig["authentication"];
+    // | IHeaderConfig
+    // | IJWTConfig
+    // | ISessionConfig
+    // | ITicketConfig
+    // | ICertUser
+    // | ISaaSToken;
   };
   tasks: ITask[];
 }
@@ -185,7 +195,8 @@ export type TaskDetails =
   | ICustomPropertyCreate
   | ICustomPropertyUpdate
   | ICertificateExportParameters
-  | ITaskCreateTriggerComposite;
+  | ITaskCreateTriggerComposite
+  | IProxyUpdate;
 
 interface IAppPublish {
   name?: string;

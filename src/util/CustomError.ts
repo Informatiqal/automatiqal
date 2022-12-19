@@ -37,6 +37,9 @@ export class CustomError extends Error {
     1017: `User defined exit. Encountered "onError.exit"`,
     1018: `Missing source task "%{arg1}"`,
     1019: `SaaS edition is not supported yet`,
+    1020: `Source for inline task missing: %{arg1}`,
+    1021: `Source for inline task contains more than one ID. Current parameter is string. "%{arg1}" for property "%{arg2}" in task "%{arg3}"`,
+    1022: `Initial checks: Non valid task name. Name should not contain "#": %{arg1}`,
   };
 
   constructor(code: number, taskName: string, params?: IErrorParams) {
