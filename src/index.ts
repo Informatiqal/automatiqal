@@ -9,7 +9,7 @@ import { WinOperations } from "./util/WinOperations";
 
 const winOperations = new WinOperations();
 
-type initialChecksNames =
+export type initialChecksNames =
   | "checkDuplicateTasks"
   | "checkWrongOperation"
   | "checkMissingSource"

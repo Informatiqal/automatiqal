@@ -198,12 +198,12 @@ export type TaskDetails =
   | ITaskCreateTriggerComposite
   | IProxyUpdate;
 
-interface IAppPublish {
+export interface IAppPublish {
   name?: string;
   stream?: string;
 }
 
-interface IAppUpdate {
+export interface IAppUpdate {
   name?: string;
   tags?: string[];
   customProperties: string[];
