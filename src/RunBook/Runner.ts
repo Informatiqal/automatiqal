@@ -84,27 +84,27 @@ export class Runner {
 
   private async taskProcessing(t: ITask) {
     if (!t.operation) throw new CustomError(1012, t.name, { arg1: t.name });
-    // TODO: data should have type!
-    // get the data for the object on which the operation will be performed
-    // either from querying QRS (calling /XXX/filter)
-    // or from result of previous task
-    const data = !t.source
-      ? await this.getFilterItems(t).catch((e) => {
-          throw new CustomError(1011, t.name, {
-            arg1: t.name,
-            arg2: e.message,
-          });
-        })
-      : this.taskResults.find((a) => a.task.name == t.source);
-
-    // process the task, push the result to taskResult variable
-    const timings: ITaskTimings = {
-      start: null,
-      end: null,
-      totalSeconds: -1,
-    };
-
     try {
+      // TODO: data should have type!
+      // get the data for the object on which the operation will be performed
+      // either from querying QRS (calling /XXX/filter)
+      // or from result of previous task
+      const data = !t.source
+        ? await this.getFilterItems(t).catch((e) => {
+            throw new CustomError(1011, t.name, {
+              arg1: t.name,
+              arg2: e.message,
+            });
+          })
+        : this.taskResults.find((a) => a.task.name == t.source);
+
+      // process the task, push the result to taskResult variable
+      const timings: ITaskTimings = {
+        start: null,
+        end: null,
+        totalSeconds: -1,
+      };
+
       if (
         t.details &&
         this.inlineVariablesRegex.test(JSON.stringify(t.details))

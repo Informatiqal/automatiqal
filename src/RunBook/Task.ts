@@ -131,19 +131,24 @@ export class Task {
   }
 
   private taskDataChecks(): void {
+    // operation is missing
     if (!this.task.operation) throw new CustomError(1010, this.task.name);
 
+    // filter is missing or empty
     if (this.task.filter && this.task.filter == "")
       throw new CustomError(1008, this.task.name);
 
+    // name is missing or empty
     if (this.task.source && this.task.source == "")
       throw new CustomError(1009, this.task.name);
 
+    // no source operation flag set
     if (winOperations.nonSourceOperations.indexOf(this.task.operation) > -1) {
       this.isNoSource = true;
       return;
     }
 
+    // source and filter are missing
     if (!this.task.source && !this.task.filter)
       throw new CustomError(1003, this.task.name, { arg1: this.task.name });
 

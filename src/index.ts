@@ -339,7 +339,11 @@ export class Automatiqal {
       if (!task.skip) {
         flatTasks.push(task);
 
-        if (task.onError && task.onError.tasks.length > 0) {
+        if (
+          task.onError &&
+          task.onError.tasks &&
+          task.onError.tasks.length > 0
+        ) {
           flatTasks = [...flatTasks, ...this.#flatTask(task.onError.tasks)];
         }
       }
