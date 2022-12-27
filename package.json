@@ -1,6 +1,6 @@
 {
   "name": "automatiqal",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Automate Qlik deployments",
   "author": {
     "email": "info@informatiqal.com",
@@ -19,9 +19,13 @@
     "build": "rollup -c",
     "watch": "rollup -cw",
     "docs": "npx typedoc src/index.doc.ts --name \"Automatiqal\" --excludePrivate --hideGenerator --darkHighlightTheme dark-plus",
-    "test": "set TS_NODE_PROJECT=tsconfig.test.json&mocha --require ts-node/register test/**/*.spec.ts",
+    "test": "set TS_NODE_PROJECT=tsconfig.test.json&mocha --require ts-node/register test/**/*.spec.ts --loader=ts-node/esm --no-warnings=ExperimentalWarning --experimental-specifier-resolution=node --ignore test/playground.spec.ts",
     "test-badge": "set TS_NODE_PROJECT=tsconfig.test.json&mocha --reporter .\\node_modules\\mocha-badge-generator\\src --reporter-options=badge_format=svg,badge_output=badge.svg --require ts-node/register test/**/*.spec.ts"
   },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "engineStrict": true,
   "keywords": [
     "qlik",
     "sense",
@@ -56,6 +60,7 @@
     "@types/node": "18.11.18",
     "chai": "4.3.7",
     "dotenv": "16.0.3",
+    "esm": "^3.2.25",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
     "rollup": "3.8.1",
@@ -67,7 +72,7 @@
   },
   "dependencies": {
     "events": "^3.3.0",
-    "qlik-repo-api": "^0.4.0",
-    "qlik-saas-api": "^0.5.0"
+    "qlik-repo-api": "^0.4.1",
+    "qlik-saas-api": "^0.5.1"
   }
 }

@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.0.17] - 2022-12-27
+
+- dependency updates
+- required NodeJS version >= 16.0.0
+
 ## [0.0.16] - 2022-12-23
 
 - few small bug fixes
