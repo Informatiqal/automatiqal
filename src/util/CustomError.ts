@@ -32,7 +32,7 @@ export class CustomError extends Error {
     1012: `Task "%{arg1}" aborted. "operation" property is missing`,
     1013: `Initial checks: Non existing operations found: %{arg1}`,
     1014: `Initial checks: Source/filter for tasks is required: %{arg1}`,
-    1015: `Initial checks: Wrong custom properties names: %{arg1}`,
+    1015: `Initial checks: Wrong custom property(ies) names: %{arg1}. Allowed values can be only alphanumeric and/or underline`,
     1016: `Initial checks: Mismatch source and operation: %{arg1}`,
     1017: `User defined exit. Encountered "onError.exit"`,
     1018: `Missing source task "%{arg1}"`,

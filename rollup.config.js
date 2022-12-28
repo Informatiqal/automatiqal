@@ -1,16 +1,15 @@
-import typescript from "rollup-plugin-typescript2";
+import typescript from "@rollup/plugin-typescript";
 import del from "rollup-plugin-delete";
-import pkg from "./package.json";
+import { readFileSync } from "fs";
+
+const pkg = JSON.parse(readFileSync("./package.json"));
 
 export default {
   input: "src/index.ts",
   output: [
     {
+      sourcemap: true,
       file: pkg.main,
-      format: "cjs",
-    },
-    {
-      file: pkg.module,
       format: "es",
     },
   ],
@@ -22,8 +21,6 @@ export default {
     del({
       targets: "dist/*",
     }),
-    typescript({
-      typescript: require("typescript"),
-    }),
+    typescript(),
   ],
 };

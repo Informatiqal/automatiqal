@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.0.17] - 2022-12-27
+
+- dependency updates
+- required NodeJS version >= 16.0.0
+
+## [0.0.16] - 2022-12-23
+
+- few small bug fixes
+- all dependencies are up-to date
+
 ## [0.0.14] - 2022-12-16
 
 - inline/source details variables [Informatiqal/automatiqal-cli#92](https://github.com/Informatiqal/automatiqal-cli/issues/92)
