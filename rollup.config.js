@@ -1,4 +1,5 @@
 import typescript from "@rollup/plugin-typescript";
+import json from "@rollup/plugin-json";
 import del from "rollup-plugin-delete";
 import { readFileSync } from "fs";
 
@@ -21,6 +22,7 @@ export default {
     del({
       targets: "dist/*",
     }),
+    json(),
     typescript(),
   ],
 };

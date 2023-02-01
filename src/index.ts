@@ -1,11 +1,13 @@
 import { QlikRepoApi } from "qlik-repo-api";
-import { QlikSaaSApi } from "qlik-saas-api";
+// import { QlikSaaSApi } from "qlik-saas-api";
+import Ajv from "ajv";
 
 import { IRunBookResult, ITaskResult, Runner } from "./RunBook/Runner";
 import { IRunBook, ITask } from "./RunBook/RunBook.interfaces";
 import { CustomError } from "./util/CustomError";
 import { EventsBus } from "./util/EventBus";
 import { WinOperations } from "./util/WinOperations";
+import schema from "./schema/runbook.json" assert { type: "json" };
 
 const winOperations = new WinOperations();
 
@@ -31,6 +33,17 @@ export class Automatiqal {
     httpsAgent?: any,
     initialChecksList?: initialChecksNames[]
   ) {
+    const ajv = new Ajv({ allErrors: true });
+    const validate = ajv.compile(schema);
+    const a: any = runBook;
+    delete a.tasks;
+    const valid = validate(runBook);
+
+    if (!valid) {
+      const errors = validate.errors.map((e) => e.message).join("\n");
+      throw new Error(errors);
+    }
+
     this.runBook = runBook;
     this.#tasksListFlat = this.#flatTask(this.runBook.tasks);
     this.#taskNames = this.#tasksListFlat.map((t) => t.name);
@@ -77,6 +90,8 @@ export class Automatiqal {
   }
 
   private initialChecks() {
+    //TODO: validate against the schema
+
     if (!this.runBook.tasks || this.runBook.tasks.length == 0)
       throw new CustomError(1000, "RunBook");
 
