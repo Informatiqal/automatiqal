@@ -1,4 +1,5 @@
 import { QlikRepoApi } from "qlik-repo-api";
+import { v4 as uuidv4 } from "uuid";
 // import { QlikSaaSApi } from "qlik-saas-api";
 // import { CustomError } from "../util/CustomError";
 import { IRunBook, ITask } from "./RunBook.interfaces";
@@ -36,6 +37,8 @@ export class Runner {
   debug: Debugger;
   private taskResults: ITaskResult[];
   private emitter: EventsBus;
+  private today: string;
+  private increment: number = 1;
   // private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/; // match values - $${xxxx}
   private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/g; // match ALL values - $${xxxx}
   constructor(runBook: IRunBook, instance) {
@@ -44,6 +47,9 @@ export class Runner {
     this.taskResults = [];
     this.emitter = new EventsBus();
     this.debug = new Debugger(this.runBook.trace, this.emitter);
+
+    const date = new Date();
+    this.today = date.toISOString().split("T")[0].replace(/-/gi, "");
   }
 
   async start(): Promise<ITaskResult[]> {
@@ -110,6 +116,8 @@ export class Runner {
         this.inlineVariablesRegex.test(JSON.stringify(t.details))
       )
         t.details = this.replaceInlineVariables(t.details, t.name);
+
+      t = this.replaceSpecialVariables(t);
 
       const task = new Task(t, this.instance, data);
       timings.start = new Date().toISOString();
@@ -209,5 +217,69 @@ export class Runner {
     return [
       (taskResult.data as IRunBookResult).details[property ? property : "id"],
     ];
+  }
+
+  // replace special variables per task
+  // special variables are: GUID, TODAY, NOW and INCREMENT
+  private replaceSpecialVariables(t: ITask): ITask {
+    const _this = this;
+    let taskString = JSON.stringify(t);
+
+    let a = taskString.match(/(?<=\${)(.*?)(?=})/g);
+
+    // nothing to replace. no need to proceed
+    if (!a) return t;
+
+    if (a.includes("TODAY"))
+      taskString = taskString.replace(/\${TODAY}/gi, this.today);
+
+    if (a.includes("GUID"))
+      taskString = taskString.replace(/\${GUID}/gi, () =>
+        uuidv4().replace(/-/gi, "")
+      );
+
+    if (a.includes("NOW")) {
+      taskString = taskString.replace(/\${NOW}/gi, () => {
+        const date = new Date();
+        const time = date
+          .toISOString()
+          .split("T")[1]
+          .split(".")[0]
+          .replace(/:/gi, "");
+
+        return `${_this.today}${time}`;
+      });
+    }
+
+    if (a.includes("INCREMENT")) {
+      taskString = taskString.replace(/\${INCREMENT}/gi, function () {
+        const a = `${_this.increment}`;
+        _this.increment++;
+        return a;
+      });
+
+      this.increment++;
+    }
+
+    if (a.includes("DECREMENT")) {
+      taskString = taskString.replace(/\${INCREMENT}/gi, function () {
+        _this.increment--;
+        const a = `${_this.increment}`;
+        return a;
+      });
+
+      this.increment++;
+    }
+
+    if (a.includes("RANDOM")) {
+      taskString = taskString.replace(/\${RANDOM}/gi, function () {
+        return [...Array(20)]
+          .map(() => Math.random().toString(36)[2])
+          .join("")
+          .toUpperCase();
+      });
+    }
+
+    return JSON.parse(taskString) as ITask;
   }
 }
