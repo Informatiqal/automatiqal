@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.0] - 2023-02-06
+
+- schema validation before run
+
+## [0.1.0] - 2023-02-05
+
+- support special variables
+
 ## [0.0.17] - 2022-12-27
 
 - dependency updates
