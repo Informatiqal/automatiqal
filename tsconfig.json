@@ -1,18 +1,18 @@
 {
     "compilerOptions": {
         "outDir": "./dist",
-        "target": "ES6",
+        "target": "ES2022",
         "declaration": true,
-        "module": "ES2020",
+        "declarationDir": "./dist",
+        "module": "ESNext",
         "noImplicitAny": false,
         "sourceMap": true,
         "moduleResolution": "node",
-        "lib": [
-            "es2021"
-        ],
+        "esModuleInterop": true,
+        "resolveJsonModule": true
     },
     "include": [
-        "src/**/*",
+        "src/**/*"
     ],
     "exclude": [
         "node_modules"
