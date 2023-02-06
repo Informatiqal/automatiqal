@@ -73,7 +73,7 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@informatiqal/automatiqal-schema": "^0.0.3",
+    "@informatiqal/automatiqal-schema": "^0.1.0",
     "ajv": "^8.12.0",
     "events": "^3.3.0",
     "qlik-repo-api": "^0.4.1",
