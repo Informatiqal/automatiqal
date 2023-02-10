@@ -1,6 +1,6 @@
 {
   "name": "automatiqal",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Automate Qlik deployments",
   "author": {
     "email": "info@informatiqal.com",
@@ -23,7 +23,7 @@
     "test-badge": "set TS_NODE_PROJECT=tsconfig.test.json&mocha --reporter .\\node_modules\\mocha-badge-generator\\src --reporter-options=badge_format=svg,badge_output=badge.svg --require ts-node/register test/**/*.spec.ts"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=14.19.1"
   },
   "engineStrict": true,
   "keywords": [
@@ -65,7 +65,7 @@
     "esm": "^3.2.25",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
-    "rollup": "3.14.0",
+    "rollup": "^3.15.0",
     "rollup-plugin-delete": "2.0.0",
     "ts-node": "10.9.1",
     "tslib": "2.5.0",
@@ -73,11 +73,11 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@informatiqal/automatiqal-schema": "^0.1.0",
+    "@informatiqal/automatiqal-schema": "^0.1.1",
     "ajv": "^8.12.0",
     "events": "^3.3.0",
-    "qlik-repo-api": "^0.4.1",
-    "qlik-saas-api": "^0.6.0",
+    "qlik-repo-api": "^0.4.2",
+    "qlik-saas-api": "^0.6.1",
     "uuid": "^9.0.0"
   }
 }
