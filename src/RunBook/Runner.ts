@@ -1,5 +1,5 @@
 import { QlikRepoApi } from "qlik-repo-api";
-import { v4 as uuidv4 } from "uuid";
+import * as uuid from "uuid";
 // import { QlikSaaSApi } from "qlik-saas-api";
 // import { CustomError } from "../util/CustomError";
 import { IRunBook, ITask } from "./RunBook.interfaces";
@@ -235,7 +235,7 @@ export class Runner {
 
     if (a.includes("GUID"))
       taskString = taskString.replace(/\${GUID}/gi, () =>
-        uuidv4().replace(/-/gi, "")
+        uuid.v4().replace(/-/gi, "")
       );
 
     if (a.includes("NOW")) {
