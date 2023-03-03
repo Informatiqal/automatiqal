@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.4] - 2023-03-03
+
+- various small code improvements
+
 ## [0.2.0] - 2023-02-06
 
 - schema validation before run
@@ -68,7 +72,7 @@
 
 - check for invalid custom property name (when created)
 - multiple task related changes
-  - handle `export` and `exportMany` operations (including saving the files)
+    - handle `export` and `exportMany` operations (including saving the files)
 - more error messages
 - a lot more operations are supported
 
@@ -77,9 +81,9 @@
 - task options are supported (`appendCustomProperties` and `appendTags`)
 - perform checks before run anything:
 
-  - check for duplicate task names
-  - check if all presented operations actually exists
-  - check if all tasks have filter/source (for operations that require them)
+    - check for duplicate task names
+    - check if all presented operations actually exists
+    - check if all tasks have filter/source (for operations that require them)
 
 - various small fixes
 
