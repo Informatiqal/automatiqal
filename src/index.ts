@@ -35,6 +35,15 @@ export class Automatiqal {
   ) {
     const ajv = new Ajv({ allErrors: true });
     const validate = ajv.compile(automatiqalSchema);
+
+    // check if all tasks are skip=true. 
+    // if yes - no need to validate or process. Validation complains a lot otherwise
+    //TODO: this should be somehow into the initial checks
+    if(runBook.tasks || runBook.tasks.length > 0) {
+      const nonSkipTasks = runBook.tasks.filter(t => !t.skip)
+      if(nonSkipTasks.length == 0) throw new CustomError(1023, "Runbook")
+    }
+
     const valid = validate(runBook);
 
     if (!valid) {
@@ -88,8 +97,6 @@ export class Automatiqal {
   }
 
   private initialChecks() {
-    //TODO: validate against the schema
-
     if (!this.runBook.tasks || this.runBook.tasks.length == 0)
       throw new CustomError(1000, "RunBook");
 
@@ -300,7 +307,7 @@ export class Automatiqal {
     // No point of running the whole runbook if its known
     // from the beginning that the task will fail
 
-    // TODO: any exclusions from this rule?
+    // NOTE: any exclusions from this rule?
     const tasksReturnTypes = winOperations.opTypes;
 
     const opMismatchTasks = this.#tasksListFlat

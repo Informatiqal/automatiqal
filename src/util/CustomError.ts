@@ -40,6 +40,7 @@ export class CustomError extends Error {
     1020: `Source for inline task missing: %{arg1}`,
     1021: `Source for inline task contains more than one ID. Current parameter is string. "%{arg1}" for property "%{arg2}" in task "%{arg3}"`,
     1022: `Initial checks: Non valid task name. Name should not contain "#": %{arg1}`,
+    1023: `Nothing to process. No tasks are specified or all tasks are set to skip = true`,
   };
 
   constructor(code: number, taskName: string, params?: IErrorParams) {
