@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.5] - 2023-03-04
+
+- json schema dependency update. See [automatiqal-cli-schema#12](https://github.com/Informatiqal/automatiqal-cli-schema/issues/12)
+
 ## [0.2.4] - 2023-03-03
 
 - various small code improvements
