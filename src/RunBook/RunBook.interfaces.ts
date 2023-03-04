@@ -178,7 +178,7 @@ export interface IRunBook {
 
 export interface IAppUpload {
   name: string;
-  file: number[];
+  file: Buffer | object;
   keepData?: boolean;
   excludeDataConnections?: boolean;
 }
