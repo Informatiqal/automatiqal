@@ -40,7 +40,7 @@ export class Runner {
   private today: string;
   private increment: number = 1;
   // private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/; // match values - $${xxxx}
-  private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/g; // match ALL values - $${xxxx}
+  private inlineVariablesRegex = new RegExp(/(?<=\$\${)(.*?)(?=})/g); // match ALL values - $${xxxx}
   constructor(runBook: IRunBook, instance) {
     this.runBook = runBook;
     this.instance = instance;
@@ -175,6 +175,8 @@ export class Runner {
   // the prev task result
   private replaceInlineVariables(details, taskName) {
     Object.entries(details).map(([key, value]) => {
+      // if the following line is removed the logic is not working. Why?!?!?!?!
+      const a = this.inlineVariablesRegex.test(JSON.stringify(value));
       if (this.inlineVariablesRegex.test(JSON.stringify(value))) {
         const prevTaskName = JSON.stringify(value).match(
           this.inlineVariablesRegex
@@ -188,7 +190,7 @@ export class Runner {
         }
 
         if (typeof value == "string") {
-          if (prevTaskIds.length > 0)
+          if (prevTaskIds.length > 1)
             throw new CustomError(1021, "", {
               arg1: value,
               arg2: key,

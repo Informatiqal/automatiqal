@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.8] - 2023-03-16
+
+- schema dependency update
+
+## [0.2.7] - 2023-03-06
+
+- correctly populate the values for inline variables
+
 ## [0.2.6] - 2023-03-04
 
 - json schema dependency update. See [automatiqal-cli-schema#13](https://github.com/Informatiqal/automatiqal-cli-schema/issues/13)

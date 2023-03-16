@@ -196,7 +196,8 @@ export type TaskDetails =
   | ICustomPropertyUpdate
   | ICertificateExportParameters
   | ITaskCreateTriggerComposite
-  | IProxyUpdate;
+  | IProxyUpdate
+  | { targetAppId: string };
 
 export interface IAppPublish {
   name?: string;
