@@ -78,7 +78,7 @@
     "@informatiqal/automatiqal-schema": "^0.3.3",
     "ajv": "^8.12.0",
     "events": "^3.3.0",
-    "qlik-repo-api": "^0.4.2",
+    "qlik-repo-api": "^0.6.0",
     "qlik-saas-api": "^0.6.1",
     "uuid": "^9.0.0"
   }
