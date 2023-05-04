@@ -33,15 +33,19 @@ export class Automatiqal {
     httpsAgent?: any,
     initialChecksList?: initialChecksNames[]
   ) {
-    const ajv = new Ajv({ allErrors: true });
+    const ajv = new Ajv({
+      allErrors: true,
+      strict: true,
+      strictRequired: true,
+    });
     const validate = ajv.compile(automatiqalSchema);
 
-    // check if all tasks are skip=true. 
+    // check if all tasks are skip=true.
     // if yes - no need to validate or process. Validation complains a lot otherwise
     //TODO: this should be somehow into the initial checks
-    if(runBook.tasks || runBook.tasks.length > 0) {
-      const nonSkipTasks = runBook.tasks.filter(t => !t.skip)
-      if(nonSkipTasks.length == 0) throw new CustomError(1023, "Runbook")
+    if (runBook.tasks || runBook.tasks.length > 0) {
+      const nonSkipTasks = runBook.tasks.filter((t) => !t.skip);
+      if (nonSkipTasks.length == 0) throw new CustomError(1023, "Runbook");
     }
 
     const valid = validate(runBook);
