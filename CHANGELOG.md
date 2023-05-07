@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.10] - 2023-05-07
+
+- few small bug fixes
+- started writing tests
+- testing moved to `vitest`. `mocha` and `chai` dependencies are dropped
+
 ## [0.2.8] - 2023-03-16
 
 - schema dependency update
