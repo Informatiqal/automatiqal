@@ -27,6 +27,7 @@ export class Automatiqal {
   #runner: Runner;
   #initialChecksList: initialChecksNames[];
   emitter: EventsBus;
+  // #inlineVariablesRegex = new RegExp(/(?<=\$\${)(.*?)(?=})/g); // match ALL values - $${xxxx}
 
   constructor(
     runBook: IRunBook,
@@ -37,8 +38,11 @@ export class Automatiqal {
       allErrors: true,
       strict: true,
       strictRequired: true,
+      allowUnionTypes: true,
     });
     const validate = ajv.compile(automatiqalSchema);
+
+    if (!runBook.tasks) throw new CustomError(1023, "Runbook");
 
     // check if all tasks are skip=true.
     // if yes - no need to validate or process. Validation complains a lot otherwise
@@ -288,6 +292,13 @@ export class Automatiqal {
 
     const incorrectValues = cpRelatesTasks
       .map((t) => {
+        // is inline variable? then dont check
+        const i = new RegExp(/(?<=\$\${)(.*?)(?=})/g).test(
+          (t.details as any).name
+        );
+        if (i == true) return undefined;
+
+        // is allowed value format
         const a = /^[A-Za-z0-9_]+$/.test((t.details as any).name);
         if (a == false) return (t.details as any).name;
 

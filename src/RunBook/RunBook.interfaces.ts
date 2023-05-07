@@ -53,6 +53,8 @@ export type WinOperations =
   | "contentLibrary.remove"
   | "compositeTrigger.remove"
   | "compositeTrigger.update"
+  | "customProperty.get"
+  | "customProperty.getAll"
   | "customProperty.create"
   | "customProperty.update"
   | "customProperty.remove"
@@ -158,7 +160,7 @@ export type QlikEditions = "saas" | "windows";
 
 export interface IRunBook {
   name: string;
-  description: string;
+  description?: string;
   edition?: QlikEditions;
   trace?: TraceLevels;
   environment: {

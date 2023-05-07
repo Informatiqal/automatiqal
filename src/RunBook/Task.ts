@@ -123,10 +123,9 @@ export class Task {
     // if the previous data is an array
     // loop though all elements and call the method in each element
     return await Promise.all(
-      this.objectsData.data.map(async (obj) => {
-        // let a1 = 1;
-        return obj[a[1]](this.task.details, this.task.options);
-      })
+      this.objectsData.data.map(async (obj) =>
+        obj[a[1]](this.task.details, this.task.options)
+      )
     );
   }
 

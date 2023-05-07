@@ -1,6 +1,6 @@
 {
   "name": "automatiqal",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "Automate Qlik deployments",
   "author": {
     "email": "info@informatiqal.com",
@@ -19,7 +19,7 @@
     "build": "rollup -c",
     "watch": "rollup -cw",
     "docs": "npx typedoc src/index.doc.ts --name \"Automatiqal\" --excludePrivate --hideGenerator --darkHighlightTheme dark-plus",
-    "test": "vitest run --ignore test/playground.spec.ts"
+    "test": "vitest run"
   },
   "engines": {
     "node": ">=14.19.1"
@@ -57,12 +57,12 @@
   "devDependencies": {
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-typescript": "^11.1.0",
-    "@types/node": "18.16.5",
+    "@types/node": "20.1.0",
     "@types/uuid": "^9.0.1",
     "dotenv": "16.0.3",
     "esm": "^3.2.25",
     "nyc": "15.1.0",
-    "rollup": "^3.21.4",
+    "rollup": "^3.21.5",
     "rollup-plugin-delete": "2.0.0",
     "ts-node": "10.9.1",
     "tslib": "2.5.0",

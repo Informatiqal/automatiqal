@@ -40,7 +40,8 @@ export class Runner {
   private today: string;
   private increment: number = 1;
   // private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/; // match values - $${xxxx}
-  private inlineVariablesRegex = new RegExp(/(?<=\$\${)(.*?)(?=})/g); // match ALL values - $${xxxx}
+  // TODO: how to re-use the regex? issue when using in multiple places when defined here
+  // private inlineVariablesRegex = new RegExp(/(?<=\$\${)(.*?)(?=})/gm); // match ALL values - $${xxxx}
   constructor(runBook: IRunBook, instance) {
     this.runBook = runBook;
     this.instance = instance;
@@ -95,6 +96,13 @@ export class Runner {
       // get the data for the object on which the operation will be performed
       // either from querying QRS (calling /XXX/filter)
       // or from result of previous task
+
+      // check for inline variables inside the filter
+      const regex = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
+      if (t.filter && regex.test(t.filter)) {
+        t.filter = this.replaceInlineVariables(t.filter, t.name, true);
+      }
+
       const data = !t.source
         ? await this.getFilterItems(t).catch((e) => {
             throw new CustomError(1011, t.name, {
@@ -111,11 +119,11 @@ export class Runner {
         totalSeconds: -1,
       };
 
-      if (
-        t.details &&
-        this.inlineVariablesRegex.test(JSON.stringify(t.details))
-      )
+      const regex1 = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
+      // check for inline variables inside the task details
+      if (t.details && regex1.test(JSON.stringify(t.details))) {
         t.details = this.replaceInlineVariables(t.details, t.name);
+      }
 
       t = this.replaceSpecialVariables(t);
 
@@ -153,13 +161,15 @@ export class Runner {
       // ignore the error and continue with the next task
       // (outside the onError block)
       if (t.onError && t.onError.ignore) return;
+      // if ignore is specifically set to false - throw the error
+      if (t.onError && t.onError.ignore == false) throw e;
 
       // throw custom error if onError.exit is provided
       if (t.onError && t.onError.exit) throw new CustomError(1017, t.name);
 
       // if there are any tasks specified in onError block
       // loop through them and run them as regular tasks
-      if (t.onError && t.onError.tasks.length > 0) {
+      if (t.onError && t.onError.tasks?.length > 0) {
         for (let onErrorTask of t.onError.tasks) {
           if (!onErrorTask.skip) await this.taskProcessing(onErrorTask);
         }
@@ -173,13 +183,25 @@ export class Runner {
   // is an inline variable $${xxx} then
   // replace its value with the id(s) from
   // the prev task result
-  private replaceInlineVariables(details, taskName) {
+  private replaceInlineVariables(details, taskName, isFilter?: boolean) {
+    if (isFilter) {
+      const regex1 = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
+      if (regex1.test(details)) {
+        const prevTaskName = details.match(regex1);
+
+        const prevTaskIds: any[] = prevTaskName.map((d) =>
+          this.getPropertyFromTaskResult(d)
+        );
+
+        return details.replace("$${" + `${prevTaskName}}`, prevTaskIds[0]);
+      }
+    }
+
     Object.entries(details).map(([key, value]) => {
-      // if the following line is removed the logic is not working. Why?!?!?!?!
-      const a = this.inlineVariablesRegex.test(JSON.stringify(value));
-      if (this.inlineVariablesRegex.test(JSON.stringify(value))) {
+      const regex2 = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
+      if (regex2.test(JSON.stringify(value))) {
         const prevTaskName = JSON.stringify(value).match(
-          this.inlineVariablesRegex
+          new RegExp(/(?<=\$\${)(.*?)(?=})/gm)
         );
 
         const prevTaskIds = prevTaskName.map((d) =>
@@ -198,6 +220,7 @@ export class Runner {
             });
           details[key] = prevTaskIds.join("");
         }
+        6;
       }
     });
 
