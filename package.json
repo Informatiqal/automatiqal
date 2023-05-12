@@ -73,7 +73,7 @@
     "vitest": "^0.31.0"
   },
   "dependencies": {
-    "@informatiqal/automatiqal-schema": "^0.5.2",
+    "@informatiqal/automatiqal-schema": "^0.6.0",
     "ajv": "^8.12.0",
     "events": "^3.3.0",
     "qlik-repo-api": "^0.6.1",
