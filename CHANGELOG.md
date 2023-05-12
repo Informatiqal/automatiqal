@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.2] - 2023-05-12
+
+- (internal) re-work of how inline variables are replaced
+- composite and schema triggers methods are now recognized
+
 ## [0.2.10] - 2023-05-07
 
 - few small bug fixes
