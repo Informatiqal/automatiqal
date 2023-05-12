@@ -100,7 +100,7 @@ export class Runner {
       // check for inline variables inside the filter
       const regex = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
       if (t.filter && regex.test(t.filter)) {
-        t.filter = this.replaceInlineVariables(t.filter, t.name, true);
+        t.filter = this.replaceInlineVariables(t.filter, t.name);
       }
 
       const data = !t.source
@@ -183,48 +183,28 @@ export class Runner {
   // is an inline variable $${xxx} then
   // replace its value with the id(s) from
   // the prev task result
-  private replaceInlineVariables(details, taskName, isFilter?: boolean) {
-    if (isFilter) {
-      const regex1 = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
-      if (regex1.test(details)) {
-        const prevTaskName = details.match(regex1);
+  private replaceInlineVariables(details, taskName) {
+    const regex = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
+    const regexSurrounding = new RegExp(/(...)(?<=\$\${)(.*?)(?=})(.)/gm);
 
-        const prevTaskIds: any[] = prevTaskName.map((d) =>
-          this.getPropertyFromTaskResult(d)
-        );
+    let detailsString = JSON.stringify(details);
 
-        return details.replace("$${" + `${prevTaskName}}`, prevTaskIds[0]);
-      }
-    }
+    const inlineVariablesMatch = [...detailsString.matchAll(regex)];
+    const inlineVariables = [...new Set(inlineVariablesMatch.map((m) => m[1]))];
+    if (inlineVariables.length == 0) return details;
 
-    Object.entries(details).map(([key, value]) => {
-      const regex2 = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
-      if (regex2.test(JSON.stringify(value))) {
-        const prevTaskName = JSON.stringify(value).match(
-          new RegExp(/(?<=\$\${)(.*?)(?=})/gm)
-        );
+    inlineVariables.map((v) => {
+      const value = this.getPropertyFromTaskResult(v);
+      if (value.length > 1)
+        throw new CustomError(1024, "", {
+          arg1: taskName,
+          arg2: v,
+        });
 
-        const prevTaskIds = prevTaskName.map((d) =>
-          this.getPropertyFromTaskResult(d)
-        );
-        if (Array.isArray(value)) {
-          details[key] = [...prevTaskIds];
-        }
-
-        if (typeof value == "string") {
-          if (prevTaskIds.length > 1)
-            throw new CustomError(1021, "", {
-              arg1: value,
-              arg2: key,
-              arg3: taskName,
-            });
-          details[key] = prevTaskIds.join("");
-        }
-        6;
-      }
+      detailsString = detailsString.replace(regexSurrounding, value[0]);
     });
 
-    return details;
+    return JSON.parse(detailsString);
   }
 
   private getPropertyFromTaskResult(taskName: string) {

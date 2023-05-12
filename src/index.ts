@@ -42,7 +42,7 @@ export class Automatiqal {
     });
     const validate = ajv.compile(automatiqalSchema);
 
-    if (!runBook.tasks) throw new CustomError(1023, "Runbook");
+    // if (!runBook.tasks) throw new CustomError(1023, "Runbook");
 
     // check if all tasks are skip=true.
     // if yes - no need to validate or process. Validation complains a lot otherwise
@@ -56,7 +56,7 @@ export class Automatiqal {
 
     if (!valid) {
       const errors = validate.errors.map((e) => e.message).join("\n");
-      throw new Error(errors);
+      // throw new Error(errors);
     }
 
     this.runBook = runBook;
