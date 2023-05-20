@@ -42,6 +42,7 @@ export class CustomError extends Error {
     1022: `Initial checks: Non valid task name. Name should not contain "#": %{arg1}`,
     1023: `Nothing to process. No tasks are specified or all tasks are set to skip = true`,
     1024: `Source for inline task contains more than one ID. Task %{arg1}. Inline variable %{arg2}`,
+    1025: `Task names should not contain # symbol. Please rename the following task(s): %{arg1}`,
   };
 
   constructor(code: number, taskName: string, params?: IErrorParams) {

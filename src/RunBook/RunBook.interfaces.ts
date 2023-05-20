@@ -9,6 +9,9 @@ import {
   ISystemRuleUpdate,
   IProxyUpdate,
   ITaskCreateTriggerSchema,
+  IAppUploadAndReplace,
+  IExternalTaskCreate,
+  ICompositeEvent,
 } from "qlik-repo-api/dist/types/interfaces";
 
 import { IConfig } from "qlik-rest-api/dist/interfaces/interfaces";
@@ -180,7 +183,7 @@ export interface IRunBook {
 
 export interface IAppUpload {
   name: string;
-  file: Buffer | object;
+  file: Buffer | object | string;
   keepData?: boolean;
   excludeDataConnections?: boolean;
 }
@@ -207,7 +210,10 @@ export type TaskDetails =
         filter?: string;
       };
     }
-  | { appFilter: string };
+  | { appFilter: string }
+  | IAppUploadAndReplace
+  | IExternalTaskCreate
+  ;
 
 export interface IAppPublish {
   name?: string;

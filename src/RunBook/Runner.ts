@@ -185,7 +185,6 @@ export class Runner {
   // the prev task result
   private replaceInlineVariables(details, taskName) {
     const regex = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
-    const regexSurrounding = new RegExp(/(...)(?<=\$\${)(.*?)(?=})(.)/gm);
 
     let detailsString = JSON.stringify(details);
 
@@ -194,14 +193,20 @@ export class Runner {
     if (inlineVariables.length == 0) return details;
 
     inlineVariables.map((v) => {
+      const inlineVariableDefinition = "".concat("$${", v, "}");
+      // const regexReplace = new RegExp(inlineVariableDefinition, "g");
       const value = this.getPropertyFromTaskResult(v);
+      // const regexSurrounding = new RegExp(/(...)(?<=\$\${)(.*?)(?=})(.)/gm);
+
       if (value.length > 1)
         throw new CustomError(1024, "", {
           arg1: taskName,
           arg2: v,
         });
 
-      detailsString = detailsString.replace(regexSurrounding, value[0]);
+      detailsString = detailsString
+        .split(inlineVariableDefinition)
+        .join(value[0]);
     });
 
     return JSON.parse(detailsString);
