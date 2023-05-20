@@ -122,6 +122,12 @@ export class Automatiqal {
       }
 
       try {
+        this.#checkForHashInTaskNames();
+      } catch (e) {
+        errors.push(e.context);
+      }
+
+      try {
         this.#checkMissingInlineVariableTask();
       } catch (e) {
         errors.push(e.context);
@@ -280,6 +286,17 @@ export class Automatiqal {
     if (nonExistingOps.length > 0)
       throw new CustomError(1013, "RunBook", {
         arg1: nonExistingOps.join(", "),
+      });
+  }
+
+  #checkForHashInTaskNames() {
+    const taskNamesWithHash = this.#tasksListFlat.filter(
+      (t) => t.name.indexOf("#") > -1
+    );
+
+    if (taskNamesWithHash.length > 0)
+      throw new CustomError(1015, "RunBook", {
+        arg1: taskNamesWithHash.join(", "),
       });
   }
 

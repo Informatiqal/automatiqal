@@ -8,6 +8,10 @@ import {
   ISystemRuleCreate,
   ISystemRuleUpdate,
   IProxyUpdate,
+  ITaskCreateTriggerSchema,
+  IAppUploadAndReplace,
+  IExternalTaskCreate,
+  ICompositeEvent,
 } from "qlik-repo-api/dist/types/interfaces";
 
 import { IConfig } from "qlik-rest-api/dist/interfaces/interfaces";
@@ -53,6 +57,10 @@ export type WinOperations =
   | "contentLibrary.remove"
   | "compositeTrigger.remove"
   | "compositeTrigger.update"
+  | "compositeTrigger.create"
+  | "schemaTrigger.remove"
+  | "schemaTrigger.update"
+  | "schemaTrigger.create"
   | "customProperty.get"
   | "customProperty.getAll"
   | "customProperty.create"
@@ -68,8 +76,6 @@ export type WinOperations =
   | "extension.import"
   | "extension.remove"
   | "extension.update"
-  | "externalTask.addTriggerSchema"
-  | "externalTask.addTriggerMany"
   | "externalTask.create"
   | "externalTask.get"
   | "externalTask.getAll"
@@ -80,9 +86,6 @@ export type WinOperations =
   | "externalTask.remove"
   | "node.get"
   | "node.getAll"
-  | "reloadTask.addTriggerSchema"
-  | "reloadTask.addTriggerComposite"
-  | "reloadTask.addTriggerMany"
   | "reloadTask.create"
   | "reloadTask.get"
   | "reloadTask.getAll"
@@ -180,7 +183,7 @@ export interface IRunBook {
 
 export interface IAppUpload {
   name: string;
-  file: Buffer | object;
+  file: Buffer | object | string;
   keepData?: boolean;
   excludeDataConnections?: boolean;
 }
@@ -199,7 +202,18 @@ export type TaskDetails =
   | ICertificateExportParameters
   | ITaskCreateTriggerComposite
   | IProxyUpdate
-  | { targetAppId: string };
+  | ITaskCreateTriggerSchema
+  | { targetAppId: string }
+  | {
+      task: {
+        id?: string;
+        filter?: string;
+      };
+    }
+  | { appFilter: string }
+  | IAppUploadAndReplace
+  | IExternalTaskCreate
+  ;
 
 export interface IAppPublish {
   name?: string;

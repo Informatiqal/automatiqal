@@ -74,6 +74,33 @@ const compositeTrigger: IWinOperation[] = [
     type: "CompositeTrigger",
     isPlural: false,
   },
+  {
+    name: "compositeTrigger.create",
+    isNonSource: true,
+    type: "CompositeTrigger",
+    isPlural: true,
+  },
+];
+
+const schemaTrigger: IWinOperation[] = [
+  {
+    name: "schemaTrigger.remove",
+    isNonSource: false,
+    type: "SchemaTrigger",
+    isPlural: false,
+  },
+  {
+    name: "schemaTrigger.update",
+    isNonSource: false,
+    type: "SchemaTrigger",
+    isPlural: false,
+  },
+  {
+    name: "schemaTrigger.create",
+    isNonSource: true,
+    type: "SchemaTrigger",
+    isPlural: true,
+  },
 ];
 
 const contentLibrary: IWinOperation[] = [
@@ -279,24 +306,6 @@ const node: IWinOperation[] = [
 
 const reloadTask: IWinOperation[] = [
   {
-    name: "reloadTask.addTriggerSchema",
-    isNonSource: false,
-    type: "ReloadTask",
-    isPlural: true,
-  },
-  {
-    name: "reloadTask.addTriggerComposite",
-    isNonSource: false,
-    type: "ReloadTask",
-    isPlural: false,
-  },
-  {
-    name: "reloadTask.addTriggerMany",
-    isNonSource: false,
-    type: "ReloadTask",
-    isPlural: true,
-  },
-  {
     name: "reloadTask.create",
     isNonSource: true,
     type: "ReloadTask",
@@ -481,6 +490,7 @@ const winOperations: IWinOperation[] = [
   ...externalTask,
   ...node,
   ...reloadTask,
+  ...schemaTrigger,
   ...stream,
   ...systemRule,
   ...tag,

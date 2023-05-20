@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.3] - 2023-05-XX
+
+- additional initial check for tasks containing `#`
+
+## [0.2.2] - 2023-05-12
+
+- (internal) re-work of how inline variables are replaced
+- composite and schema triggers methods are now recognized
+- `automatiqal-schema` updated to v0.6.0
+
 ## [0.2.10] - 2023-05-07
 
 - few small bug fixes
