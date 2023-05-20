@@ -1,10 +1,10 @@
 # Changelog
 
-## [0.2.3] - 2023-05-XX
+## [0.2.12] - 2023-05-XX
 
 - additional initial check for tasks containing `#`
 
-## [0.2.2] - 2023-05-12
+## [0.2.11] - 2023-05-12
 
 - (internal) re-work of how inline variables are replaced
 - composite and schema triggers methods are now recognized
