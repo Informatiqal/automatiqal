@@ -3,6 +3,7 @@ interface IWinOperation {
   isNonSource: boolean;
   type?: string;
   isPlural?: boolean;
+  sensitiveProperty?: string[];
 }
 
 const about: IWinOperation[] = [
@@ -34,7 +35,12 @@ const app: IWinOperation[] = [
 ];
 
 const certificate: IWinOperation[] = [
-  { name: "certificate.export", isNonSource: true, type: "Certificate" },
+  {
+    name: "certificate.export",
+    isNonSource: true,
+    type: "Certificate",
+    sensitiveProperty: ["certificatePassword"],
+  },
   {
     name: "certificate.distributionPathGet",
     isNonSource: true,
@@ -179,6 +185,7 @@ const dataConnection: IWinOperation[] = [
     isNonSource: true,
     type: "DataConnection",
     isPlural: true,
+    sensitiveProperty: ["password"],
   },
   {
     name: "dataConnection.remove",
@@ -191,6 +198,7 @@ const dataConnection: IWinOperation[] = [
     isNonSource: false,
     type: "DataConnection",
     isPlural: false,
+    sensitiveProperty: ["password"],
   },
 ];
 
@@ -212,6 +220,7 @@ const extension: IWinOperation[] = [
     isNonSource: true,
     type: "Extension",
     isPlural: true,
+    sensitiveProperty: ["password"],
   },
   {
     name: "extension.remove",
@@ -460,6 +469,7 @@ const virtualProxy: IWinOperation[] = [
     isNonSource: true,
     type: "VirtualProxy",
     isPlural: true,
+    sensitiveProperty: ["jwtPublicKeyCertificate", "oidcClientSecret"],
   },
   {
     name: "virtualProxy.remove",
@@ -467,7 +477,12 @@ const virtualProxy: IWinOperation[] = [
     type: "VirtualProxy",
     isPlural: false,
   },
-  { name: "virtualProxy.update", isNonSource: false, type: "VirtualProxy" },
+  {
+    name: "virtualProxy.update",
+    isNonSource: false,
+    type: "VirtualProxy",
+    sensitiveProperty: ["jwtPublicKeyCertificate"],
+  },
 ];
 
 const user: IWinOperation[] = [
@@ -503,6 +518,7 @@ const winOperations: IWinOperation[] = [
 export class WinOperations {
   nonSourceOperations: string[];
   nonSourceOperationsPlural: string[];
+  sensitiveDataOperations: string[];
   names: string[];
   allOperations: IWinOperation[];
   opTypes: { [key: string]: string };
@@ -526,6 +542,10 @@ export class WinOperations {
       .map((o) => o.name);
 
     this.names = winOperations.map((o) => o.name);
+
+    this.sensitiveDataOperations = winOperations
+      .filter((o) => o.hasOwnProperty("sensitiveProperty"))
+      .map((t) => t.name);
   }
 
   filter(name: string) {

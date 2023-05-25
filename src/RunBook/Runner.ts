@@ -138,7 +138,7 @@ export class Runner {
           1000;
 
         const result: ITaskResult = {
-          task: t,
+          task: this.maskSensitiveData(t),
           timings: timings,
           data: taskResult,
           status: "Completed",
@@ -151,7 +151,7 @@ export class Runner {
       });
     } catch (e) {
       this.taskResults.push({
-        task: t,
+        task: this.maskSensitiveData(t),
         status: "Error",
         data: [],
         timings: { start: "", end: "", totalSeconds: -1 },
@@ -291,5 +291,25 @@ export class Runner {
     }
 
     return JSON.parse(taskString) as ITask;
+  }
+
+  /**
+   * Mask any sensitive data inside the task details
+   * like data connection passwords
+   */
+  private maskSensitiveData(taskDetails: ITask) {
+    const isWithSensitiveData: boolean =
+      winOperations.sensitiveDataOperations.includes(taskDetails.operation);
+
+    if (!isWithSensitiveData) return taskDetails;
+
+    const operation = winOperations.filter(taskDetails.operation);
+
+    operation.sensitiveProperty.map((prop) => {
+      // if the property exists then mask it
+      if (taskDetails.details[prop]) taskDetails.details[prop] = "**********";
+    });
+
+    return taskDetails;
   }
 }

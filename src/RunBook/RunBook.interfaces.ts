@@ -12,6 +12,8 @@ import {
   IAppUploadAndReplace,
   IExternalTaskCreate,
   ICompositeEvent,
+  IDataConnectionCreate,
+  IDataConnectionUpdate,
 } from "qlik-repo-api/dist/types/interfaces";
 
 import { IConfig } from "qlik-rest-api/dist/interfaces/interfaces";
@@ -213,7 +215,8 @@ export type TaskDetails =
   | { appFilter: string }
   | IAppUploadAndReplace
   | IExternalTaskCreate
-  ;
+  | IDataConnectionCreate
+  | IDataConnectionUpdate;
 
 export interface IAppPublish {
   name?: string;
