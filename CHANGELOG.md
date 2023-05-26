@@ -1,6 +1,24 @@
 # Changelog
 
-## [0.2.12] - 2023-05-XX
+## [0.2.13] - 2023-05-26
+
+- mask sensitive data in the task result data [#177](https://github.com/Informatiqal/automatiqal/issues/177). The following properties will be masked:
+    - certificate.export:
+        - certificatePassword
+    - dataConnection.create:
+        - password
+    - dataConnection.update:
+        - password
+    - extension.import:
+        - password
+    - virtualProxy.create:
+        - jwtPublicKeyCertificate
+        - oidcClientSecret
+    - virtualProxy.update:
+        - jwtPublicKeyCertificate
+        - oidcClientSecret
+
+## [0.2.12] - 2023-05-20
 
 - additional initial check for tasks containing `#`
 
