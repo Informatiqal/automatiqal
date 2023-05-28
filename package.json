@@ -59,7 +59,7 @@
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
     "@rollup/plugin-typescript": "^11.1.1",
-    "@types/node": "20.2.3",
+    "@types/node": "20.2.5",
     "@types/uuid": "^9.0.1",
     "dotenv": "16.0.3",
     "esm": "^3.2.25",
@@ -76,7 +76,7 @@
     "@informatiqal/automatiqal-schema": "^0.6.2",
     "ajv": "^8.12.0",
     "events": "^3.3.0",
-    "qlik-repo-api": "^0.7.0",
+    "qlik-repo-api": "^0.7.2",
     "qlik-saas-api": "^0.6.1",
     "uuid": "^9.0.0"
   }
