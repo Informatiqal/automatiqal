@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.14] - 2023-05-28
+
+- dependency updates
+
 ## [0.2.13] - 2023-05-26
 
 - mask sensitive data in the task result data [#177](https://github.com/Informatiqal/automatiqal/issues/177). The following properties will be masked:

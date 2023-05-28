@@ -147,8 +147,8 @@ export interface ITask {
     allowZero?: boolean;
     whitelistOperation?: TAddRemoveSet;
     virtualProxiesOperation?: TAddRemoveSet;
-    tagOperations?: TAddRemoveSet;
-    customPropertyOperations?: TAddRemoveSet;
+    tagOperation?: TAddRemoveSet;
+    customPropertyOperation?: TAddRemoveSet;
   };
   location?: string;
   details?: TaskDetails;
