@@ -431,7 +431,7 @@ describe("Variables usage", function () {
   });
 });
 
-describe("Custom properties and tags", function () {
+describe("Custom properties", function () {
   it("Append/add custom properties", async function () {
     const runbook: IRunBook = {
       name: "Simple runbook",
@@ -607,6 +607,141 @@ describe("Custom properties and tags", function () {
             },
             options: {
               customPropertyOperation: "add",
+            },
+          },
+        ],
+      };
+
+      const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+      const result = await automatiqal.run();
+    } catch (e) {
+      error = e.message;
+    }
+
+    expect(error).to.be.equal(expectedError);
+  });
+});
+
+describe("Tags", function () {
+  it("Append/add tags", async function () {
+    const runbook: IRunBook = {
+      name: "Simple runbook",
+      environment: {
+        host: `${process.env.TEST_HOST}`,
+        port: 4242,
+        authentication: {
+          user_dir: `${process.env.TEST_USER_DIR}`,
+          user_name: `${process.env.TEST_USER_ID}`,
+        },
+      },
+      tasks: [
+        {
+          name: "Stream before update",
+          operation: "stream.get",
+          filter: `id eq ${process.env.TEST_STREAM_ID}`,
+        },
+        {
+          name: "Update stream 1",
+          description: "Append tags",
+          operation: "stream.update",
+          filter: `id eq ${process.env.TEST_STREAM_ID}`,
+          details: {
+            tags: ["test tag", "test tag 1"],
+          },
+          options: {
+            tagOperation: "add",
+          },
+        },
+        {
+          name: "Update stream 2",
+          description: "Remove tags",
+          operation: "stream.update",
+          filter: `id eq ${process.env.TEST_STREAM_ID}`,
+          details: {
+            tags: ["test tag", "test tag 1"],
+          },
+          options: {
+            tagOperation: "remove",
+          },
+        },
+      ],
+    };
+
+    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const result = await automatiqal.run();
+
+    const tagsCountBase = (result[0].data[0].details as IStream).tags.length;
+
+    const tagsCountAdd = (result[1].data[0] as IStream).tags.length;
+
+    const tagsCountRemove = (result[2].data[0] as IStream).tags.length;
+
+    expect(tagsCountBase + 2).to.be.equal(tagsCountAdd);
+    expect(tagsCountBase).to.be.equal(tagsCountRemove);
+  });
+
+  it("Set/overwrite tags", async function () {
+    const runbook: IRunBook = {
+      name: "Simple runbook",
+      environment: {
+        host: `${process.env.TEST_HOST}`,
+        port: 4242,
+        authentication: {
+          user_dir: `${process.env.TEST_USER_DIR}`,
+          user_name: `${process.env.TEST_USER_ID}`,
+        },
+      },
+      tasks: [
+        {
+          name: "Update stream 1",
+          description: "Set tags",
+          operation: "stream.update",
+          filter: `id eq ${process.env.TEST_STREAM_ID}`,
+          details: {
+            tags: ["test tag", "test tag 1"],
+          },
+          options: {
+            tagOperation: "set",
+          },
+        },
+      ],
+    };
+
+    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const result = await automatiqal.run();
+
+    const tagsCountSet = (result[0].data[0] as IStream).tags.length;
+
+    expect(tagsCountSet).to.be.equal(2);
+  });
+
+  it("Update with missing tag", async function () {
+    let expectedError =
+      'tags.get: Tag with name "some random tag" do not exists';
+    let error = "";
+
+    try {
+      const runbook: IRunBook = {
+        name: "Simple runbook",
+        environment: {
+          host: `${process.env.TEST_HOST}`,
+          port: 4242,
+          authentication: {
+            user_dir: `${process.env.TEST_USER_DIR}`,
+            user_name: `${process.env.TEST_USER_ID}`,
+          },
+        },
+        tasks: [
+          {
+            name: "Update stream 1",
+            description: "Append missing tag",
+            operation: "stream.update",
+            filter: `id eq ${process.env.TEST_STREAM_ID}`,
+            details: {
+              tags: ["some random tag"],
+            },
+            options: {
+              tagOperation: "add",
             },
           },
         ],
