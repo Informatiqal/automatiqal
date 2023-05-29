@@ -430,3 +430,194 @@ describe("Variables usage", function () {
     expect(result[3].data[0]).to.be.equal(204);
   });
 });
+
+describe("Custom properties and tags", function () {
+  it("Append/add custom properties", async function () {
+    const runbook: IRunBook = {
+      name: "Simple runbook",
+      environment: {
+        host: `${process.env.TEST_HOST}`,
+        port: 4242,
+        authentication: {
+          user_dir: `${process.env.TEST_USER_DIR}`,
+          user_name: `${process.env.TEST_USER_ID}`,
+        },
+      },
+      tasks: [
+        {
+          name: "Stream before update",
+          operation: "stream.get",
+          filter: `id eq ${process.env.TEST_STREAM_ID}`,
+        },
+        {
+          name: "Update stream 1",
+          description: "Append custom properties",
+          operation: "stream.update",
+          filter: `id eq ${process.env.TEST_STREAM_ID}`,
+          details: {
+            customProperties: [
+              "TestCustomProperty=value 2",
+              "TestCustomProperty=value 3",
+              "StreamAccess=ADGroup1",
+            ],
+          },
+          options: {
+            customPropertyOperation: "add",
+          },
+        },
+        {
+          name: "Update stream 2",
+          description: "Remove custom properties",
+          operation: "stream.update",
+          filter: `id eq ${process.env.TEST_STREAM_ID}`,
+          details: {
+            customProperties: [
+              "TestCustomProperty=value 2",
+              "TestCustomProperty=value 3",
+              "StreamAccess=ADGroup1",
+            ],
+          },
+          options: {
+            customPropertyOperation: "remove",
+          },
+        },
+      ],
+    };
+
+    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const result = await automatiqal.run();
+
+    const customPropsCountBase = (result[0].data[0].details as IStream)
+      .customProperties.length;
+
+    const customPropsCountAdd = (result[1].data[0] as IStream).customProperties
+      .length;
+
+    const customPropsCountRemove = (result[2].data[0] as IStream)
+      .customProperties.length;
+
+    expect(customPropsCountBase + 3).to.be.equal(customPropsCountAdd);
+    expect(customPropsCountBase).to.be.equal(customPropsCountRemove);
+  });
+
+  it("Set/overwrite custom properties", async function () {
+    const runbook: IRunBook = {
+      name: "Simple runbook",
+      environment: {
+        host: `${process.env.TEST_HOST}`,
+        port: 4242,
+        authentication: {
+          user_dir: `${process.env.TEST_USER_DIR}`,
+          user_name: `${process.env.TEST_USER_ID}`,
+        },
+      },
+      tasks: [
+        {
+          name: "Update stream 1",
+          description: "Append custom properties",
+          operation: "stream.update",
+          filter: `id eq ${process.env.TEST_STREAM_ID}`,
+          details: {
+            customProperties: [
+              "TestCustomProperty=value 2",
+              "StreamAccess=ADGroup1",
+            ],
+          },
+          options: {
+            customPropertyOperation: "set",
+          },
+        },
+      ],
+    };
+
+    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const result = await automatiqal.run();
+
+    const customPropsCountSet = (result[0].data[0] as IStream).customProperties
+      .length;
+
+    expect(customPropsCountSet).to.be.equal(2);
+  });
+
+  it("Update with missing custom property", async function () {
+    let expectedError =
+      'customProperty.get: Custom property with name "RandomCustomProperty" do not exists';
+    let error = "";
+
+    try {
+      const runbook: IRunBook = {
+        name: "Simple runbook",
+        environment: {
+          host: `${process.env.TEST_HOST}`,
+          port: 4242,
+          authentication: {
+            user_dir: `${process.env.TEST_USER_DIR}`,
+            user_name: `${process.env.TEST_USER_ID}`,
+          },
+        },
+        tasks: [
+          {
+            name: "Update stream 1",
+            description: "Append custom properties",
+            operation: "stream.update",
+            filter: `id eq ${process.env.TEST_STREAM_ID}`,
+            details: {
+              customProperties: ["RandomCustomProperty=value 2"],
+            },
+            options: {
+              customPropertyOperation: "add",
+            },
+          },
+        ],
+      };
+
+      const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+      const result = await automatiqal.run();
+    } catch (e) {
+      error = e.message;
+    }
+
+    expect(error).to.be.equal(expectedError);
+  });
+
+  it("Update with wrong custom property value", async function () {
+    let expectedError =
+      'customProperty.get: Choice value "random value" do not exists for custom property "TestCustomProperty"';
+    let error = "";
+
+    try {
+      const runbook: IRunBook = {
+        name: "Simple runbook",
+        environment: {
+          host: `${process.env.TEST_HOST}`,
+          port: 4242,
+          authentication: {
+            user_dir: `${process.env.TEST_USER_DIR}`,
+            user_name: `${process.env.TEST_USER_ID}`,
+          },
+        },
+        tasks: [
+          {
+            name: "Update stream 1",
+            description: "Append custom properties",
+            operation: "stream.update",
+            filter: `id eq ${process.env.TEST_STREAM_ID}`,
+            details: {
+              customProperties: ["TestCustomProperty=random value"],
+            },
+            options: {
+              customPropertyOperation: "add",
+            },
+          },
+        ],
+      };
+
+      const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+      const result = await automatiqal.run();
+    } catch (e) {
+      error = e.message;
+    }
+
+    expect(error).to.be.equal(expectedError);
+  });
+});
