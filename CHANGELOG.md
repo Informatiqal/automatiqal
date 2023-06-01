@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.16] - 2023-06-01
+
+- removed dependency on `uuid` package. It was causing some issue after building. Instead using `crypto.randomUUID` native function
+
 ## [0.2.15] - 2023-06-01
 
 - fix issue where binary data type was changed when special variables were replaced [#183](https://github.com/Informatiqal/automatiqal/issues/183)

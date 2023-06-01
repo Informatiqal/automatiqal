@@ -1,7 +1,5 @@
 import { QlikRepoApi } from "qlik-repo-api";
-import * as uuid from "uuid";
-// import { QlikSaaSApi } from "qlik-saas-api";
-// import { CustomError } from "../util/CustomError";
+import { randomUUID } from "crypto";
 import { IRunBook, ITask } from "./RunBook.interfaces";
 import { Task } from "./Task";
 import { Debugger } from "../util/Debugger";
@@ -251,7 +249,7 @@ export class Runner {
 
     if (a.includes("GUID"))
       taskString = taskString.replace(/\${GUID}/gi, () =>
-        uuid.v4().replace(/-/gi, "")
+        randomUUID().replace(/-/gi, "")
       );
 
     if (a.includes("NOW")) {
