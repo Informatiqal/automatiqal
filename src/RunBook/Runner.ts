@@ -235,6 +235,12 @@ export class Runner {
     const _this = this;
     let taskString = JSON.stringify(t);
 
+    let tempFile: Buffer;
+    if (t.details.hasOwnProperty("file")) {
+      tempFile = (t.details as { file: Buffer }).file;
+      (t.details as { file: Buffer }).file = undefined;
+    }
+
     let a = taskString.match(/(?<=\${)(.*?)(?=})/g);
 
     // nothing to replace. no need to proceed
@@ -290,7 +296,13 @@ export class Runner {
       });
     }
 
-    return JSON.parse(taskString) as ITask;
+    const tt = JSON.parse(taskString) as ITask;
+
+    if (t.details.hasOwnProperty("file")) {
+      (tt.details as any).file = tempFile;
+    }
+
+    return tt;
   }
 
   /**

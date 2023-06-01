@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.15] - 2023-06-01
+
+- fix issue where binary data type was changed when special variables were replaced [#183](https://github.com/Informatiqal/automatiqal/issues/183)
+- dependency updates
+
 ## [0.2.14] - 2023-05-28
 
 - dependency updates
