@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.17] - 2023-06-02
+
+- schema updated
+- `ajv-errors` is added as dependency
+
 ## [0.2.16] - 2023-06-01
 
 - removed dependency on `uuid` package. It was causing some issue after building. Instead using `crypto.randomUUID` native function

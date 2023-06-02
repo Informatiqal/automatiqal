@@ -216,7 +216,8 @@ export type TaskDetails =
   | IAppUploadAndReplace
   | IExternalTaskCreate
   | IDataConnectionCreate
-  | IDataConnectionUpdate;
+  | IDataConnectionUpdate
+  | { location: string; skipData?: boolean };
 
 export interface IAppPublish {
   name?: string;
