@@ -234,7 +234,7 @@ export class Runner {
     let taskString = JSON.stringify(t);
 
     let tempFile: Buffer;
-    if (t.details.hasOwnProperty("file")) {
+    if (t.details?.hasOwnProperty("file")) {
       tempFile = (t.details as { file: Buffer }).file;
       (t.details as { file: Buffer }).file = undefined;
     }

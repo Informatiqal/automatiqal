@@ -2,6 +2,7 @@ import { QlikRepoApi } from "qlik-repo-api";
 // import { QlikSaaSApi } from "qlik-saas-api";
 import { automatiqalSchema } from "@informatiqal/automatiqal-schema";
 import Ajv from "ajv";
+import ajvErrors from "ajv-errors";
 
 import { IRunBookResult, ITaskResult, Runner } from "./RunBook/Runner";
 import { IRunBook, ITask } from "./RunBook/RunBook.interfaces";
@@ -40,6 +41,9 @@ export class Automatiqal {
       strictRequired: true,
       allowUnionTypes: true,
     });
+
+    ajvErrors(ajv);
+
     const validate = ajv.compile(automatiqalSchema);
 
     if (!runBook.tasks) throw new CustomError(1023, "Runbook");
