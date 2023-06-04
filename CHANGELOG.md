@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.18] - 2023-06-04
+
+- schema updated
+
 ## [0.2.17] - 2023-06-02
 
 - schema updated
