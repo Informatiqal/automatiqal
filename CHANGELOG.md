@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.19] - 2023-06-05
+
+- dependency updates (mainly for `qlik-repo-api`)
+
 ## [0.2.18] - 2023-06-04
 
 - schema updated
