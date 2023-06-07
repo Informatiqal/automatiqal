@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: dotEnvPath });
 
 import { Automatiqal } from "../src/index";
+// import { Automatiqal } from "../dist/index";
 import { IRunBook } from "../src/RunBook/RunBook.interfaces";
 import {
   ICustomProperty,
@@ -754,5 +755,83 @@ describe("Tags", function () {
     }
 
     expect(error).to.be.equal(expectedError);
+  });
+});
+
+describe("Upload content", function () {
+  it("Upload app (Buffer)", async function () {
+    const appContent = fs.readFileSync(`${process.env.IMPORT_APP_FILE}`);
+
+    const runbook: IRunBook = {
+      name: "Simple runbook",
+      environment: {
+        host: `${process.env.TEST_HOST}`,
+        port: 4242,
+        authentication: {
+          user_dir: `${process.env.TEST_USER_DIR}`,
+          user_name: `${process.env.TEST_USER_ID}`,
+        },
+      },
+      tasks: [
+        {
+          name: "Upload app",
+          operation: "app.upload",
+          details: {
+            file: appContent,
+            name: "Temp app - Automatiqal Test Run",
+          },
+        },
+        {
+          name: "Remove temp app",
+          operation: "app.remove",
+          source: "Upload app",
+        },
+      ],
+    };
+
+    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const result = await automatiqal.run();
+
+    expect((result[0].data as any).details.hasOwnProperty("id")).to.be.true;
+    expect((result[0].data as any).details.fileSize).to.be.greaterThan(0);
+    expect(result[1].data).to.be.equal(204);
+  });
+
+  it("Upload app (ReadStream)", async function () {
+    const appContent = fs.createReadStream(`${process.env.IMPORT_APP_FILE}`);
+
+    const runbook: IRunBook = {
+      name: "Simple runbook",
+      environment: {
+        host: `${process.env.TEST_HOST}`,
+        port: 4242,
+        authentication: {
+          user_dir: `${process.env.TEST_USER_DIR}`,
+          user_name: `${process.env.TEST_USER_ID}`,
+        },
+      },
+      tasks: [
+        {
+          name: "Upload app",
+          operation: "app.upload",
+          details: {
+            file: appContent,
+            name: "Temp app - Automatiqal Test Run",
+          },
+        },
+        {
+          name: "Remove temp app",
+          operation: "app.remove",
+          source: "Upload app",
+        },
+      ],
+    };
+
+    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const result = await automatiqal.run();
+
+    expect((result[0].data as any).details.hasOwnProperty("id")).to.be.true;
+    expect((result[0].data as any).details.fileSize).to.be.greaterThan(0);
+    expect(result[1].data).to.be.equal(204);
   });
 });
