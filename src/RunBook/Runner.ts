@@ -231,18 +231,29 @@ export class Runner {
   // special variables are: GUID, TODAY, NOW and INCREMENT
   private replaceSpecialVariables(t: ITask): ITask {
     const _this = this;
-    let taskString = JSON.stringify(t);
 
+    // if file property exists and its value is of type Buffer
+    // then store the content of the buffer into a temp variable
+    // the reason for this is to not alter the buffer value
+    // when replacing the special variables
+    // the buffer value will be added back when all
+    // special values are replaces (the end of this function)
     let tempFile: Buffer;
     if (t.details?.hasOwnProperty("file")) {
       tempFile = (t.details as { file: Buffer }).file;
       (t.details as { file: Buffer }).file = undefined;
     }
 
+    let taskString = JSON.stringify(t);
+
     let a = taskString.match(/(?<=\${)(.*?)(?=})/g);
 
     // nothing to replace. no need to proceed
-    if (!a) return t;
+    // return the file prop value back to the object
+    if (!a) {
+      if (tempFile) (t.details as { file: Buffer }).file = tempFile;
+      return t;
+    }
 
     if (a.includes("TODAY"))
       taskString = taskString.replace(/\${TODAY}/gi, this.today);
@@ -296,9 +307,7 @@ export class Runner {
 
     const tt = JSON.parse(taskString) as ITask;
 
-    if (t.details.hasOwnProperty("file")) {
-      (tt.details as any).file = tempFile;
-    }
+    if (tempFile) (tt.details as any).file = tempFile;
 
     return tt;
   }

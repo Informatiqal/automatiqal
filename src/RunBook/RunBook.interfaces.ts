@@ -1,3 +1,4 @@
+import { ReadStream } from "fs";
 import {
   ICustomPropertyCreate,
   ICustomPropertyUpdate,
@@ -185,7 +186,7 @@ export interface IRunBook {
 
 export interface IAppUpload {
   name: string;
-  file: Buffer | object | string;
+  file: Buffer | object | string | ReadStream;
   keepData?: boolean;
   excludeDataConnections?: boolean;
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.20] - 2023-06-07
+
+- allow `ReadStream` to be passed when the operation is about uploading files (apps, content libraries, extensions etc.)
+- fix issue with Buffer/ReadStream when replacing special variables
+- dependency updates
+
 ## [0.2.19] - 2023-06-05
 
 - dependency updates (mainly for `qlik-repo-api`)
