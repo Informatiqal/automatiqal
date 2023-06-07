@@ -15,6 +15,7 @@ import {
   ICompositeEvent,
   IDataConnectionCreate,
   IDataConnectionUpdate,
+  IExtensionImport,
 } from "qlik-repo-api/dist/types/interfaces";
 
 import { IConfig } from "qlik-rest-api/dist/interfaces/interfaces";
@@ -218,9 +219,11 @@ export type TaskDetails =
   | IExternalTaskCreate
   | IDataConnectionCreate
   | IDataConnectionUpdate
+  | IExtensionImport
   | { location: string; skipData?: boolean }
   | { sourceFileNames: string[]; location: string }
-  | { sourceFileName: string; location: string };
+  | { sourceFileName: string; location: string }
+  ;
 
 export interface IAppPublish {
   name?: string;

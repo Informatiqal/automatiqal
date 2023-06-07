@@ -834,4 +834,80 @@ describe("Upload content", function () {
     expect((result[0].data as any).details.fileSize).to.be.greaterThan(0);
     expect(result[1].data).to.be.equal(204);
   });
+
+  it("Upload extension (Buffer)", async function () {
+    const extensionContent = fs.readFileSync(
+      `${process.env.IMPORT_EXTENSION_FILE}`
+    );
+
+    const runbook: IRunBook = {
+      name: "Simple runbook",
+      environment: {
+        host: `${process.env.TEST_HOST}`,
+        port: 4242,
+        authentication: {
+          user_dir: `${process.env.TEST_USER_DIR}`,
+          user_name: `${process.env.TEST_USER_ID}`,
+        },
+      },
+      tasks: [
+        {
+          name: "Upload extension",
+          operation: "extension.import",
+          details: {
+            file: extensionContent,
+          },
+        },
+        {
+          name: "Remove temp extension",
+          operation: "extension.remove",
+          source: "Upload extension",
+        },
+      ],
+    };
+
+    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const result = await automatiqal.run();
+
+    expect((result[0].data as any).details.hasOwnProperty("id")).to.be.true;
+    expect(result[1].data).to.be.equal(204);
+  });
+
+  it("Upload extension (ReadStream)", async function () {
+    const extensionContent = fs.createReadStream(
+      `${process.env.IMPORT_EXTENSION_FILE}`
+    );
+
+    const runbook: IRunBook = {
+      name: "Simple runbook",
+      environment: {
+        host: `${process.env.TEST_HOST}`,
+        port: 4242,
+        authentication: {
+          user_dir: `${process.env.TEST_USER_DIR}`,
+          user_name: `${process.env.TEST_USER_ID}`,
+        },
+      },
+      tasks: [
+        {
+          name: "Upload extension",
+          operation: "extension.import",
+          details: {
+            file: extensionContent,
+          },
+        },
+        {
+          name: "Remove temp extension",
+          operation: "extension.remove",
+          source: "Upload extension",
+        },
+      ],
+    };
+
+    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const result = await automatiqal.run();
+
+    expect((result[0].data as any).details.hasOwnProperty("id")).to.be.true;
+    expect(result[1].data).to.be.equal(204);
+  });
 });
