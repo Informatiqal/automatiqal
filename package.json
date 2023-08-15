@@ -44,7 +44,7 @@
     "!tsconfig.test.json",
     "!renovate.json",
     "!Notes.md",
-    "!.markdownlint.json"
+    "!.markdownlint.json" 
   ],
   "repository": {
     "type": "git",
