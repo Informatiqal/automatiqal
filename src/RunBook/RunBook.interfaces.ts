@@ -25,7 +25,11 @@ import { IConfig } from "qlik-rest-api/dist/interfaces/interfaces";
 // const operations = [...winOperations.map((m) => m.name)] as const;
 // export type WinOperations = typeof operations[number];
 
-export type SaaSOperations = "";
+export type SaaSOperations =
+  | "item.getAll"
+  | "item.get"
+  | "item.collections"
+  | "item.publishedItems";
 
 export type WinOperations =
   | "about.apiDefaults"
@@ -222,8 +226,7 @@ export type TaskDetails =
   | IExtensionImport
   | { location: string; skipData?: boolean }
   | { sourceFileNames: string[]; location: string }
-  | { sourceFileName: string; location: string }
-  ;
+  | { sourceFileName: string; location: string };
 
 export interface IAppPublish {
   name?: string;

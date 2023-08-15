@@ -2,21 +2,23 @@ import { IRunBookResult } from "./Runner";
 import { ITask } from "./RunBook.interfaces";
 import { CustomError } from "../util/CustomError";
 import { Debugger } from "../util/Debugger";
-import { WinOperations } from "../util/WinOperations";
+import { Operations } from "../util/operations/index";
 import { QlikRepoApi } from "qlik-repo-api";
+import { QlikSaaSApi } from "qlik-saas-api";
 
-const winOperations = new WinOperations();
 export class Task {
   task: ITask;
-  instance: QlikRepoApi.client;
+  instance: QlikRepoApi.client | QlikSaaSApi.client;
   objectsData?: any; // IRunBookResult;
   debug: Debugger;
   private isNoSource: boolean;
+  private operations: Operations;
   constructor(task: ITask, instance: any, objectsData?: IRunBookResult) {
     this.task = task;
     this.instance = instance;
     this.objectsData = objectsData;
     this.debug = new Debugger();
+    this.operations = Operations.getInstance();
 
     this.taskDataChecks();
   }
@@ -25,7 +27,7 @@ export class Task {
   // .. This definitely requires refactoring!!!
   async process(): Promise<IRunBookResult[]> {
     const a = this.task.operation.split(".");
-    const op = winOperations.filter(this.task.operation);
+    const op = this.operations.ops.filter(this.task.operation);
 
     // app.exportMany is slightly different.
     // And should be handled separately :(
@@ -43,7 +45,7 @@ export class Task {
       }
 
       // if "filter" is provided then just pass it as it is
-      return (await this.instance.apps
+      return (await (this.instance as QlikRepoApi.client).apps
         .exportMany({ filter: this.task.filter, ...this.task.details })
         .catch((e) => {
           e.message = `REST communication error! ${e.message}`;
@@ -64,8 +66,10 @@ export class Task {
 
     if (this.isNoSource) {
       if (
-        winOperations.nonSourceOperationsPlural.indexOf(this.task.operation) ==
-        -1
+        this.operations.ops.nonSourceOperationsPlural.indexOf(
+          this.task.operation
+        ) == -1 &&
+        (this.instance as QlikRepoApi.client).about
       ) {
         if (a[0].substring(a[0].length - 2) == "ie") a[0] = `${a[0]}s`;
         return await this.instance[a[0]]
@@ -76,7 +80,7 @@ export class Task {
             throw e;
           });
       }
-
+      
       return await this.instance[`${a[0]}s`]
         [a[1]](this.task.details || {}, this.task.options)
         .catch((e) => {
@@ -142,7 +146,9 @@ export class Task {
       throw new CustomError(1009, this.task.name);
 
     // no source operation flag set
-    if (winOperations.nonSourceOperations.indexOf(this.task.operation) > -1) {
+    if (
+      this.operations.ops.nonSourceOperations.indexOf(this.task.operation) > -1
+    ) {
       this.isNoSource = true;
       return;
     }

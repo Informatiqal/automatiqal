@@ -5,9 +5,8 @@ import { Task } from "./Task";
 import { Debugger } from "../util/Debugger";
 import { EventsBus } from "../util/EventBus";
 import { CustomError } from "../util/CustomError";
-import { WinOperations } from "../util/WinOperations";
+import { Operations } from "../util/operations/index";
 
-const winOperations = new WinOperations();
 export interface IRunBookResult {
   task: string;
   // result: ITaskResult;
@@ -37,6 +36,7 @@ export class Runner {
   private emitter: EventsBus;
   private today: string;
   private increment: number = 1;
+  private operations: Operations;
   // private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/; // match values - $${xxxx}
   // TODO: how to re-use the regex? issue when using in multiple places when defined here
   // private inlineVariablesRegex = new RegExp(/(?<=\$\${)(.*?)(?=})/gm); // match ALL values - $${xxxx}
@@ -46,6 +46,7 @@ export class Runner {
     this.taskResults = [];
     this.emitter = new EventsBus();
     this.debug = new Debugger(this.runBook.trace, this.emitter);
+    this.operations = Operations.getInstance();
 
     const date = new Date();
     this.today = date.toISOString().split("T")[0].replace(/-/gi, "");
@@ -64,10 +65,13 @@ export class Runner {
   private async getFilterItems(task: ITask): Promise<any> {
     const a = task.operation.split(".");
 
-    if (winOperations.nonSourceOperations.indexOf(task.operation) > -1) {
+    if (this.operations.ops.nonSourceOperations.indexOf(task.operation) > -1) {
       // this.debug.print(task.name, "0");
       return {};
     }
+
+    if (this.operations.ops.nonSourceOperations.indexOf(task.operation) > -1)
+      return {};
 
     // NOTE: special operation? debug? continue?
     // if (a.length == 1) {
@@ -318,11 +322,13 @@ export class Runner {
    */
   private maskSensitiveData(taskDetails: ITask) {
     const isWithSensitiveData: boolean =
-      winOperations.sensitiveDataOperations.includes(taskDetails.operation);
+      this.operations.ops.sensitiveDataOperations.includes(
+        taskDetails.operation
+      );
 
     if (!isWithSensitiveData) return taskDetails;
 
-    const operation = winOperations.filter(taskDetails.operation);
+    const operation = this.operations.ops.filter(taskDetails.operation);
 
     operation.sensitiveProperty.map((prop) => {
       // if the property exists then mask it

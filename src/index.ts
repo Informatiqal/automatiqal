@@ -1,5 +1,5 @@
 import { QlikRepoApi } from "qlik-repo-api";
-// import { QlikSaaSApi } from "qlik-saas-api";
+import { QlikSaaSApi } from "qlik-saas-api";
 import { automatiqalSchema } from "@informatiqal/automatiqal-schema";
 import Ajv from "ajv";
 import ajvErrors from "ajv-errors";
@@ -8,9 +8,7 @@ import { IRunBookResult, ITaskResult, Runner } from "./RunBook/Runner";
 import { IRunBook, ITask } from "./RunBook/RunBook.interfaces";
 import { CustomError } from "./util/CustomError";
 import { EventsBus } from "./util/EventBus";
-import { WinOperations } from "./util/WinOperations";
-
-const winOperations = new WinOperations();
+import { Operations } from "./util/operations/index";
 
 export type initialChecksNames =
   | "checkDuplicateTasks"
@@ -24,8 +22,9 @@ export class Automatiqal {
   runBook: IRunBook;
   #tasksListFlat: ITask[];
   #taskNames: string[];
-  #restInstance: QlikRepoApi.client; //| QlikSaaSApi.client;
+  #restInstance: QlikRepoApi.client | QlikSaaSApi.client;
   #runner: Runner;
+  #ops: Operations;
   #initialChecksList: initialChecksNames[];
   emitter: EventsBus;
   // #inlineVariablesRegex = new RegExp(/(?<=\$\${)(.*?)(?=})/g); // match ALL values - $${xxxx}
@@ -56,12 +55,12 @@ export class Automatiqal {
       if (nonSkipTasks.length == 0) throw new CustomError(1023, "Runbook");
     }
 
-    const valid = validate(runBook);
+    // const valid = validate(runBook);
 
-    if (!valid) {
-      const errors = validate.errors.map((e) => e.message).join("\n");
-      throw new Error(errors);
-    }
+    // if (!valid) {
+    //   const errors = validate.errors.map((e) => e.message).join("\n");
+    //   throw new Error(errors);
+    // }
 
     this.runBook = runBook;
     this.#tasksListFlat = this.#flatTask(this.runBook.tasks);
@@ -74,6 +73,8 @@ export class Automatiqal {
 
     // default the runbook to QSEoW edition
     if (!this.runBook.edition) this.runBook.edition = "windows";
+
+    this.#ops = Operations.getInstance(this.runBook.edition);
 
     // perform obvious checks before execution
     this.initialChecks();
@@ -98,7 +99,12 @@ export class Automatiqal {
       }
     }
 
-    if (runBook.edition == "saas") throw new CustomError(1019, "");
+    if (runBook.edition == "saas") {
+      this.#restInstance = new QlikSaaSApi.client({
+        host: runBook.environment.host,
+        authentication: runBook.environment.authentication,
+      });
+    }
 
     // initialize the Runner
     this.#runner = new Runner(this.runBook, this.#restInstance);
@@ -118,103 +124,103 @@ export class Automatiqal {
     let errors: string[] = [];
 
     // TODO: anyway to solve this in a different way?
-    if (!this.#initialChecksList || this.#initialChecksList.length == 0) {
-      try {
-        this.#checkDuplicateTasks();
-      } catch (e) {
-        errors.push(e.context);
-      }
+    // if (!this.#initialChecksList || this.#initialChecksList.length == 0) {
+    //   try {
+    //     this.#checkDuplicateTasks();
+    //   } catch (e) {
+    //     errors.push(e.context);
+    //   }
 
-      try {
-        this.#checkForHashInTaskNames();
-      } catch (e) {
-        errors.push(e.context);
-      }
+    //   try {
+    //     this.#checkForHashInTaskNames();
+    //   } catch (e) {
+    //     errors.push(e.context);
+    //   }
 
-      try {
-        this.#checkMissingInlineVariableTask();
-      } catch (e) {
-        errors.push(e.context);
-      }
+    //   try {
+    //     this.#checkMissingInlineVariableTask();
+    //   } catch (e) {
+    //     errors.push(e.context);
+    //   }
 
-      try {
-        this.#checkWrongOperation();
-      } catch (e) {
-        errors.push(e.context);
-      }
+    //   try {
+    //     this.#checkWrongOperation();
+    //   } catch (e) {
+    //     errors.push(e.context);
+    //   }
 
-      try {
-        this.#checkMissingSource();
-      } catch (e) {
-        errors.push(e.context);
-      }
+    //   try {
+    //     this.#checkMissingSource();
+    //   } catch (e) {
+    //     errors.push(e.context);
+    //   }
 
-      try {
-        this.#checkCustomPropertiesName();
-      } catch (e) {
-        errors.push(e.context);
-      }
+    //   try {
+    //     this.#checkCustomPropertiesName();
+    //   } catch (e) {
+    //     errors.push(e.context);
+    //   }
 
-      try {
-        this.#checkCorrectSource();
-      } catch (e) {
-        errors.push(e.context);
-      }
+    //   try {
+    //     this.#checkCorrectSource();
+    //   } catch (e) {
+    //     errors.push(e.context);
+    //   }
 
-      try {
-        this.#checkValidTaskName();
-      } catch (e) {
-        errors.push(e.context);
-      }
-    } else {
-      if (this.#initialChecksList.includes("checkDuplicateTasks")) {
-        try {
-          this.#checkDuplicateTasks();
-        } catch (e) {
-          errors.push(e.context);
-        }
-      }
+    //   try {
+    //     this.#checkValidTaskName();
+    //   } catch (e) {
+    //     errors.push(e.context);
+    //   }
+    // } else {
+    //   if (this.#initialChecksList.includes("checkDuplicateTasks")) {
+    //     try {
+    //       this.#checkDuplicateTasks();
+    //     } catch (e) {
+    //       errors.push(e.context);
+    //     }
+    //   }
 
-      if (this.#initialChecksList.includes("checkWrongOperation")) {
-        try {
-          this.#checkWrongOperation();
-        } catch (e) {
-          errors.push(e.context);
-        }
-      }
+    //   if (this.#initialChecksList.includes("checkWrongOperation")) {
+    //     try {
+    //       this.#checkWrongOperation();
+    //     } catch (e) {
+    //       errors.push(e.context);
+    //     }
+    //   }
 
-      if (this.#initialChecksList.includes("checkMissingSource")) {
-        try {
-          this.#checkMissingSource();
-        } catch (e) {
-          errors.push(e.context);
-        }
-      }
+    //   if (this.#initialChecksList.includes("checkMissingSource")) {
+    //     try {
+    //       this.#checkMissingSource();
+    //     } catch (e) {
+    //       errors.push(e.context);
+    //     }
+    //   }
 
-      if (this.#initialChecksList.includes("checkCustomPropertiesName")) {
-        try {
-          this.#checkCustomPropertiesName();
-        } catch (e) {
-          errors.push(e.context);
-        }
-      }
+    //   if (this.#initialChecksList.includes("checkCustomPropertiesName")) {
+    //     try {
+    //       this.#checkCustomPropertiesName();
+    //     } catch (e) {
+    //       errors.push(e.context);
+    //     }
+    //   }
 
-      if (this.#initialChecksList.includes("checkCorrectSource")) {
-        try {
-          this.#checkCorrectSource();
-        } catch (e) {
-          errors.push(e.context);
-        }
-      }
+    //   if (this.#initialChecksList.includes("checkCorrectSource")) {
+    //     try {
+    //       this.#checkCorrectSource();
+    //     } catch (e) {
+    //       errors.push(e.context);
+    //     }
+    //   }
 
-      if (this.#initialChecksList.includes("checkValidTaskName")) {
-        try {
-          this.#checkValidTaskName();
-        } catch (e) {
-          errors.push(e.context);
-        }
-      }
-    }
+    //   if (this.#initialChecksList.includes("checkValidTaskName")) {
+    //     try {
+    //       this.#checkValidTaskName();
+    //     } catch (e) {
+    //       errors.push(e.context);
+    //     }
+    //   }
+    // }
 
     if (errors.length > 0) throw new Error(errors.join("\n"));
   }
@@ -239,7 +245,7 @@ export class Automatiqal {
     const missingSource = this.#tasksListFlat
       .filter((t) => !t.source && !t.filter)
       .map((t) => {
-        const i = winOperations.nonSourceOperations.indexOf(t.operation);
+        const i = this.#ops.ops.nonSourceOperations.indexOf(t.operation);
 
         if (i == -1) return t;
 
@@ -278,7 +284,7 @@ export class Automatiqal {
   #checkWrongOperation() {
     const nonExistingOps = this.#tasksListFlat
       .map((t) => {
-        const i = winOperations.names.indexOf(t.operation);
+        const i = this.#ops.ops.names.indexOf(t.operation);
 
         if (i == -1) return t;
 
@@ -344,7 +350,7 @@ export class Automatiqal {
     // from the beginning that the task will fail
 
     // NOTE: any exclusions from this rule?
-    const tasksReturnTypes = winOperations.opTypes;
+    const tasksReturnTypes = this.#ops.ops.opTypes;
 
     const opMismatchTasks = this.#tasksListFlat
       .filter((t) => t.hasOwnProperty("source"))
