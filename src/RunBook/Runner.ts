@@ -65,11 +65,6 @@ export class Runner {
   private async getFilterItems(task: ITask): Promise<any> {
     const a = task.operation.split(".");
 
-    if (this.operations.ops.nonSourceOperations.indexOf(task.operation) > -1) {
-      // this.debug.print(task.name, "0");
-      return {};
-    }
-
     if (this.operations.ops.nonSourceOperations.indexOf(task.operation) > -1)
       return {};
 
@@ -186,6 +181,7 @@ export class Runner {
   // replace its value with the id(s) from
   // the prev task result
   private replaceInlineVariables(details, taskName) {
+    const _this = this;
     const regex = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
 
     let detailsString = JSON.stringify(details);
@@ -197,7 +193,7 @@ export class Runner {
     inlineVariables.map((v) => {
       const inlineVariableDefinition = "".concat("$${", v, "}");
       // const regexReplace = new RegExp(inlineVariableDefinition, "g");
-      const value = this.getPropertyFromTaskResult(v);
+      const value = _this.getPropertyFromTaskResult(v, taskName);
       // const regexSurrounding = new RegExp(/(...)(?<=\$\${)(.*?)(?=})(.)/gm);
 
       if (value.length > 1)
@@ -214,7 +210,7 @@ export class Runner {
     return JSON.parse(detailsString);
   }
 
-  private getPropertyFromTaskResult(taskName: string) {
+  private getPropertyFromTaskResult(taskName: string, sourceTaskName: string) {
     const [name, property] = taskName.split("#");
 
     const taskResult = this.taskResults.filter((r) => r.task.name == name)[0];
@@ -222,9 +218,21 @@ export class Runner {
     // if property is used then return its value
     // else return ID as default
     if (Array.isArray(taskResult.data))
-      return (taskResult.data as IRunBookResult[]).map(
-        (d) => d.details[property ? property : "id"]
-      );
+      return (taskResult.data as IRunBookResult[]).map((d) => {
+        if (!property) return "id";
+
+        const inlineValue = property
+          .split(".")
+          .reduce((a, prop) => a[prop], d.details);
+
+        if (!inlineValue)
+          throw new CustomError(1026, sourceTaskName, {
+            arg1: name,
+            arg2: property,
+          });
+
+        return inlineValue;
+      });
 
     return [
       (taskResult.data as IRunBookResult).details[property ? property : "id"],
