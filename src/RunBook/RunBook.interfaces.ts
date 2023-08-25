@@ -18,26 +18,46 @@ import {
   IExtensionImport,
 } from "qlik-repo-api/dist/types/interfaces";
 
+import { IDataConnectionsCreate } from "qlik-saas-api/dist/modules/DataConnections";
+import { IDataConnectionsUpdate } from "qlik-saas-api/dist/modules/DataConnection";
+import {
+  IAppImport,
+  IAppUpdate as IAppUpdate_SaaS,
+  IAppPublish as IAppPublish_SaaS,
+  IAppCopy,
+  IAppRePublish,
+} from "qlik-saas-api/dist/modules/Apps.interfaces";
+
 import { IConfig } from "qlik-rest-api/dist/interfaces/interfaces";
 
 export type SaaSOperations =
+  | "app.get"
+  | "app.getAll"
+  | "app.import"
+  | "app.create"
+  | "app.copy"
+  | "app.export"
+  | "app.publish"
+  | "app.rePublish"
+  | "app.addToSpace"
+  | "app.removeFromSpace"
+  | "app.remove"
+  | "app.update"
   | "item.getAll"
   | "item.get"
   | "item.collections"
   | "item.publishedItems"
   | "space.get"
   | "space.getAll"
-  | "space.getFilter"
   | "space.create"
   | "space.remove"
   | "space.update"
+  | "space.assignments"
   | "dataConnection.get"
   | "dataConnection.getAll"
-  | "dataConnection.getFilter"
   | "dataConnection.create"
   | "dataConnection.remove"
   | "dataConnection.update"
-  | "space.assignments"
   | "user.get"
   | "user.getAll"
   | "user.create"
@@ -45,7 +65,6 @@ export type SaaSOperations =
   | "user.me"
   | "user.metadata"
   | "user.update"
-  | "app.getFilter"
   | "reload.start";
 
 export type WinOperations =
@@ -240,11 +259,19 @@ export type TaskDetails =
   | IAppUploadAndReplace
   | IExternalTaskCreate
   | IDataConnectionCreate
+  | IDataConnectionsCreate
+  | IDataConnectionsUpdate
   | IDataConnectionUpdate
   | IExtensionImport
+  | IAppImport
+  | IAppUpdate_SaaS
+  | IAppPublish_SaaS
+  | IAppRePublish
+  | IAppCopy
   | { location: string; skipData?: boolean }
   | { sourceFileNames: string[]; location: string }
-  | { sourceFileName: string; location: string };
+  | { sourceFileName: string; location: string }
+  | { spaceId: string };
 
 export interface IAppPublish {
   name?: string;

@@ -56,6 +56,17 @@ const user: ISaaSOperation[] = [
 
 const app: ISaaSOperation[] = [
   { name: "app.get", isNonSource: false, type: "App" },
+  { name: "app.getAll", isNonSource: true, type: "App", isPlural: true },
+  { name: "app.remove", isNonSource: false, type: "App" },
+  { name: "app.import", isNonSource: true, type: "App", isPlural: true },
+  { name: "app.create", isNonSource: true, type: "App", isPlural: true },
+  { name: "app.copy", isNonSource: false, type: "App" },
+  { name: "app.export", isNonSource: false, type: "App" },
+  { name: "app.publish", isNonSource: false, type: "App" },
+  { name: "app.rePublish", isNonSource: false, type: "App" },
+  { name: "app.addToSpace", isNonSource: false, type: "App" },
+  { name: "app.removeFromSpace", isNonSource: false, type: "App" },
+  { name: "app.update", isNonSource: false, type: "App" },
 ];
 
 const reload: ISaaSOperation[] = [

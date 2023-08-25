@@ -103,6 +103,13 @@ export class Automatiqal {
       this.#restInstance = new QlikSaaSApi.client({
         host: runBook.environment.host,
         authentication: runBook.environment.authentication,
+        options: {
+          saas: {
+            apps: {
+              swapResourceIdAndId: true,
+            },
+          },
+        },
       });
     }
 

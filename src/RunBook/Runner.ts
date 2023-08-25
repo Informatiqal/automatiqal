@@ -196,7 +196,7 @@ export class Runner {
       const value = _this.getPropertyFromTaskResult(v, taskName);
       // const regexSurrounding = new RegExp(/(...)(?<=\$\${)(.*?)(?=})(.)/gm);
 
-      if (value.length > 1)
+      if (Array.isArray(value) && value.length > 1)
         throw new CustomError(1024, "", {
           arg1: taskName,
           arg2: v,
@@ -204,7 +204,7 @@ export class Runner {
 
       detailsString = detailsString
         .split(inlineVariableDefinition)
-        .join(value[0]);
+        .join(Array.isArray(value) ? value[0] : value);
     });
 
     return JSON.parse(detailsString);
@@ -234,9 +234,23 @@ export class Runner {
         return inlineValue;
       });
 
-    return [
-      (taskResult.data as IRunBookResult).details[property ? property : "id"],
-    ];
+    if (!property) return (taskResult.data as IRunBookResult).details["id"];
+
+    const inlineValue = property
+      .split(".")
+      .reduce((a, prop) => a[prop], taskResult.data.details);
+
+    if (!inlineValue)
+      throw new CustomError(1026, sourceTaskName, {
+        arg1: name,
+        arg2: property,
+      });
+
+    return inlineValue;
+
+    // return [
+    //   (taskResult.data as IRunBookResult).details[property ? property : "id"],
+    // ];
   }
 
   // replace special variables per task

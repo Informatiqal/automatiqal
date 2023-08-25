@@ -57,20 +57,20 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.4",
     "@rollup/plugin-json": "^6.0.0",
-    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.1",
     "@rollup/plugin-typescript": "^11.1.2",
-    "@types/node": "20.5.0",
+    "@types/node": "20.5.6",
     "@types/uuid": "^9.0.2",
     "dotenv": "16.3.1",
     "esm": "^3.2.25",
     "nyc": "15.1.0",
-    "rollup": "^3.28.0",
+    "rollup": "^3.28.1",
     "rollup-plugin-delete": "2.0.0",
     "ts-node": "10.9.1",
-    "tslib": "2.6.1",
+    "tslib": "2.6.2",
     "typedoc": "0.24.8",
     "typescript": "^5.0.4",
-    "vitest": "^0.34.1"
+    "vitest": "^0.34.3"
   },
   "dependencies": {
     "@informatiqal/automatiqal-schema": "^0.8.0",
@@ -78,6 +78,6 @@
     "ajv-errors": "^3.0.0",
     "events": "^3.3.0",
     "qlik-repo-api": "^0.12.0",
-    "qlik-saas-api": "^0.11.0"
+    "qlik-saas-api": "^0.13.3"
   }
 }
