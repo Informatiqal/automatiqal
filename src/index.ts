@@ -131,103 +131,103 @@ export class Automatiqal {
     let errors: string[] = [];
 
     // TODO: anyway to solve this in a different way?
-    // if (!this.#initialChecksList || this.#initialChecksList.length == 0) {
-    //   try {
-    //     this.#checkDuplicateTasks();
-    //   } catch (e) {
-    //     errors.push(e.context);
-    //   }
+    if (!this.#initialChecksList || this.#initialChecksList.length == 0) {
+      try {
+        this.#checkDuplicateTasks();
+      } catch (e) {
+        errors.push(e.context);
+      }
 
-    //   try {
-    //     this.#checkForHashInTaskNames();
-    //   } catch (e) {
-    //     errors.push(e.context);
-    //   }
+      try {
+        this.#checkForHashInTaskNames();
+      } catch (e) {
+        errors.push(e.context);
+      }
 
-    //   try {
-    //     this.#checkMissingInlineVariableTask();
-    //   } catch (e) {
-    //     errors.push(e.context);
-    //   }
+      try {
+        this.#checkMissingInlineVariableTask();
+      } catch (e) {
+        errors.push(e.context);
+      }
 
-    //   try {
-    //     this.#checkWrongOperation();
-    //   } catch (e) {
-    //     errors.push(e.context);
-    //   }
+      try {
+        this.#checkWrongOperation();
+      } catch (e) {
+        errors.push(e.context);
+      }
 
-    //   try {
-    //     this.#checkMissingSource();
-    //   } catch (e) {
-    //     errors.push(e.context);
-    //   }
+      try {
+        this.#checkMissingSource();
+      } catch (e) {
+        errors.push(e.context);
+      }
 
-    //   try {
-    //     this.#checkCustomPropertiesName();
-    //   } catch (e) {
-    //     errors.push(e.context);
-    //   }
+      try {
+        this.#checkCustomPropertiesName();
+      } catch (e) {
+        errors.push(e.context);
+      }
 
-    //   try {
-    //     this.#checkCorrectSource();
-    //   } catch (e) {
-    //     errors.push(e.context);
-    //   }
+      try {
+        this.#checkCorrectSource();
+      } catch (e) {
+        errors.push(e.context);
+      }
 
-    //   try {
-    //     this.#checkValidTaskName();
-    //   } catch (e) {
-    //     errors.push(e.context);
-    //   }
-    // } else {
-    //   if (this.#initialChecksList.includes("checkDuplicateTasks")) {
-    //     try {
-    //       this.#checkDuplicateTasks();
-    //     } catch (e) {
-    //       errors.push(e.context);
-    //     }
-    //   }
+      try {
+        this.#checkValidTaskName();
+      } catch (e) {
+        errors.push(e.context);
+      }
+    } else {
+      if (this.#initialChecksList.includes("checkDuplicateTasks")) {
+        try {
+          this.#checkDuplicateTasks();
+        } catch (e) {
+          errors.push(e.context);
+        }
+      }
 
-    //   if (this.#initialChecksList.includes("checkWrongOperation")) {
-    //     try {
-    //       this.#checkWrongOperation();
-    //     } catch (e) {
-    //       errors.push(e.context);
-    //     }
-    //   }
+      if (this.#initialChecksList.includes("checkWrongOperation")) {
+        try {
+          this.#checkWrongOperation();
+        } catch (e) {
+          errors.push(e.context);
+        }
+      }
 
-    //   if (this.#initialChecksList.includes("checkMissingSource")) {
-    //     try {
-    //       this.#checkMissingSource();
-    //     } catch (e) {
-    //       errors.push(e.context);
-    //     }
-    //   }
+      if (this.#initialChecksList.includes("checkMissingSource")) {
+        try {
+          this.#checkMissingSource();
+        } catch (e) {
+          errors.push(e.context);
+        }
+      }
 
-    //   if (this.#initialChecksList.includes("checkCustomPropertiesName")) {
-    //     try {
-    //       this.#checkCustomPropertiesName();
-    //     } catch (e) {
-    //       errors.push(e.context);
-    //     }
-    //   }
+      if (this.#initialChecksList.includes("checkCustomPropertiesName")) {
+        try {
+          this.#checkCustomPropertiesName();
+        } catch (e) {
+          errors.push(e.context);
+        }
+      }
 
-    //   if (this.#initialChecksList.includes("checkCorrectSource")) {
-    //     try {
-    //       this.#checkCorrectSource();
-    //     } catch (e) {
-    //       errors.push(e.context);
-    //     }
-    //   }
+      if (this.#initialChecksList.includes("checkCorrectSource")) {
+        try {
+          this.#checkCorrectSource();
+        } catch (e) {
+          errors.push(e.context);
+        }
+      }
 
-    //   if (this.#initialChecksList.includes("checkValidTaskName")) {
-    //     try {
-    //       this.#checkValidTaskName();
-    //     } catch (e) {
-    //       errors.push(e.context);
-    //     }
-    //   }
-    // }
+      if (this.#initialChecksList.includes("checkValidTaskName")) {
+        try {
+          this.#checkValidTaskName();
+        } catch (e) {
+          errors.push(e.context);
+        }
+      }
+    }
 
     if (errors.length > 0) throw new Error(errors.join("\n"));
   }

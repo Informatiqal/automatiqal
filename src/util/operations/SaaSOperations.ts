@@ -73,13 +73,28 @@ const reload: ISaaSOperation[] = [
   { name: "reload.start", isNonSource: true, type: "Reload", isPlural: true },
 ];
 
+const origins: ISaaSOperation[] = [
+  { name: "origin.get", isNonSource: false, type: "Origin" },
+  { name: "origin.getAll", isNonSource: true, type: "Origin", isPlural: true },
+  { name: "origin.create", isNonSource: true, type: "Origin", isPlural: true },
+  { name: "origin.remove", isNonSource: false, type: "Origin" },
+  { name: "origin.update", isNonSource: false, type: "Origin" },
+  {
+    name: "origin.generateHeader",
+    isNonSource: true,
+    type: "Origin",
+    isPlural: true,
+  },
+];
+
 const saasOperations: ISaaSOperation[] = [
   ...app,
   ...dataConnection,
   ...item,
+  ...origins,
+  ...reload,
   ...space,
   ...user,
-  ...reload,
 ];
 
 export class SaaSOperations {

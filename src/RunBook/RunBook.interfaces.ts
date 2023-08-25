@@ -20,6 +20,7 @@ import {
 
 import { IDataConnectionsCreate } from "qlik-saas-api/dist/modules/DataConnections";
 import { IDataConnectionsUpdate } from "qlik-saas-api/dist/modules/DataConnection";
+import { IOriginCreate } from "qlik-saas-api/dist/modules/Origins";
 import {
   IAppImport,
   IAppUpdate as IAppUpdate_SaaS,
@@ -47,6 +48,12 @@ export type SaaSOperations =
   | "item.get"
   | "item.collections"
   | "item.publishedItems"
+  | "origin.get"
+  | "origin.getAll"
+  | "origin.create"
+  | "origin.remove"
+  | "origin.update"
+  | "origin.generateHeader"
   | "space.get"
   | "space.getAll"
   | "space.create"
@@ -268,6 +275,7 @@ export type TaskDetails =
   | IAppPublish_SaaS
   | IAppRePublish
   | IAppCopy
+  | IOriginCreate
   | { location: string; skipData?: boolean }
   | { sourceFileNames: string[]; location: string }
   | { sourceFileName: string; location: string }
