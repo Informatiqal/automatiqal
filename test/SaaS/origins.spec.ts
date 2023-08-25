@@ -80,12 +80,11 @@ describe("CSP Origins", function () {
     expect(errors.length).to.be.equal(0);
     // data for all tasks is returned
     expect(result.length).to.be.equal(runBookConfig.tasks.length);
-    // the setup name is the same as the SaaS Origin
-    expect((result[1].data as unknown as Origin).details.name).to.be.equal(
-      (runBookConfig.tasks[1].details as IOriginCreate).name
-    );
     // the updated setup name is the same as the SaaS Origin
-    expect((result[3].data as unknown as Origin).details.name).to.be.equal(
+    expect((result[3].task as unknown as Origin).details.name).to.be.equal(
+      (runBookConfig.tasks[3].details as IOriginCreate).name
+    );
+    expect((result[4].data as unknown as Origin).details.name).to.be.equal(
       (runBookConfig.tasks[3].details as IOriginCreate).name
     );
     // the start and end SaaS Origins count is the same
