@@ -19,17 +19,34 @@ import {
 } from "qlik-repo-api/dist/types/interfaces";
 
 import { IConfig } from "qlik-rest-api/dist/interfaces/interfaces";
-// import {  } from "qlik-saas-api/dist/types/Common";
-
-// import { winOperations } from "../RunBook/Task";
-// const operations = [...winOperations.map((m) => m.name)] as const;
-// export type WinOperations = typeof operations[number];
 
 export type SaaSOperations =
   | "item.getAll"
   | "item.get"
   | "item.collections"
-  | "item.publishedItems";
+  | "item.publishedItems"
+  | "space.get"
+  | "space.getAll"
+  | "space.getFilter"
+  | "space.create"
+  | "space.remove"
+  | "space.update"
+  | "dataConnection.get"
+  | "dataConnection.getAll"
+  | "dataConnection.getFilter"
+  | "dataConnection.create"
+  | "dataConnection.remove"
+  | "dataConnection.update"
+  | "space.assignments"
+  | "user.get"
+  | "user.getAll"
+  | "user.create"
+  | "user.remove"
+  | "user.me"
+  | "user.metadata"
+  | "user.update"
+  | "app.getFilter"
+  | "reload.start";
 
 export type WinOperations =
   | "about.apiDefaults"
@@ -219,6 +236,7 @@ export type TaskDetails =
       };
     }
   | { appFilter: string }
+  | { appId: string; partial?: boolean }
   | IAppUploadAndReplace
   | IExternalTaskCreate
   | IDataConnectionCreate

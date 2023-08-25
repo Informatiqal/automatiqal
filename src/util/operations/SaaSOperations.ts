@@ -13,7 +13,63 @@ const item: ISaaSOperation[] = [
   { name: "item.publishedItems", isNonSource: false, type: "Item" },
 ];
 
-const saasOperations: ISaaSOperation[] = [...item];
+const dataConnection: ISaaSOperation[] = [
+  { name: "dataConnection.get", isNonSource: false, type: "DataConnection" },
+  {
+    name: "dataConnection.getAll",
+    isNonSource: true,
+    type: "DataConnection",
+    isPlural: true,
+  },
+  {
+    name: "dataConnection.create",
+    isNonSource: true,
+    type: "DataConnection",
+    isPlural: true,
+  },
+  { name: "dataConnection.remove", isNonSource: false, type: "DataConnection" },
+  { name: "dataConnection.update", isNonSource: false, type: "DataConnection" },
+];
+
+const space: ISaaSOperation[] = [
+  { name: "space.get", isNonSource: false, type: "Space" },
+  { name: "space.getAll", isNonSource: true, type: "Space", isPlural: true },
+  { name: "space.create", isNonSource: true, type: "Space", isPlural: true },
+  { name: "space.remove", isNonSource: false, type: "Space" },
+  { name: "space.update", isNonSource: false, type: "Space" },
+  {
+    name: "space.assignments",
+    isNonSource: false,
+    type: "Space",
+  },
+];
+
+const user: ISaaSOperation[] = [
+  { name: "user.get", isNonSource: false, type: "User" },
+  { name: "user.getAll", isNonSource: true, type: "User", isPlural: true },
+  { name: "user.create", isNonSource: true, type: "User", isPlural: true },
+  { name: "user.remove", isNonSource: false, type: "User" },
+  { name: "user.update", isNonSource: false, type: "User" },
+  { name: "user.me", isNonSource: true, type: "User" },
+  { name: "user.metadata", isNonSource: true, type: "User" },
+];
+
+const app: ISaaSOperation[] = [
+  { name: "app.get", isNonSource: false, type: "App" },
+];
+
+const reload: ISaaSOperation[] = [
+  { name: "reload.start", isNonSource: true, type: "Reload", isPlural: true },
+];
+
+const saasOperations: ISaaSOperation[] = [
+  ...app,
+  ...dataConnection,
+  ...item,
+  ...space,
+  ...user,
+  ...reload,
+];
 
 export class SaaSOperations {
   nonSourceOperations: string[];
