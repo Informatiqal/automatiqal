@@ -9,7 +9,7 @@ import { Origin } from "qlik-saas-api/dist/modules/Origin";
 describe("CSP Origins", function () {
   it("All operations - all positive", async function () {
     const runBookConfig: IRunBook = {
-      name: "Test CSP Origins operations",
+      name: "CSP Origins operations",
       edition: "saas",
       environment: {
         host: `${process.env.SAAS_URL}`,

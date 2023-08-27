@@ -42,6 +42,11 @@ const space: ISaaSOperation[] = [
     isNonSource: false,
     type: "Space",
   },
+  {
+    name: "space.assignmentsCreate",
+    isNonSource: false,
+    type: "Space",
+  },
 ];
 
 const user: ISaaSOperation[] = [
@@ -87,6 +92,25 @@ const origins: ISaaSOperation[] = [
   },
 ];
 
+const webHooks: ISaaSOperation[] = [
+  { name: "webHook.get", isNonSource: false, type: "WebHook" },
+  {
+    name: "webHook.getAll",
+    isNonSource: true,
+    type: "WebHook",
+    isPlural: true,
+  },
+  { name: "webHook.remove", isNonSource: false, type: "WebHook" },
+  {
+    name: "webHook.create",
+    isNonSource: true,
+    type: "WebHook",
+    isPlural: true,
+  },
+  { name: "webHook.update", isNonSource: false, type: "WebHook" },
+  { name: "webHook.patch", isNonSource: false, type: "WebHook" },
+];
+
 const saasOperations: ISaaSOperation[] = [
   ...app,
   ...dataConnection,
@@ -95,6 +119,7 @@ const saasOperations: ISaaSOperation[] = [
   ...reload,
   ...space,
   ...user,
+  ...webHooks,
 ];
 
 export class SaaSOperations {

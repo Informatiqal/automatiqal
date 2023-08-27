@@ -30,6 +30,17 @@ import {
 } from "qlik-saas-api/dist/modules/Apps.interfaces";
 
 import { IConfig } from "qlik-rest-api/dist/interfaces/interfaces";
+import {
+  IAssignmentCreate,
+  ISpace,
+  ISpaceUpdate,
+} from "qlik-saas-api/dist/modules/Space";
+import { ISpaceCreate } from "qlik-saas-api/dist/modules/Spaces";
+import { IWebHookCreate } from "qlik-saas-api/dist/modules/WebHooks";
+import {
+  IWebHookPatch,
+  IWebHookUpdate,
+} from "qlik-saas-api/dist/modules/WebHook";
 
 export type SaaSOperations =
   | "app.get"
@@ -60,6 +71,7 @@ export type SaaSOperations =
   | "space.remove"
   | "space.update"
   | "space.assignments"
+  | "space.assignmentsCreate"
   | "dataConnection.get"
   | "dataConnection.getAll"
   | "dataConnection.create"
@@ -72,7 +84,13 @@ export type SaaSOperations =
   | "user.me"
   | "user.metadata"
   | "user.update"
-  | "reload.start";
+  | "reload.start"
+  | "webHook.get"
+  | "webHook.getAll"
+  | "webHook.remove"
+  | "webHook.create"
+  | "webHook.update"
+  | "webHook.patch";
 
 export type WinOperations =
   | "about.apiDefaults"
@@ -253,6 +271,10 @@ export type TaskDetails =
   | ICertificateExportParameters
   | ITaskCreateTriggerComposite
   | IProxyUpdate
+  | ISpace
+  | ISpaceUpdate
+  | ISpaceCreate
+  | IAssignmentCreate
   | ITaskCreateTriggerSchema
   | { targetAppId: string }
   | {
@@ -276,6 +298,10 @@ export type TaskDetails =
   | IAppRePublish
   | IAppCopy
   | IOriginCreate
+  | IWebHookCreate
+  | IWebHookUpdate
+  | IWebHookPatch
+  | IWebHookPatch[]
   | { location: string; skipData?: boolean }
   | { sourceFileNames: string[]; location: string }
   | { sourceFileName: string; location: string }
