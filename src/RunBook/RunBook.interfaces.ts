@@ -309,6 +309,7 @@ export type TaskDetails =
   | IWebHookUpdate
   | IWebIntegrationCreate
   | IWebIntegrationUpdate
+  | IWebIntegrationUpdate[]
   | IWebHookPatch
   | IWebHookPatch[]
   | { location: string; skipData?: boolean }

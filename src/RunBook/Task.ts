@@ -46,7 +46,7 @@ export class Task {
 
       // if "filter" is provided then just pass it as it is
       return (await (this.instance as QlikRepoApi.client).apps
-        .exportMany({ filter: this.task.filter, ...this.task.details })
+        .exportMany({ filter: this.task.filter })
         .catch((e) => {
           e.message = `REST communication error! ${e.message}`;
           e.stack = "";
@@ -80,7 +80,7 @@ export class Task {
             throw e;
           });
       }
-      
+
       return await this.instance[`${a[0]}s`]
         [a[1]](this.task.details || {}, this.task.options)
         .catch((e) => {
