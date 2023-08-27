@@ -111,6 +111,24 @@ const webHooks: ISaaSOperation[] = [
   { name: "webHook.patch", isNonSource: false, type: "WebHook" },
 ];
 
+const webIntegrations: ISaaSOperation[] = [
+  { name: "webIntegration.get", isNonSource: false, type: "WebIntegration" },
+  {
+    name: "webIntegration.getAll",
+    isNonSource: true,
+    type: "WebIntegration",
+    isPlural: true,
+  },
+  { name: "webIntegration.remove", isNonSource: false, type: "WebIntegration" },
+  {
+    name: "webIntegration.create",
+    isNonSource: true,
+    type: "WebIntegration",
+    isPlural: true,
+  },
+  { name: "webIntegration.update", isNonSource: false, type: "WebIntegration" },
+];
+
 const saasOperations: ISaaSOperation[] = [
   ...app,
   ...dataConnection,
@@ -120,6 +138,7 @@ const saasOperations: ISaaSOperation[] = [
   ...space,
   ...user,
   ...webHooks,
+  ...webIntegrations,
 ];
 
 export class SaaSOperations {

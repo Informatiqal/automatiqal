@@ -41,6 +41,8 @@ import {
   IWebHookPatch,
   IWebHookUpdate,
 } from "qlik-saas-api/dist/modules/WebHook";
+import { IWebIntegrationCreate } from "qlik-saas-api/dist/modules/WebIntegrations";
+import { IWebIntegrationUpdate } from "qlik-saas-api/dist/modules/WebIntegration";
 
 export type SaaSOperations =
   | "app.get"
@@ -90,7 +92,12 @@ export type SaaSOperations =
   | "webHook.remove"
   | "webHook.create"
   | "webHook.update"
-  | "webHook.patch";
+  | "webHook.patch"
+  | "webIntegration.get"
+  | "webIntegration.getAll"
+  | "webIntegration.remove"
+  | "webIntegration.create"
+  | "webIntegration.update";
 
 export type WinOperations =
   | "about.apiDefaults"
@@ -300,6 +307,8 @@ export type TaskDetails =
   | IOriginCreate
   | IWebHookCreate
   | IWebHookUpdate
+  | IWebIntegrationCreate
+  | IWebIntegrationUpdate
   | IWebHookPatch
   | IWebHookPatch[]
   | { location: string; skipData?: boolean }
