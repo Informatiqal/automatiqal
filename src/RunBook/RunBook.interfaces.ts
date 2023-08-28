@@ -43,8 +43,16 @@ import {
 } from "qlik-saas-api/dist/modules/WebHook";
 import { IWebIntegrationCreate } from "qlik-saas-api/dist/modules/WebIntegrations";
 import { IWebIntegrationUpdate } from "qlik-saas-api/dist/modules/WebIntegration";
+import { IAPIKeyCreate, IAPIKeysConfigsUpdate } from "qlik-saas-api/dist/modules/APIKeys";
 
 export type SaaSOperations =
+  | "apiKey.get"
+  | "apiKey.getAll"
+  | "apiKey.create"
+  | "apiKey.configs"
+  | "apiKey.configsUpdate"
+  | "apiKey.remove"
+  | "apiKey.update"
   | "app.get"
   | "app.getAll"
   | "app.import"
@@ -266,6 +274,7 @@ export interface IAppUpload {
 
 // TODO: add all the missing types
 export type TaskDetails =
+  | IAPIKeyCreate
   | IAppPublish
   | IAppUpdate
   | IVirtualProxyUpdate
@@ -312,10 +321,13 @@ export type TaskDetails =
   | IWebIntegrationUpdate[]
   | IWebHookPatch
   | IWebHookPatch[]
+  | IAPIKeysConfigsUpdate[]
   | { location: string; skipData?: boolean }
   | { sourceFileNames: string[]; location: string }
   | { sourceFileName: string; location: string }
-  | { spaceId: string };
+  | { spaceId: string }
+  | { description: string }
+  | { tenantId: string };
 
 export interface IAppPublish {
   name?: string;

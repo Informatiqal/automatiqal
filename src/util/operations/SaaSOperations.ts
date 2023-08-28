@@ -6,6 +6,16 @@ interface ISaaSOperation {
   sensitiveProperty?: string[];
 }
 
+const apiKey: ISaaSOperation[] = [
+  { name: "apiKey.get", isNonSource: false, type: "ApiKey" },
+  { name: "apiKey.getAll", isNonSource: true, type: "ApiKey", isPlural: true },
+  { name: "apiKey.create", isNonSource: true, type: "ApiKey", isPlural: true },
+  { name: "apiKey.configs", isNonSource: true, type: "ApiKey", isPlural: true },
+  { name: "apiKey.configsUpdate", isNonSource: true, type: "ApiKey", isPlural: true },
+  { name: "apiKey.remove", isNonSource: false, type: "ApiKey" },
+  { name: "apiKey.update", isNonSource: false, type: "ApiKey" },
+];
+
 const item: ISaaSOperation[] = [
   { name: "item.get", isNonSource: false, type: "Item" },
   { name: "item.getAll", isNonSource: true, type: "Item", isPlural: true },
@@ -130,6 +140,7 @@ const webIntegrations: ISaaSOperation[] = [
 ];
 
 const saasOperations: ISaaSOperation[] = [
+  ...apiKey,
   ...app,
   ...dataConnection,
   ...item,

@@ -66,12 +66,17 @@ export class Task {
 
     if (this.isNoSource) {
       if (
-        this.operations.ops.nonSourceOperationsPlural.indexOf(
+        (this.operations.ops.nonSourceOperationsPlural.indexOf(
           this.task.operation
         ) == -1 &&
-        (this.instance as QlikRepoApi.client).about
+          (this.instance as QlikRepoApi.client).about) ||
+        a[0] == "apiKeie"
       ) {
+        // TODO: bit specific for apiKeys only. Can come back to it at some point
+        if (a[0] == "apiKeie") a[0] = "apiKeys";
+
         if (a[0].substring(a[0].length - 2) == "ie") a[0] = `${a[0]}s`;
+
         return await this.instance[a[0]]
           [a[1]](this.task.details || {}, this.task.options)
           .catch((e) => {
