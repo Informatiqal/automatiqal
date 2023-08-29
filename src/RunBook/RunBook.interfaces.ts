@@ -30,6 +30,7 @@ import {
 } from "qlik-saas-api/dist/modules/Apps.interfaces";
 
 import { IConfig } from "qlik-rest-api/dist/interfaces/interfaces";
+import { IExtensionImportData } from "qlik-saas-api/dist/modules/Extensions";
 import {
   IAssignmentCreate,
   ISpace,
@@ -65,6 +66,11 @@ export type SaaSOperations =
   | "app.removeFromSpace"
   | "app.remove"
   | "app.update"
+  | "extension.get"
+  | "extension.getAll"
+  | "extension.import"
+  | "extension.remove"
+  | "extension.update"
   | "item.getAll"
   | "item.get"
   | "item.collections"
@@ -322,12 +328,30 @@ export type TaskDetails =
   | IWebHookPatch
   | IWebHookPatch[]
   | IAPIKeysConfigsUpdate[]
+  | IExtensionImportData
   | { location: string; skipData?: boolean }
   | { sourceFileNames: string[]; location: string }
   | { sourceFileName: string; location: string }
   | { spaceId: string }
   | { description: string }
-  | { tenantId: string };
+  | { tenantId: string }
+  | {
+    file: string | Buffer;
+    data: IExtensionImportData
+    | {
+      file: string | Buffer;
+      data: Partial<IExtensionImportData>;
+    }
+  | {
+      file?: undefined;
+      data: Partial<IExtensionImportData>;
+    }
+  | {
+      file: string | Buffer;
+      data?: undefined;
+    };
+}
+  ;
 
 export interface IAppPublish {
   name?: string;

@@ -16,6 +16,14 @@ const apiKey: ISaaSOperation[] = [
   { name: "apiKey.update", isNonSource: false, type: "ApiKey" },
 ];
 
+const extensions: ISaaSOperation[] = [
+  { name: "extension.get", isNonSource: false, type: "Extensions" },
+  { name: "extension.getAll", isNonSource: true, type: "Extensions", isPlural: true },
+  { name: "extension.import", isNonSource: true, type: "Extensions", isPlural: true },
+  { name: "extension.remove", isNonSource: false, type: "Extensions" },
+  { name: "extension.update", isNonSource: false, type: "Extensions" },
+];
+
 const item: ISaaSOperation[] = [
   { name: "item.get", isNonSource: false, type: "Item" },
   { name: "item.getAll", isNonSource: true, type: "Item", isPlural: true },
@@ -143,6 +151,7 @@ const saasOperations: ISaaSOperation[] = [
   ...apiKey,
   ...app,
   ...dataConnection,
+  ...extensions,
   ...item,
   ...origins,
   ...reload,
