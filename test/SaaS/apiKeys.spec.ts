@@ -64,7 +64,6 @@ describe("API Keys", function () {
 
     const result = await automatiqal.run();
 
-    expect(true).to.be.true;
     // at least one api key exists
     expect((result[2].data as unknown as APIKey[]).length).to.be.greaterThan(0);
 

@@ -17,12 +17,13 @@ const apiKey: ISaaSOperation[] = [
 ];
 
 const extensions: ISaaSOperation[] = [
-  { name: "extension.get", isNonSource: false, type: "Extensions" },
-  { name: "extension.getAll", isNonSource: true, type: "Extensions", isPlural: true },
-  { name: "extension.import", isNonSource: true, type: "Extensions", isPlural: true },
-  { name: "extension.remove", isNonSource: false, type: "Extensions" },
-  { name: "extension.update", isNonSource: false, type: "Extensions" },
+  { name: "extension.get", isNonSource: false, type: "Extension" },
+  { name: "extension.getAll", isNonSource: true, type: "Extension", isPlural: true },
+  { name: "extension.import", isNonSource: true, type: "Extension", isPlural: true },
+  { name: "extension.remove", isNonSource: false, type: "Extension" },
+  { name: "extension.update", isNonSource: false, type: "Extension" },
 ];
+
 
 const item: ISaaSOperation[] = [
   { name: "item.get", isNonSource: false, type: "Item" },
@@ -92,8 +93,11 @@ const app: ISaaSOperation[] = [
   { name: "app.update", isNonSource: false, type: "App" },
 ];
 
-const reload: ISaaSOperation[] = [
+const reloads: ISaaSOperation[] = [
+  { name: "reload.get", isNonSource: false, type: "Reload" },
+  { name: "reload.getAll", isNonSource: true, type: "Reload", isPlural: true },
   { name: "reload.start", isNonSource: true, type: "Reload", isPlural: true },
+  { name: "reload.cancel", isNonSource: false, type: "Reload"},
 ];
 
 const origins: ISaaSOperation[] = [
@@ -154,7 +158,7 @@ const saasOperations: ISaaSOperation[] = [
   ...extensions,
   ...item,
   ...origins,
-  ...reload,
+  ...reloads,
   ...space,
   ...user,
   ...webHooks,
