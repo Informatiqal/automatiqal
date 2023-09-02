@@ -97,8 +97,6 @@ export type SaaSOperations =
   | "user.getAll"
   | "user.create"
   | "user.remove"
-  | "user.me"
-  | "user.metadata"
   | "user.update"
   | "reload.get"
   | "reload.getAll"
@@ -257,7 +255,7 @@ export type QlikEditions = "saas" | "windows";
 export interface IRunBook {
   name: string;
   description?: string;
-  edition?: QlikEditions;
+  edition: QlikEditions;
   trace?: TraceLevels;
   environment: {
     host: string;

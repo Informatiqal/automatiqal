@@ -18,31 +18,31 @@ describe("Reloads", function () {
         },
       },
       tasks: [
-      {
-        name: "Get all Init",
-        operation: "reload.getAll",
-      },
-      {
-        name: "Start reload",
-        operation: "reload.start",
-        details: {
-          appId: `${process.env.RELOAD_APP_ID}`
-        }
-      },
-      {
-        name: "Get all Mid",
-        operation: "reload.getAll",
-      },
-      {
-        name: "Stop reload",
-        operation: "reload.cancel",
-        source: "Start reload"
-      },
-      {
-        name: "Get all Last",
-        operation: "reload.getAll",
+        {
+          name: "Get all Init",
+          operation: "reload.getAll",
         },
-    ],
+        {
+          name: "Start reload",
+          operation: "reload.start",
+          details: {
+            appId: `${process.env.RELOAD_APP_ID}`,
+          },
+        },
+        {
+          name: "Get all Mid",
+          operation: "reload.getAll",
+        },
+        {
+          name: "Stop reload",
+          operation: "reload.cancel",
+          source: "Start reload",
+        },
+        {
+          name: "Get all Last",
+          operation: "reload.getAll",
+        },
+      ],
     };
 
     const automatiqal = new Automatiqal(runBookConfig, httpsAgentCert);
@@ -69,6 +69,10 @@ describe("Reloads", function () {
 
     // once the temp api key is removed the total count of all api keys
     // should be the same as the start count (before creation)
-    expect((result[1].data as unknown as Reload).details.status).to.be.oneOf(["CANCELING", "CANCELED", "QUEUED"]);
+    expect((result[1].data as unknown as Reload).details.status).to.be.oneOf([
+      "CANCELING",
+      "CANCELED",
+      "QUEUED",
+    ]);
   });
 });

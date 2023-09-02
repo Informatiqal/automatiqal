@@ -18,7 +18,7 @@ export class CustomError extends Error {
   code: number;
   messages: { [key: string]: string } = {
     1000: `Nothing to process. No tasks are specified`,
-    1001: `Invalid edition value. Valid editions are "windows" or "saas". Provided value "%{arg1}"`,
+    1001: `Invalid edition value or edition value is missing. Valid editions are "windows" or "saas". Provided value "%{arg1}"`,
     1002: `Initial checks: Task names duplications. Duplicated names: %{arg1}`,
     1003: `No "source" or "filter" is provided for task "%{arg1}"`,
     1004: `Task "%{arg1}" aborted. 0 objects will be affected`,
