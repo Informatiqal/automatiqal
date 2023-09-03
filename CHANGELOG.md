@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.0] - 2023-09-03
+
+- the initial work for integrating SaaS package is done. At the moment only few methods are exposed but the rest will be added in the near future
+- started adding the base tests for SaaS
+- dependency updates
+
 ## [0.2.20] - 2023-06-07
 
 - allow `ReadStream` to be passed when the operation is about uploading files (apps, content libraries, extensions etc.)
