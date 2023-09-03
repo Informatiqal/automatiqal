@@ -30,6 +30,7 @@ describe("General", function () {
   it("Get About", async function () {
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -56,6 +57,7 @@ describe("General", function () {
   it("No tasks defined or tasks prop missing", async function () {
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -84,6 +86,7 @@ describe("OnError", function () {
   it("Ignore and continue", async function () {
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -120,6 +123,7 @@ describe("OnError", function () {
   it("Force exit", async function () {
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -160,6 +164,7 @@ describe("OnError", function () {
   it("Run tasks", async function () {
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -198,6 +203,7 @@ describe("Multiple objects", function () {
   it("Non-explicitly not allowed", async function () {
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -233,6 +239,7 @@ describe("Multiple objects", function () {
   it("Explicitly not allowed", async function () {
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -270,9 +277,10 @@ describe("Multiple objects", function () {
 });
 
 describe("Variables usage", function () {
-  it("Special variables", async function () {
+  it("Special variables", async function () { 
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -338,6 +346,7 @@ describe("Variables usage", function () {
   it("Inline variable in filter", async function () {
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -377,6 +386,7 @@ describe("Variables usage", function () {
 
   it("Inline variable in details", async function () {
     const runbook: IRunBook = {
+      edition: "windows",
       name: "Simple runbook",
       environment: {
         host: `${process.env.TEST_HOST}`,
@@ -436,6 +446,7 @@ describe("Custom properties", function () {
   it("Append/add custom properties", async function () {
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -504,6 +515,7 @@ describe("Custom properties", function () {
   it("Set/overwrite custom properties", async function () {
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -548,6 +560,7 @@ describe("Custom properties", function () {
     try {
       const runbook: IRunBook = {
         name: "Simple runbook",
+        edition: "windows",
         environment: {
           host: `${process.env.TEST_HOST}`,
           port: 4242,
@@ -589,6 +602,7 @@ describe("Custom properties", function () {
     try {
       const runbook: IRunBook = {
         name: "Simple runbook",
+        edition: "windows",
         environment: {
           host: `${process.env.TEST_HOST}`,
           port: 4242,
@@ -627,6 +641,7 @@ describe("Tags", function () {
   it("Append/add tags", async function () {
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -684,6 +699,7 @@ describe("Tags", function () {
   it("Set/overwrite tags", async function () {
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -724,6 +740,7 @@ describe("Tags", function () {
     try {
       const runbook: IRunBook = {
         name: "Simple runbook",
+        edition: "windows",
         environment: {
           host: `${process.env.TEST_HOST}`,
           port: 4242,
@@ -764,6 +781,7 @@ describe("Upload content", function () {
 
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -802,6 +820,7 @@ describe("Upload content", function () {
 
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -842,6 +861,7 @@ describe("Upload content", function () {
 
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,
@@ -880,6 +900,7 @@ describe("Upload content", function () {
 
     const runbook: IRunBook = {
       name: "Simple runbook",
+      edition: "windows",
       environment: {
         host: `${process.env.TEST_HOST}`,
         port: 4242,

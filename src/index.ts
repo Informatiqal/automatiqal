@@ -1,16 +1,17 @@
 import { QlikRepoApi } from "qlik-repo-api";
-// import { QlikSaaSApi } from "qlik-saas-api";
-import { automatiqalSchema } from "@informatiqal/automatiqal-schema";
-import Ajv from "ajv";
+import { QlikSaaSApi } from "qlik-saas-api";
+import {
+  automatiqalWindowsSchema,
+  automatiqalSaaSSchema,
+} from "@informatiqal/automatiqal-schema";
+import Ajv, { ValidateFunction } from "ajv";
 import ajvErrors from "ajv-errors";
 
 import { IRunBookResult, ITaskResult, Runner } from "./RunBook/Runner";
 import { IRunBook, ITask } from "./RunBook/RunBook.interfaces";
 import { CustomError } from "./util/CustomError";
 import { EventsBus } from "./util/EventBus";
-import { WinOperations } from "./util/WinOperations";
-
-const winOperations = new WinOperations();
+import { Operations } from "./util/operations/index";
 
 export type initialChecksNames =
   | "checkDuplicateTasks"
@@ -24,8 +25,9 @@ export class Automatiqal {
   runBook: IRunBook;
   #tasksListFlat: ITask[];
   #taskNames: string[];
-  #restInstance: QlikRepoApi.client; //| QlikSaaSApi.client;
+  #restInstance: QlikRepoApi.client | QlikSaaSApi.client;
   #runner: Runner;
+  #ops: Operations;
   #initialChecksList: initialChecksNames[];
   emitter: EventsBus;
   // #inlineVariablesRegex = new RegExp(/(?<=\$\${)(.*?)(?=})/g); // match ALL values - $${xxxx}
@@ -44,7 +46,19 @@ export class Automatiqal {
 
     ajvErrors(ajv);
 
-    const validate = ajv.compile(automatiqalSchema);
+    if (
+      !runBook.edition ||
+      (runBook.edition != "windows" && runBook.edition != "saas")
+    )
+      throw new CustomError(1001, "RunBook", { arg1: this.runBook.edition });
+
+    let validate: ValidateFunction<unknown>;
+
+    if (runBook.edition == "windows")
+      validate = ajv.compile(automatiqalWindowsSchema);
+
+    if (runBook.edition == "saas")
+      validate = ajv.compile(automatiqalSaaSSchema);
 
     if (!runBook.tasks) throw new CustomError(1023, "Runbook");
 
@@ -75,6 +89,8 @@ export class Automatiqal {
     // default the runbook to QSEoW edition
     if (!this.runBook.edition) this.runBook.edition = "windows";
 
+    this.#ops = Operations.getInstance(this.runBook.edition);
+
     // perform obvious checks before execution
     this.initialChecks();
 
@@ -98,7 +114,19 @@ export class Automatiqal {
       }
     }
 
-    if (runBook.edition == "saas") throw new CustomError(1019, "");
+    if (runBook.edition == "saas") {
+      this.#restInstance = new QlikSaaSApi.client({
+        host: runBook.environment.host,
+        authentication: runBook.environment.authentication,
+        options: {
+          saas: {
+            apps: {
+              swapResourceIdAndId: true,
+            },
+          },
+        },
+      });
+    }
 
     // initialize the Runner
     this.#runner = new Runner(this.runBook, this.#restInstance);
@@ -112,8 +140,8 @@ export class Automatiqal {
     if (!this.runBook.tasks || this.runBook.tasks.length == 0)
       throw new CustomError(1000, "RunBook");
 
-    if (this.runBook.edition != "windows" && this.runBook.edition != "saas")
-      throw new CustomError(1001, "RunBook", { arg1: this.runBook.edition });
+    // if (this.runBook.edition != "windows" && this.runBook.edition != "saas")
+    //   throw new CustomError(1001, "RunBook", { arg1: this.runBook.edition });
 
     let errors: string[] = [];
 
@@ -239,7 +267,7 @@ export class Automatiqal {
     const missingSource = this.#tasksListFlat
       .filter((t) => !t.source && !t.filter)
       .map((t) => {
-        const i = winOperations.nonSourceOperations.indexOf(t.operation);
+        const i = this.#ops.ops.nonSourceOperations.indexOf(t.operation);
 
         if (i == -1) return t;
 
@@ -278,7 +306,7 @@ export class Automatiqal {
   #checkWrongOperation() {
     const nonExistingOps = this.#tasksListFlat
       .map((t) => {
-        const i = winOperations.names.indexOf(t.operation);
+        const i = this.#ops.ops.names.indexOf(t.operation);
 
         if (i == -1) return t;
 
@@ -344,7 +372,7 @@ export class Automatiqal {
     // from the beginning that the task will fail
 
     // NOTE: any exclusions from this rule?
-    const tasksReturnTypes = winOperations.opTypes;
+    const tasksReturnTypes = this.#ops.ops.opTypes;
 
     const opMismatchTasks = this.#tasksListFlat
       .filter((t) => t.hasOwnProperty("source"))

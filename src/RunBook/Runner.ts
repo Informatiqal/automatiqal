@@ -5,9 +5,8 @@ import { Task } from "./Task";
 import { Debugger } from "../util/Debugger";
 import { EventsBus } from "../util/EventBus";
 import { CustomError } from "../util/CustomError";
-import { WinOperations } from "../util/WinOperations";
+import { Operations } from "../util/operations/index";
 
-const winOperations = new WinOperations();
 export interface IRunBookResult {
   task: string;
   // result: ITaskResult;
@@ -37,6 +36,7 @@ export class Runner {
   private emitter: EventsBus;
   private today: string;
   private increment: number = 1;
+  private operations: Operations;
   // private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/; // match values - $${xxxx}
   // TODO: how to re-use the regex? issue when using in multiple places when defined here
   // private inlineVariablesRegex = new RegExp(/(?<=\$\${)(.*?)(?=})/gm); // match ALL values - $${xxxx}
@@ -46,6 +46,7 @@ export class Runner {
     this.taskResults = [];
     this.emitter = new EventsBus();
     this.debug = new Debugger(this.runBook.trace, this.emitter);
+    this.operations = Operations.getInstance();
 
     const date = new Date();
     this.today = date.toISOString().split("T")[0].replace(/-/gi, "");
@@ -64,10 +65,8 @@ export class Runner {
   private async getFilterItems(task: ITask): Promise<any> {
     const a = task.operation.split(".");
 
-    if (winOperations.nonSourceOperations.indexOf(task.operation) > -1) {
-      // this.debug.print(task.name, "0");
+    if (this.operations.ops.nonSourceOperations.indexOf(task.operation) > -1)
       return {};
-    }
 
     // NOTE: special operation? debug? continue?
     // if (a.length == 1) {
@@ -182,6 +181,7 @@ export class Runner {
   // replace its value with the id(s) from
   // the prev task result
   private replaceInlineVariables(details, taskName) {
+    const _this = this;
     const regex = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
 
     let detailsString = JSON.stringify(details);
@@ -193,10 +193,10 @@ export class Runner {
     inlineVariables.map((v) => {
       const inlineVariableDefinition = "".concat("$${", v, "}");
       // const regexReplace = new RegExp(inlineVariableDefinition, "g");
-      const value = this.getPropertyFromTaskResult(v);
+      const value = _this.getPropertyFromTaskResult(v, taskName);
       // const regexSurrounding = new RegExp(/(...)(?<=\$\${)(.*?)(?=})(.)/gm);
 
-      if (value.length > 1)
+      if (Array.isArray(value) && value.length > 1)
         throw new CustomError(1024, "", {
           arg1: taskName,
           arg2: v,
@@ -204,13 +204,13 @@ export class Runner {
 
       detailsString = detailsString
         .split(inlineVariableDefinition)
-        .join(value[0]);
+        .join(Array.isArray(value) ? value[0] : value);
     });
 
     return JSON.parse(detailsString);
   }
 
-  private getPropertyFromTaskResult(taskName: string) {
+  private getPropertyFromTaskResult(taskName: string, sourceTaskName: string) {
     const [name, property] = taskName.split("#");
 
     const taskResult = this.taskResults.filter((r) => r.task.name == name)[0];
@@ -218,13 +218,39 @@ export class Runner {
     // if property is used then return its value
     // else return ID as default
     if (Array.isArray(taskResult.data))
-      return (taskResult.data as IRunBookResult[]).map(
-        (d) => d.details[property ? property : "id"]
-      );
+      return (taskResult.data as IRunBookResult[]).map((d) => {
+        if (!property) return "id";
 
-    return [
-      (taskResult.data as IRunBookResult).details[property ? property : "id"],
-    ];
+        const inlineValue = property
+          .split(".")
+          .reduce((a, prop) => a[prop], d.details);
+
+        if (!inlineValue)
+          throw new CustomError(1026, sourceTaskName, {
+            arg1: name,
+            arg2: property,
+          });
+
+        return inlineValue;
+      });
+
+    if (!property) return (taskResult.data as IRunBookResult).details["id"];
+
+    const inlineValue = property
+      .split(".")
+      .reduce((a, prop) => a[prop], taskResult.data.details);
+
+    if (!inlineValue)
+      throw new CustomError(1026, sourceTaskName, {
+        arg1: name,
+        arg2: property,
+      });
+
+    return inlineValue;
+
+    // return [
+    //   (taskResult.data as IRunBookResult).details[property ? property : "id"],
+    // ];
   }
 
   // replace special variables per task
@@ -318,11 +344,13 @@ export class Runner {
    */
   private maskSensitiveData(taskDetails: ITask) {
     const isWithSensitiveData: boolean =
-      winOperations.sensitiveDataOperations.includes(taskDetails.operation);
+      this.operations.ops.sensitiveDataOperations.includes(
+        taskDetails.operation
+      );
 
     if (!isWithSensitiveData) return taskDetails;
 
-    const operation = winOperations.filter(taskDetails.operation);
+    const operation = this.operations.ops.filter(taskDetails.operation);
 
     operation.sensitiveProperty.map((prop) => {
       // if the property exists then mask it

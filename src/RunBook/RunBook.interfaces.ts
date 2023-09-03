@@ -18,14 +18,104 @@ import {
   IExtensionImport,
 } from "qlik-repo-api/dist/types/interfaces";
 
+import { IDataConnectionsCreate } from "qlik-saas-api/dist/modules/DataConnections";
+import { IDataConnectionsUpdate } from "qlik-saas-api/dist/modules/DataConnection";
+import { IOriginCreate } from "qlik-saas-api/dist/modules/Origins";
+import {
+  IAppImport,
+  IAppUpdate as IAppUpdate_SaaS,
+  IAppPublish as IAppPublish_SaaS,
+  IAppCopy,
+  IAppRePublish,
+} from "qlik-saas-api/dist/modules/Apps.interfaces";
+
 import { IConfig } from "qlik-rest-api/dist/interfaces/interfaces";
-// import {  } from "qlik-saas-api/dist/types/Common";
+import { IExtensionImportData } from "qlik-saas-api/dist/modules/Extensions";
+import {
+  IAssignmentCreate,
+  ISpace,
+  ISpaceUpdate,
+} from "qlik-saas-api/dist/modules/Space";
+import { ISpaceCreate } from "qlik-saas-api/dist/modules/Spaces";
+import { IWebHookCreate } from "qlik-saas-api/dist/modules/WebHooks";
+import {
+  IWebHookPatch,
+  IWebHookUpdate,
+} from "qlik-saas-api/dist/modules/WebHook";
+import { IWebIntegrationCreate } from "qlik-saas-api/dist/modules/WebIntegrations";
+import { IWebIntegrationUpdate } from "qlik-saas-api/dist/modules/WebIntegration";
+import {
+  IAPIKeyCreate,
+  IAPIKeysConfigsUpdate,
+} from "qlik-saas-api/dist/modules/APIKeys";
 
-// import { winOperations } from "../RunBook/Task";
-// const operations = [...winOperations.map((m) => m.name)] as const;
-// export type WinOperations = typeof operations[number];
-
-export type SaaSOperations = "";
+export type SaaSOperations =
+  | "apiKey.get"
+  | "apiKey.getAll"
+  | "apiKey.create"
+  | "apiKey.configs"
+  | "apiKey.configsUpdate"
+  | "apiKey.remove"
+  | "apiKey.update"
+  | "app.get"
+  | "app.getAll"
+  | "app.import"
+  | "app.create"
+  | "app.copy"
+  | "app.export"
+  | "app.publish"
+  | "app.rePublish"
+  | "app.addToSpace"
+  | "app.removeFromSpace"
+  | "app.remove"
+  | "app.update"
+  | "extension.get"
+  | "extension.getAll"
+  | "extension.import"
+  | "extension.remove"
+  | "extension.update"
+  | "item.getAll"
+  | "item.get"
+  | "item.collections"
+  | "item.publishedItems"
+  | "origin.get"
+  | "origin.getAll"
+  | "origin.create"
+  | "origin.remove"
+  | "origin.update"
+  | "origin.generateHeader"
+  | "space.get"
+  | "space.getAll"
+  | "space.create"
+  | "space.remove"
+  | "space.update"
+  | "space.assignments"
+  | "space.assignmentsCreate"
+  | "dataConnection.get"
+  | "dataConnection.getAll"
+  | "dataConnection.create"
+  | "dataConnection.remove"
+  | "dataConnection.update"
+  | "user.get"
+  | "user.getAll"
+  | "user.create"
+  | "user.remove"
+  | "user.update"
+  | "reload.get"
+  | "reload.getAll"
+  | "reload.start"
+  | "reload.cancel"
+  | "webHook.get"
+  | "webHook.getAll"
+  | "webHook.remove"
+  | "webHook.create"
+  | "webHook.update"
+  | "webHook.patch"
+  | "webIntegration.get"
+  | "webIntegration.getAll"
+  | "webIntegration.remove"
+  | "webIntegration.create"
+  | "webIntegration.update";
 
 export type WinOperations =
   | "about.apiDefaults"
@@ -168,7 +258,7 @@ export type QlikEditions = "saas" | "windows";
 export interface IRunBook {
   name: string;
   description?: string;
-  edition?: QlikEditions;
+  edition: QlikEditions;
   trace?: TraceLevels;
   environment: {
     host: string;
@@ -194,6 +284,7 @@ export interface IAppUpload {
 
 // TODO: add all the missing types
 export type TaskDetails =
+  | IAPIKeyCreate
   | IAppPublish
   | IAppUpdate
   | IVirtualProxyUpdate
@@ -206,6 +297,10 @@ export type TaskDetails =
   | ICertificateExportParameters
   | ITaskCreateTriggerComposite
   | IProxyUpdate
+  | ISpace
+  | ISpaceUpdate
+  | ISpaceCreate
+  | IAssignmentCreate
   | ITaskCreateTriggerSchema
   | { targetAppId: string }
   | {
@@ -215,15 +310,52 @@ export type TaskDetails =
       };
     }
   | { appFilter: string }
+  | { appId: string; partial?: boolean }
   | IAppUploadAndReplace
   | IExternalTaskCreate
   | IDataConnectionCreate
+  | IDataConnectionsCreate
+  | IDataConnectionsUpdate
   | IDataConnectionUpdate
   | IExtensionImport
+  | IAppImport
+  | IAppUpdate_SaaS
+  | IAppPublish_SaaS
+  | IAppRePublish
+  | IAppCopy
+  | IOriginCreate
+  | IWebHookCreate
+  | IWebHookUpdate
+  | IWebIntegrationCreate
+  | IWebIntegrationUpdate
+  | IWebIntegrationUpdate[]
+  | IWebHookPatch
+  | IWebHookPatch[]
+  | IAPIKeysConfigsUpdate[]
+  | IExtensionImportData
   | { location: string; skipData?: boolean }
   | { sourceFileNames: string[]; location: string }
   | { sourceFileName: string; location: string }
-  ;
+  | { spaceId: string }
+  | { description: string }
+  | { tenantId: string }
+  | {
+      file: string | Buffer;
+      data: IExtensionImportData;
+    }
+  | {
+      file: string | Buffer;
+      data: Partial<IExtensionImportData>;
+    }
+  | {
+      file?: undefined;
+      data: Partial<IExtensionImportData>;
+    }
+  | {
+      file: string | Buffer;
+      data?: undefined;
+    };
+// };
 
 export interface IAppPublish {
   name?: string;
