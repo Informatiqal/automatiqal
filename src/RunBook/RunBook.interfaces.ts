@@ -44,7 +44,10 @@ import {
 } from "qlik-saas-api/dist/modules/WebHook";
 import { IWebIntegrationCreate } from "qlik-saas-api/dist/modules/WebIntegrations";
 import { IWebIntegrationUpdate } from "qlik-saas-api/dist/modules/WebIntegration";
-import { IAPIKeyCreate, IAPIKeysConfigsUpdate } from "qlik-saas-api/dist/modules/APIKeys";
+import {
+  IAPIKeyCreate,
+  IAPIKeysConfigsUpdate,
+} from "qlik-saas-api/dist/modules/APIKeys";
 
 export type SaaSOperations =
   | "apiKey.get"
@@ -337,9 +340,10 @@ export type TaskDetails =
   | { description: string }
   | { tenantId: string }
   | {
-    file: string | Buffer;
-    data: IExtensionImportData
-    | {
+      file: string | Buffer;
+      data: IExtensionImportData;
+    }
+  | {
       file: string | Buffer;
       data: Partial<IExtensionImportData>;
     }
@@ -351,8 +355,7 @@ export type TaskDetails =
       file: string | Buffer;
       data?: undefined;
     };
-}
-  ;
+// };
 
 export interface IAppPublish {
   name?: string;

@@ -42,7 +42,8 @@ describe("Web hooks", function () {
         {
           name: "Get single web hook",
           operation: "webHook.get",
-          source: "Create temp web hook",
+          // source: "Create temp web hook",
+          filter: "id eq '$${Create temp web hook}'"
         },
         {
           name: "Update temp web hook",
@@ -102,7 +103,7 @@ describe("Web hooks", function () {
       (result[2].data as unknown as WebHook[]).length -
         (result[0].data as unknown as WebHook[]).length
     ).to.be.equal(1);
-    
+
     // once the temp webhook is removed the total count of all web hooks
     // should be the same as the start count (before creation)
     expect(

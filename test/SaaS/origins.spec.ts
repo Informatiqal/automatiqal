@@ -52,7 +52,7 @@ describe("CSP Origins", function () {
         {
           name: "Get updated origin details",
           operation: "origin.get",
-          source: "Create origin",
+          filter: "id eq '$${Create origin}'",
         },
         {
           name: "Remove origin",
@@ -81,10 +81,7 @@ describe("CSP Origins", function () {
     // data for all tasks is returned
     expect(result.length).to.be.equal(runBookConfig.tasks.length);
     // the updated setup name is the same as the SaaS Origin
-    expect((result[3].task as unknown as Origin).details.name).to.be.equal(
-      (runBookConfig.tasks[3].details as IOriginCreate).name
-    );
-    expect((result[4].data as unknown as Origin).details.name).to.be.equal(
+    expect((result[4].data as unknown as Origin[])[0].details.name).to.be.equal(
       (runBookConfig.tasks[3].details as IOriginCreate).name
     );
     // the start and end SaaS Origins count is the same

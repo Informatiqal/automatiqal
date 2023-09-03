@@ -1,7 +1,10 @@
 import { QlikRepoApi } from "qlik-repo-api";
 import { QlikSaaSApi } from "qlik-saas-api";
-import { automatiqalSchema } from "@informatiqal/automatiqal-schema";
-import Ajv from "ajv";
+import {
+  automatiqalWindowsSchema,
+  automatiqalSaaSSchema,
+} from "@informatiqal/automatiqal-schema";
+import Ajv, { ValidateFunction } from "ajv";
 import ajvErrors from "ajv-errors";
 
 import { IRunBookResult, ITaskResult, Runner } from "./RunBook/Runner";
@@ -43,7 +46,19 @@ export class Automatiqal {
 
     ajvErrors(ajv);
 
-    const validate = ajv.compile(automatiqalSchema);
+    if (
+      !runBook.edition ||
+      (runBook.edition != "windows" && runBook.edition != "saas")
+    )
+      throw new CustomError(1001, "RunBook", { arg1: this.runBook.edition });
+
+    let validate: ValidateFunction<unknown>;
+
+    if (runBook.edition == "windows")
+      validate = ajv.compile(automatiqalWindowsSchema);
+
+    if (runBook.edition == "saas")
+      validate = ajv.compile(automatiqalSaaSSchema);
 
     if (!runBook.tasks) throw new CustomError(1023, "Runbook");
 
@@ -55,12 +70,12 @@ export class Automatiqal {
       if (nonSkipTasks.length == 0) throw new CustomError(1023, "Runbook");
     }
 
-    // const valid = validate(runBook);
+    const valid = validate(runBook);
 
-    // if (!valid) {
-    //   const errors = validate.errors.map((e) => e.message).join("\n");
-    //   throw new Error(errors);
-    // }
+    if (!valid) {
+      const errors = validate.errors.map((e) => e.message).join("\n");
+      throw new Error(errors);
+    }
 
     this.runBook = runBook;
     this.#tasksListFlat = this.#flatTask(this.runBook.tasks);
@@ -125,8 +140,8 @@ export class Automatiqal {
     if (!this.runBook.tasks || this.runBook.tasks.length == 0)
       throw new CustomError(1000, "RunBook");
 
-    if (this.runBook.edition != "windows" && this.runBook.edition != "saas")
-      throw new CustomError(1001, "RunBook", { arg1: this.runBook.edition });
+    // if (this.runBook.edition != "windows" && this.runBook.edition != "saas")
+    //   throw new CustomError(1001, "RunBook", { arg1: this.runBook.edition });
 
     let errors: string[] = [];
 

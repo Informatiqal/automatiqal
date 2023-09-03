@@ -1,4 +1,4 @@
-import fs from "fs"
+import fs from "fs";
 import { describe, it, expect } from "vitest";
 import { Automatiqal } from "../../src/index";
 import { IRunBook } from "../../src/RunBook/RunBook.interfaces";
@@ -9,7 +9,9 @@ import { IExtensionImportData } from "qlik-saas-api/dist/modules/Extensions";
 
 describe("Extensions", function () {
   it("All operations - all positive", async function () {
-    const extensionZip = fs.readFileSync(`${process.env.IMPORT_EXTENSION_FILE}`)
+    const extensionZip = fs.readFileSync(
+      `${process.env.IMPORT_EXTENSION_FILE}`
+    );
 
     const runBookConfig: IRunBook = {
       name: "Extensions operations",
@@ -33,12 +35,12 @@ describe("Extensions", function () {
             file: extensionZip,
             data: {
               name: "Automatiqal Test",
-              type: "visualization"
-            }
+              type: "visualization",
+            },
           } as {
             file: string | Buffer;
             data: IExtensionImportData;
-        },
+          },
         },
         {
           name: "Get all extensions After",
@@ -81,8 +83,14 @@ describe("Extensions", function () {
     // data for all tasks is returned
     expect(result.length).to.be.equal(runBookConfig.tasks.length);
     // the updated setup tags count is the same as the SaaS tags count
-    expect((result[1].data as unknown as Extension).details.tags.length).to.be.equal(
-      (runBookConfig.tasks[3].details as {data:Partial<IExtensionImportData>}).data.tags?.length
+    expect(
+      (result[1].data as unknown as Extension).details.tags.length
+    ).to.be.equal(
+      (
+        runBookConfig.tasks[3].details as {
+          data: Partial<IExtensionImportData>;
+        }
+      ).data.tags?.length
     );
     // the start and end SaaS entity count is the same
     expect((result[0].data as unknown as Extension[]).length).to.be.equal(
