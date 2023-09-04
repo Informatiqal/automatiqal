@@ -1,6 +1,6 @@
 {
   "name": "automatiqal",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Automate Qlik deployments",
   "author": {
     "email": "info@informatiqal.com",
@@ -78,6 +78,6 @@
     "ajv-errors": "^3.0.0",
     "events": "^3.3.0",
     "qlik-repo-api": "^0.12.0",
-    "qlik-saas-api": "^0.14.2"
+    "qlik-saas-api": "^0.14.3"
   }
 }
