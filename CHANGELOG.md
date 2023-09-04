@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.1] - 2023-09-04
+
+- updated with the latest `qlik-saas-api` package version
+
 ## [0.3.0] - 2023-09-03
 
 - the initial work for integrating SaaS package is done. At the moment only few methods are exposed but the rest will be added in the near future
