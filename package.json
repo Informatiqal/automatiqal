@@ -1,6 +1,6 @@
 {
   "name": "automatiqal",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Automate Qlik deployments",
   "author": {
     "email": "info@informatiqal.com",
@@ -68,7 +68,7 @@
     "rollup-plugin-delete": "2.0.0",
     "ts-node": "10.9.1",
     "tslib": "2.6.2",
-    "typedoc": "0.25.0",
+    "typedoc": "0.25.1",
     "typescript": "^5.0.4",
     "vitest": "^0.34.3"
   },
@@ -78,6 +78,6 @@
     "ajv-errors": "^3.0.0",
     "events": "^3.3.0",
     "qlik-repo-api": "^0.12.0",
-    "qlik-saas-api": "^0.14.3"
+    "qlik-saas-api": "^0.14.4"
   }
 }

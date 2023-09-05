@@ -11,19 +11,34 @@ const apiKey: ISaaSOperation[] = [
   { name: "apiKey.getAll", isNonSource: true, type: "ApiKey", isPlural: true },
   { name: "apiKey.create", isNonSource: true, type: "ApiKey", isPlural: true },
   { name: "apiKey.configs", isNonSource: true, type: "ApiKey", isPlural: true },
-  { name: "apiKey.configsUpdate", isNonSource: true, type: "ApiKey", isPlural: true },
+  {
+    name: "apiKey.configsUpdate",
+    isNonSource: true,
+    type: "ApiKey",
+    isPlural: true,
+  },
   { name: "apiKey.remove", isNonSource: false, type: "ApiKey" },
   { name: "apiKey.update", isNonSource: false, type: "ApiKey" },
 ];
 
 const extensions: ISaaSOperation[] = [
   { name: "extension.get", isNonSource: false, type: "Extension" },
-  { name: "extension.getAll", isNonSource: true, type: "Extension", isPlural: true },
-  { name: "extension.import", isNonSource: true, type: "Extension", isPlural: true },
+  {
+    name: "extension.getAll",
+    isNonSource: true,
+    type: "Extension",
+    isPlural: true,
+  },
+  {
+    name: "extension.import",
+    isNonSource: true,
+    type: "Extension",
+    isPlural: true,
+  },
   { name: "extension.remove", isNonSource: false, type: "Extension" },
   { name: "extension.update", isNonSource: false, type: "Extension" },
+  { name: "extension.download", isNonSource: false, type: "Extension" },
 ];
-
 
 const item: ISaaSOperation[] = [
   { name: "item.get", isNonSource: false, type: "Item" },
@@ -45,9 +60,15 @@ const dataConnection: ISaaSOperation[] = [
     isNonSource: true,
     type: "DataConnection",
     isPlural: true,
+    sensitiveProperty: ["qConnectionSecret", "qPassword"],
   },
   { name: "dataConnection.remove", isNonSource: false, type: "DataConnection" },
-  { name: "dataConnection.update", isNonSource: false, type: "DataConnection" },
+  {
+    name: "dataConnection.update",
+    isNonSource: false,
+    type: "DataConnection",
+    sensitiveProperty: ["qConnectionSecret", "qPassword"],
+  },
 ];
 
 const space: ISaaSOperation[] = [
@@ -97,7 +118,7 @@ const reloads: ISaaSOperation[] = [
   { name: "reload.get", isNonSource: false, type: "Reload" },
   { name: "reload.getAll", isNonSource: true, type: "Reload", isPlural: true },
   { name: "reload.start", isNonSource: true, type: "Reload", isPlural: true },
-  { name: "reload.cancel", isNonSource: false, type: "Reload"},
+  { name: "reload.cancel", isNonSource: false, type: "Reload" },
 ];
 
 const origins: ISaaSOperation[] = [
@@ -121,6 +142,7 @@ const webHooks: ISaaSOperation[] = [
     isNonSource: true,
     type: "WebHook",
     isPlural: true,
+    sensitiveProperty: ["secret"],
   },
   { name: "webHook.remove", isNonSource: false, type: "WebHook" },
   {
@@ -128,8 +150,14 @@ const webHooks: ISaaSOperation[] = [
     isNonSource: true,
     type: "WebHook",
     isPlural: true,
+    sensitiveProperty: ["secret"],
   },
-  { name: "webHook.update", isNonSource: false, type: "WebHook" },
+  {
+    name: "webHook.update",
+    isNonSource: false,
+    type: "WebHook",
+    sensitiveProperty: ["secret"],
+  },
   { name: "webHook.patch", isNonSource: false, type: "WebHook" },
 ];
 

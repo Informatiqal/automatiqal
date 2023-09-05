@@ -74,6 +74,7 @@ export type SaaSOperations =
   | "extension.import"
   | "extension.remove"
   | "extension.update"
+  | "extension.download"
   | "item.getAll"
   | "item.get"
   | "item.collections"
@@ -334,6 +335,7 @@ export type TaskDetails =
   | IAPIKeysConfigsUpdate[]
   | IExtensionImportData
   | { location: string; skipData?: boolean }
+  | { location: string; noData?: boolean }
   | { sourceFileNames: string[]; location: string }
   | { sourceFileName: string; location: string }
   | { spaceId: string }
