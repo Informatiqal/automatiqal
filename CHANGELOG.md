@@ -1,8 +1,9 @@
 # Changelog
 
-## [0.3.1] - 2023-09-04
+## [0.3.2] - 2023-09-05
 
-- updated with the latest `qlik-saas-api` package version
+- `extension.download` is enabled
+- added sensitive data prop for a few methods
 
 ## [0.3.1] - 2023-09-04
 
