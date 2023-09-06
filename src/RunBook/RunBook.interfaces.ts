@@ -242,6 +242,7 @@ export interface ITask {
     virtualProxiesOperation?: TAddRemoveSet;
     tagOperation?: TAddRemoveSet;
     customPropertyOperation?: TAddRemoveSet;
+    unmaskSecrets?: boolean;
   };
   location?: string;
   details?: TaskDetails;

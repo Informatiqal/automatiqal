@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.3.3] - 2023-09-06
+
+- mask sensitive data by default
+- `unmaskSecrets` property in `options` to force unmask any sensitive data in the data response (not in the task)
+
 ## [0.3.2] - 2023-09-05
 
 - `extension.download` is enabled

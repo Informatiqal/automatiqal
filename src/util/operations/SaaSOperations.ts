@@ -136,7 +136,13 @@ const origins: ISaaSOperation[] = [
 ];
 
 const webHooks: ISaaSOperation[] = [
-  { name: "webHook.get", isNonSource: false, type: "WebHook" },
+  {
+    name: "webHook.get",
+    isNonSource: false,
+    type: "WebHook",
+
+    sensitiveProperty: ["secret"],
+  },
   {
     name: "webHook.getAll",
     isNonSource: true,

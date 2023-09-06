@@ -137,7 +137,13 @@ export class Runner {
         const result: ITaskResult = {
           task: this.maskSensitiveData(t),
           timings: timings,
-          data: taskResult,
+          // by default all sensitive data will be automatically masked
+          // unless the task options specifically disables this behavior
+          // aka: options.unmaskSecrets == true
+          data:
+            t.options && t.options?.unmaskSecrets == true
+              ? taskResult
+              : this.maskSensitiveDataDetails(taskResult, t.operation),
           status: "Completed",
         };
         this.emitter.emit("task:result", result);
@@ -358,5 +364,41 @@ export class Runner {
     });
 
     return taskDetails;
+  }
+
+  /**
+   * Mask any sensitive data inside the task details
+   * like data connection passwords
+   */
+  // TODO: we should have only one function for masking
+  private maskSensitiveDataDetails(
+    taskResult: IRunBookResult[],
+    operation: string
+  ) {
+    //TODO: this one and this.maskSensitiveData should not be called at all if the task dont have sensitive data
+    const isWithSensitiveData: boolean =
+      this.operations.ops.sensitiveDataOperations.includes(operation);
+
+    if (!isWithSensitiveData) return taskResult;
+    const o = this.operations.ops.filter(operation);
+
+    if (Array.isArray(taskResult)) {
+      return taskResult.map((d) => {
+        o.sensitiveProperty.map((prop) => {
+          // if the property exists then mask it
+          if (d.details[prop]) d.details[prop] = "**********";
+        });
+
+        return d;
+      });
+    } else {
+      o.sensitiveProperty.map((prop) => {
+        // if the property exists then mask it
+        if ((taskResult as IRunBookResult).details[prop])
+          (taskResult as IRunBookResult).details[prop] = "**********";
+      });
+
+      return taskResult;
+    }
   }
 }
