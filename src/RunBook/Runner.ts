@@ -78,9 +78,14 @@ export class Runner {
       a[0] = `${a[0]}s`;
     }
 
-    const data = await this.instance[`${a[0]}`].getFilter({
+    const taskOperationMeta = this.operations.ops.filter(task.operation)
+
+    const data = 
+    await this.instance[`${a[0]}`].getFilter({
       filter: task.filter,
     });
+    
+    // taskOperationMeta.realOperation ?await this.instance
 
     // this.debug.print(task.name, data.length);
     return { data };
@@ -225,7 +230,7 @@ export class Runner {
     // else return ID as default
     if (Array.isArray(taskResult.data))
       return (taskResult.data as IRunBookResult[]).map((d) => {
-        if (!property) return "id";
+        if (!property) return d.details.id;
 
         const inlineValue = property
           .split(".")

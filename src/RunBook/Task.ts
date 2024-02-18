@@ -77,6 +77,9 @@ export class Task {
 
         if (a[0].substring(a[0].length - 2) == "ie") a[0] = `${a[0]}s`;
 
+        if (op.hasOwnProperty("subTaskGroup"))
+          a[0] = `${a[0]}.${op.subTaskGroup}`;
+
         return await this.instance[a[0]]
           [a[1]](this.task.details || {}, this.task.options)
           .catch((e) => {
@@ -133,7 +136,11 @@ export class Task {
     // loop though all elements and call the method in each element
     return await Promise.all(
       this.objectsData.data.map(async (obj) =>
-        obj[a[1]](this.task.details, this.task.options)
+        op.hasOwnProperty("realOperation")
+          ? ""
+          : op.hasOwnProperty("subTaskGroup")
+          ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
+          : obj[a[1]](this.task.details, this.task.options)
       )
     );
   }

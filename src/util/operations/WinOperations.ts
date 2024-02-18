@@ -4,6 +4,8 @@ interface IWinOperation {
   type?: string;
   isPlural?: boolean;
   sensitiveProperty?: string[];
+  subTaskGroup?: string;
+  realOperation?: string;
 }
 
 const about: IWinOperation[] = [

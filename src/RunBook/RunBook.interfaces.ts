@@ -31,11 +31,8 @@ import {
 
 import { IConfig } from "qlik-rest-api/dist/interfaces/interfaces";
 import { IExtensionImportData } from "qlik-saas-api/dist/modules/Extensions";
-import {
-  IAssignmentCreate,
-  ISpace,
-  ISpaceUpdate,
-} from "qlik-saas-api/dist/modules/Space";
+import { ISpace, ISpaceUpdate } from "qlik-saas-api/dist/modules/Space";
+import { IAssignmentCreate } from "qlik-saas-api/dist/modules/SpaceAssignments";
 import { ISpaceCreate } from "qlik-saas-api/dist/modules/Spaces";
 import { IWebHookCreate } from "qlik-saas-api/dist/modules/WebHooks";
 import {
@@ -65,10 +62,41 @@ export type SaaSOperations =
   | "app.export"
   | "app.publish"
   | "app.rePublish"
+  | "app.reload"
   | "app.addToSpace"
   | "app.removeFromSpace"
   | "app.remove"
   | "app.update"
+  | "app.scriptVersions"
+  | "app.scriptVersion"
+  | "app.getReloadTasks"
+  | "app.createReloadTasks"
+  | "app.changeObjectOwner"
+  | "automation.get"
+  | "automation.getAll"
+  | "automation.remove"
+  | "automation.create"
+  | "automation.usage"
+  | "automation.getSettings"
+  | "automation.setSettings"
+  | "automation.copy"
+  | "automation.enable"
+  | "automation.disable"
+  | "automation.move"
+  | "brand.get"
+  | "brand.getAll"
+  | "brand.remove"
+  | "brand.create"
+  | "brand.addFile"
+  | "brand.update"
+  | "brand.activate"
+  | "brand.deactivate"
+  | "encryption.get"
+  | "encryption.getAll"
+  | "encryption.list"
+  | "encryption.migrationDetails"
+  | "encryption.create"
+  | "encryption.resetToDefaultProvider"
   | "extension.get"
   | "extension.getAll"
   | "extension.import"
@@ -90,7 +118,7 @@ export type SaaSOperations =
   | "space.create"
   | "space.remove"
   | "space.update"
-  | "space.assignments"
+  | "space.assignmentsGetAll"
   | "space.assignmentsCreate"
   | "dataConnection.get"
   | "dataConnection.getAll"
