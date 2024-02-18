@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.3.4] - 2024-02-18
+
+- more SaaS operations are enabled
+- dependency updates
+
 ## [0.3.3] - 2023-09-06
 
 - mask sensitive data by default
