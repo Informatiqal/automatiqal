@@ -61,7 +61,7 @@
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/node": "20.11.19",
     "@types/uuid": "^9.0.8",
-    "dotenv": "16.4.4",
+    "dotenv": "16.4.5",
     "esm": "^3.2.25",
     "nyc": "15.1.0",
     "rollup": "^4.12.0",
