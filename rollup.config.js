@@ -14,7 +14,7 @@ export default {
       sourcemap: true,
       file: pkg.main,
       format: "es",
-    },
+    }
   ],
   external: ["events"],
   plugins: [

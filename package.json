@@ -1,6 +1,6 @@
 {
   "name": "automatiqal",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Automate Qlik deployments",
   "author": {
     "email": "info@informatiqal.com",
@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "main": "dist/index.js",
-  "module": "dist/index.es.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
@@ -59,9 +59,9 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.6",
-    "@types/node": "20.11.19",
+    "@types/node": "20.11.20",
     "@types/uuid": "^9.0.8",
-    "dotenv": "16.4.4",
+    "dotenv": "16.4.5",
     "esm": "^3.2.25",
     "nyc": "15.1.0",
     "rollup": "^4.12.0",

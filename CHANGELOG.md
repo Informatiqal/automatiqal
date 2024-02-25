@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.5] - 2024-02-25
+
+- dependency updates
+
 ## [0.3.4] - 2024-02-18
 
 - more SaaS operations are enabled
