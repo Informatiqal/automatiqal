@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.6] - 2024-04-23
+
+- dependency updates
+
 ## [0.3.5] - 2024-02-25
 
 - dependency updates
