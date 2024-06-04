@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.3.8] - 2024-06-04
+
+- `app.uploadMany` enabled
+- dependency updates
+
 ## [0.3.7] - 2024-05-28
 
 - dependency updates

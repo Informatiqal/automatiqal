@@ -1,6 +1,6 @@
 {
   "name": "automatiqal",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "Automate Qlik deployments",
   "author": {
     "email": "info@informatiqal.com",
@@ -59,7 +59,7 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.6",
-    "@types/node": "20.12.12",
+    "@types/node": "20.14.1",
     "@types/uuid": "^9.0.8",
     "dotenv": "16.4.5",
     "esm": "^3.2.25",
@@ -73,10 +73,10 @@
   },
   "dependencies": {
     "@informatiqal/automatiqal-schema": "^0.9.5",
-    "ajv": "^8.14.0",
+    "ajv": "^8.15.0",
     "ajv-errors": "^3.0.0",
     "events": "^3.3.0",
-    "qlik-repo-api": "^0.12.1",
+    "qlik-repo-api": "^0.12.2",
     "qlik-saas-api": "^0.18.3",
     "rollup": "^4.18.0"
   }

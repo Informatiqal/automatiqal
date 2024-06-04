@@ -163,6 +163,7 @@ export type WinOperations =
   | "app.switch"
   | "app.update"
   | "app.upload"
+  | "app.uploadMany"
   | "app.uploadAndReplace"
   | "certificate.export"
   | "certificate.distributionPathGet"
