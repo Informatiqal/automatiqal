@@ -45,6 +45,7 @@ import {
   IAPIKeyCreate,
   IAPIKeysConfigsUpdate,
 } from "qlik-saas-api/dist/modules/APIKeys";
+import { IncomingMessage } from "http";
 
 export type SaaSOperations =
   | "apiKey.get"
@@ -386,6 +387,13 @@ export type TaskDetails =
   | {
       file: string | Buffer;
       data?: undefined;
+    }
+  | {
+      file: Buffer | ReadStream | IncomingMessage | WritableStream;
+      name: string;
+    }[]
+  | {
+      location: string;
     };
 // };
 

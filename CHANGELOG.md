@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.3.9] - 2024-06-06
+
+- schema version updated
+- dependency updates
+
 ## [0.3.8] - 2024-06-04
 
 - `app.uploadMany` enabled
