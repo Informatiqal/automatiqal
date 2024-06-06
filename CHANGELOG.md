@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.11] - 2024-06-06
+
+- dependency updates
+
 ## [0.3.10] - 2024-06-06
 
 - `app.uploadMany` included in the QSEoW operations list
