@@ -28,6 +28,7 @@ const app: IWinOperation[] = [
   { name: "app.switch", isNonSource: false, type: "App" },
   { name: "app.update", isNonSource: false, type: "App" },
   { name: "app.upload", isNonSource: true, type: "App", isPlural: true },
+  { name: "app.uploadMany", isNonSource: true, type: "App", isPlural: true },
   {
     name: "app.uploadAndReplace",
     isNonSource: true,

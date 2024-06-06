@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.10] - 2024-06-06
+
+- `app.uploadMany` included in the QSEoW operations list
+
 ## [0.3.9] - 2024-06-06
 
 - schema version updated
