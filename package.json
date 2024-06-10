@@ -63,7 +63,7 @@
     "@types/uuid": "^9.0.8",
     "dotenv": "16.4.5",
     "esm": "^3.2.25",
-    "nyc": "15.1.0",
+    "nyc": "17.0.0",
     "rollup-plugin-delete": "2.0.0",
     "ts-node": "10.9.2",
     "tslib": "2.6.3",
