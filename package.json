@@ -76,7 +76,7 @@
     "ajv": "^8.16.0",
     "ajv-errors": "^3.0.0",
     "events": "^3.3.0",
-    "qlik-repo-api": "^0.12.3",
+    "qlik-repo-api": "^0.13.0",
     "qlik-saas-api": "^0.18.3",
     "rollup": "^4.18.0"
   }
