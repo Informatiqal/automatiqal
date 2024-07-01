@@ -256,12 +256,32 @@ export type WinOperations =
 export type TAddRemoveSet = "add" | "remove" | "set";
 
 export interface ITask {
+  /**
+   * Unique name of the task
+   */
   name: string;
+  /**
+   * Longer description of the task
+   */
   description?: string;
   operation: WinOperations | SaaSOperations;
+  /**
+   * Get entities based on the specified filter
+   */
   filter?: string;
+  /**
+   * Task will be ran on the entities returned from the defined task name
+   */
   source?: string;
+  /**
+   * Skip or not the current tasks
+   */
   skip?: boolean;
+  /**
+   * Determine if the task to be skipped or not based on
+   * the condition provided here
+   */
+  when?: string;
   //   onError?: ITask[];
   options?: {
     appendCustomProperties?: boolean;

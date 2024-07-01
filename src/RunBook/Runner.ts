@@ -1,11 +1,13 @@
 import { QlikRepoApi } from "qlik-repo-api";
 import { randomUUID } from "crypto";
+import ivm, { Reference } from "isolated-vm";
 import { IRunBook, ITask } from "./RunBook.interfaces";
 import { Task } from "./Task";
 import { Debugger } from "../util/Debugger";
 import { EventsBus } from "../util/EventBus";
 import { CustomError } from "../util/CustomError";
 import { Operations } from "../util/operations/index";
+import { parseFilter } from "@informatiqal/filter-parser";
 
 export interface IRunBookResult {
   task: string;
@@ -55,7 +57,36 @@ export class Runner {
   async start(): Promise<ITaskResult[]> {
     //return await Promise.all(
     // this.runBook.tasks.forEach(async (t) => {
+
     for (let t of this.runBook.tasks) {
+      // parse the "when" condition only if "skip"
+      // is not explicitly defined
+      // aka "skip" is with higher priority
+      if (!Object.hasOwnProperty("skip")) {
+        let whenSkip = false;
+        if (t.when) {
+          let jsCondition = "";
+
+          try {
+            jsCondition = this.parseWhenCondition(t.when);
+          } catch (e) {
+            throw new Error(
+              `Error parsing the "where" filter for task "${t.name}"`
+            );
+          }
+
+          try {
+            whenSkip = await this.evaluateWhenCondition(jsCondition);
+          } catch (e) {
+            throw new Error(
+              `Error evaluating the "where" filter for task "${t.name}"`
+            );
+          }
+
+          t.skip = whenSkip;
+        }
+      }
+
       if (!t.skip) await this.taskProcessing(t);
     }
 
@@ -78,13 +109,12 @@ export class Runner {
       a[0] = `${a[0]}s`;
     }
 
-    const taskOperationMeta = this.operations.ops.filter(task.operation)
+    const taskOperationMeta = this.operations.ops.filter(task.operation);
 
-    const data = 
-    await this.instance[`${a[0]}`].getFilter({
+    const data = await this.instance[`${a[0]}`].getFilter({
       filter: task.filter,
     });
-    
+
     // taskOperationMeta.realOperation ?await this.instance
 
     // this.debug.print(task.name, data.length);
@@ -405,5 +435,109 @@ export class Runner {
 
       return taskResult;
     }
+  }
+
+  private parseWhenCondition(conditions: string) {
+    let parsedJsElements = parseFilter(conditions) as string;
+
+    const regEx = /(?<=\$\${)(.*?)(?=})/g;
+
+    const inlineConditions: string[] = Array.from(
+      new Set(parsedJsElements.match(regEx))
+    );
+
+    if (inlineConditions.length > 0) {
+      inlineConditions.map((ic) => {
+        let taskName = ic;
+        let prop = "";
+        let type = "";
+
+        if (ic.indexOf("|") > 0)
+          [taskName, prop, type = "logical"] = ic.split("|");
+        if (ic.indexOf("#") > 0)
+          [taskName, prop, type = "property"] = ic.split("#");
+
+        const taskResult = this.taskResults.filter(
+          (r) => r.task.name == taskName
+        )[0];
+
+        if (prop) {
+          const realProp = prop.endsWith("!")
+            ? prop.substring(0, prop.length - 1)
+            : prop;
+
+          if (type == "logical") {
+            if (realProp == "length") {
+              if (Array.isArray(taskResult.data)) {
+                parsedJsElements = parsedJsElements.replaceAll(
+                  `$$\{${ic}}`,
+                  `${taskResult.data.length}`
+                );
+              }
+            }
+
+            if (prop == "skip") {
+              parsedJsElements = parsedJsElements.replaceAll(
+                `$$\{${ic}}`,
+                `${taskResult.task.skip || false}`
+              );
+            }
+          }
+
+          if (type == "property") {
+            //@ts-ignore
+            const p = taskResult.data.map((d) => d.details[realProp]);
+
+            parsedJsElements = parsedJsElements.replaceAll(
+              `$$\{${ic}}`,
+              // `"${taskResult.data[0].details[prop]}"`
+              `['${[...p].join("','")}']`
+            );
+
+            // let b = `$$\{${ic}}.includes('${prop}')`
+
+            // parsedJsElements = parsedJsElements.replace(
+            //   `$$\{${ic}}.includes('${prop}')`,
+            //   `${p}.some(res => s.includes(res))`
+            // );
+
+            let a = 1;
+
+            // "$${Get some apps#name}.includes('temp')"
+            // "$${Get some apps#name}.includes('temp') && $${Get some apps#name} == 'temp'"
+          }
+        }
+      });
+    }
+
+    let a = 1;
+    return parsedJsElements;
+  }
+
+  private async evaluateWhenCondition(jsCondition: string) {
+    const isolate = new ivm.Isolate();
+    const context = await isolate.createContext();
+    const jail = context.global;
+    await jail.set(
+      "whenCondition",
+      new ivm.Reference(function () {
+        return `() => { if(${jsCondition}) { return true } else { return false } }`;
+      })
+    );
+
+    const fn = await context.eval(
+      `(async function untrusted() {
+            const condition = whenCondition.applySync();
+            const evalResult = eval(condition);
+            return evalResult();
+        })`,
+      { reference: true }
+    );
+
+    const value = (await fn.apply(undefined, [], {
+      result: { promise: true },
+    })) as boolean;
+
+    return !value;
   }
 }
