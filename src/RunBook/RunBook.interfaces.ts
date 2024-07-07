@@ -284,6 +284,10 @@ export interface ITask {
   };
 }
 
+export interface IBlock {
+  tasks: ITask[];
+}
+
 export type TraceLevels = "error" | "debug";
 export type QlikEditions = "saas" | "windows";
 
@@ -304,7 +308,7 @@ export interface IRunBook {
     // | ICertUser
     // | ISaaSToken;
   };
-  tasks: ITask[];
+  tasks: ITask[] | IBlock[];
 }
 
 export interface IAppUpload {
