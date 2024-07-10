@@ -7,8 +7,8 @@ import {
 import Ajv, { ValidateFunction } from "ajv";
 import ajvErrors from "ajv-errors";
 
-import { IRunBookResult, ITaskResult, Runner } from "./RunBook/Runner";
-import { ILoop, IRunBook, ITask } from "./RunBook/RunBook.interfaces";
+import { ITaskResult, Runner } from "./RunBook/Runner";
+import { IRunBook, ITask } from "./RunBook/RunBook.interfaces";
 import { CustomError } from "./util/CustomError";
 import { EventsBus } from "./util/EventBus";
 import { Operations } from "./util/operations/index";
@@ -94,8 +94,6 @@ export class Automatiqal {
     // perform obvious checks before execution
     this.initialChecks();
 
-    this.replaceLoopVariables();
-
     // if QSEoW - set up Qlik Repo client
     if (runBook.edition == "windows") {
       if (httpsAgent) {
@@ -136,68 +134,6 @@ export class Automatiqal {
 
   async run(): Promise<ITaskResult[]> {
     return await this.#runner.start();
-  }
-
-  private replaceLoopVariables() {
-    const tasksWithLoop = this.#tasksListFlat.filter((t) =>
-      t.hasOwnProperty("loop")
-    );
-
-    tasksWithLoop.map((t) => {
-      let taskIndex = 0;
-      for (let i = 0; i < this.runBook.tasks.length; i++) {
-        if (this.runBook.tasks[i].name == t.name) taskIndex = i;
-      }
-
-      this.replaceLoopVariablesInTask(t).map((t1, i) => {
-        this.runBook.tasks.splice(taskIndex + 1 + i, 0, t1);
-      });
-
-      this.runBook.tasks.splice(taskIndex, 1);
-    });
-  }
-
-  private replaceLoopVariablesInTask(task: ITask) {
-    const regex = new RegExp(/(?<={{)(.*?)(?=}})/gm);
-    let taskStringTemplate = JSON.stringify(task);
-    let loopVariables = [...taskStringTemplate.matchAll(regex)];
-
-    if (loopVariables.length == 0)
-      throw new CustomError(1027, "RunBook", {
-        arg1: task.name,
-      });
-
-    const loopedTasks = task.loop.map((value1, index) => {
-      let taskString = taskStringTemplate;
-      loopVariables.map((v) => {
-        const value = v[0].trim();
-        if (value == "item")
-          taskString = taskString.replaceAll(`{{${v[0]}}}`, value as any);
-
-        if (value == "index")
-          taskString = taskString.replaceAll(`{{${v[0]}}}`, index as any);
-
-        if (value.startsWith("item.")) {
-          const b = value.replace("item.", "");
-          if (!value1.hasOwnProperty(b))
-            throw new CustomError(1028, "RunBook", {
-              arg1: task.name,
-              arg2: b,
-            });
-
-          const c = value1[b];
-          taskString = taskString.replaceAll(`{{${v[0]}}}`, c);
-        }
-      });
-
-      const newTask = JSON.parse(taskString) as ITask;
-      newTask.name = `${newTask.name} (${index + 1})`;
-      delete newTask.loop;
-
-      return newTask;
-    });
-
-    return [...loopedTasks];
   }
 
   private initialChecks() {
