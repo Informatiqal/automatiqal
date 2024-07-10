@@ -255,6 +255,11 @@ export type WinOperations =
 
 export type TAddRemoveSet = "add" | "remove" | "set";
 
+export type ILoop =
+  | string
+  | number
+  | { [k: string]: string | number | boolean };
+
 export interface ITask {
   name: string;
   description?: string;
@@ -282,6 +287,7 @@ export interface ITask {
     ignore?: boolean;
     tasks?: ITask[];
   };
+  loop?: ILoop[];
 }
 
 export type TraceLevels = "error" | "debug";

@@ -1,6 +1,6 @@
 import { QlikRepoApi } from "qlik-repo-api";
 import { randomUUID } from "crypto";
-import { IRunBook, ITask } from "./RunBook.interfaces";
+import { ILoop, IRunBook, ITask } from "./RunBook.interfaces";
 import { Task } from "./Task";
 import { Debugger } from "../util/Debugger";
 import { EventsBus } from "../util/EventBus";
@@ -78,13 +78,12 @@ export class Runner {
       a[0] = `${a[0]}s`;
     }
 
-    const taskOperationMeta = this.operations.ops.filter(task.operation)
+    const taskOperationMeta = this.operations.ops.filter(task.operation);
 
-    const data = 
-    await this.instance[`${a[0]}`].getFilter({
+    const data = await this.instance[`${a[0]}`].getFilter({
       filter: task.filter,
     });
-    
+
     // taskOperationMeta.realOperation ?await this.instance
 
     // this.debug.print(task.name, data.length);
@@ -121,8 +120,8 @@ export class Runner {
         totalSeconds: -1,
       };
 
-      const regex1 = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
       // check for inline variables inside the task details
+      const regex1 = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
       if (t.details && regex1.test(JSON.stringify(t.details))) {
         t.details = this.replaceInlineVariables(t.details, t.name);
       }
