@@ -7,7 +7,7 @@ import {
 import Ajv, { ValidateFunction } from "ajv";
 import ajvErrors from "ajv-errors";
 
-import { IRunBookResult, ITaskResult, Runner } from "./RunBook/Runner";
+import { ITaskResult, Runner } from "./RunBook/Runner";
 import { IRunBook, ITask } from "./RunBook/RunBook.interfaces";
 import { CustomError } from "./util/CustomError";
 import { EventsBus } from "./util/EventBus";
