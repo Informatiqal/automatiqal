@@ -278,6 +278,7 @@ export interface ITask {
     tagOperation?: TAddRemoveSet;
     customPropertyOperation?: TAddRemoveSet;
     unmaskSecrets?: boolean;
+    loopParallel?: boolean;
   };
   location?: string;
   details?: TaskDetails;

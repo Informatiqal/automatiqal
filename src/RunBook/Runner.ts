@@ -139,29 +139,25 @@ export class Runner {
 
       timings.start = new Date().toISOString();
 
-      const taskResults = await Promise.all(
-        t.loop.map(async (loopValue, index) => {
-          const taskWithReplacedLoopVariables = this.replaceLoopVariablesInTask(
-            t,
-            loopValue,
-            index
-          );
-          const task = new Task(
-            taskWithReplacedLoopVariables,
-            this.instance,
-            data
-          );
+      let taskResults: IRunBookResult[] = [];
 
-          const taskResult = await task.process();
+      // loop through all values and execute the task again
+      if (t.options?.loopParallel == true) {
+        taskResults = await Promise.all(
+          t.loop.map((loopValue, i) => {
+            return this.runTaskLoop(t, i, data, loopValue);
+          })
+        ).then((r) => r.flat());
+      } else {
+        let taskResultPostLoop: IRunBookResult[][] = [];
 
-          // by default all sensitive data will be automatically masked
-          // unless the task options specifically disables this behavior
-          // aka: options.unmaskSecrets == true
-          return t.options && t.options?.unmaskSecrets == true
-            ? taskResult
-            : this.maskSensitiveDataDetails(taskResult, t.operation);
-        })
-      ).then((results) => results.flat());
+        for (let i = 0; i < t.loop.length; i++) {
+          const loopedData = await this.runTaskLoop(t, i, data, t.loop[i]);
+          taskResultPostLoop.push(loopedData);
+        }
+
+        taskResults = taskResultPostLoop.flat();
+      }
 
       timings.end = new Date().toISOString();
       timings.totalSeconds =
@@ -169,7 +165,7 @@ export class Runner {
         1000;
 
       result.timings = timings;
-      result.data = taskResults;
+      result.data = taskResults.flat();
 
       this.emitter.emit("task:result", result);
       this.emitter.emit("runbook:log", `${t.name} complete`);
@@ -203,6 +199,27 @@ export class Runner {
 
       if (!t.onError) throw e;
     }
+  }
+
+  private async runTaskLoop(t: ITask, i: number, data: any, loopValue: ILoop) {
+    const taskWithReplacedLoopVariables = this.replaceLoopVariablesInTask(
+      t,
+      loopValue,
+      i
+    );
+    const task = new Task(taskWithReplacedLoopVariables, this.instance, data);
+
+    const taskResult = await task.process();
+
+    // by default all sensitive data will be automatically masked
+    // unless the task options specifically disables this behavior
+    // aka: options.unmaskSecrets == true
+    const dataToReturn =
+      t.options && t.options?.unmaskSecrets == true
+        ? taskResult
+        : this.maskSensitiveDataDetails(taskResult, t.operation);
+
+    return dataToReturn;
   }
 
   private replaceLoopVariablesInTask(
