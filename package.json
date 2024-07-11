@@ -1,7 +1,7 @@
 {
   "name": "automatiqal",
-  "version": "0.3.11",
-  "description": "Automate Qlik deployments",
+  "version": "0.4.0",
+  "description": "Automate Qlik deployments, management and administration",
   "author": {
     "email": "info@informatiqal.com",
     "name": "Informatiqal @informatiqal",
