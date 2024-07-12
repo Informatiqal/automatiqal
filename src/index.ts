@@ -34,8 +34,11 @@ export class Automatiqal {
 
   constructor(
     runBook: IRunBook,
-    httpsAgent?: any,
-    initialChecksList?: initialChecksNames[]
+    options?: {
+      httpsAgent?: any;
+      initialChecksList?: initialChecksNames[];
+      disableSchemaValidation?: boolean;
+    }
   ) {
     const ajv = new Ajv({
       allErrors: true,
@@ -70,18 +73,20 @@ export class Automatiqal {
       if (nonSkipTasks.length == 0) throw new CustomError(1023, "Runbook");
     }
 
-    const valid = validate(runBook);
+    if (!options?.disableSchemaValidation) {
+      const valid = validate(runBook);
 
-    if (!valid) {
-      const errors = validate.errors.map((e) => e.message).join("\n");
-      throw new Error(errors);
+      if (!valid) {
+        const errors = validate.errors.map((e) => e.message).join("\n");
+        throw new Error(errors);
+      }
     }
 
     this.runBook = runBook;
     this.#tasksListFlat = this.#flatTask(this.runBook.tasks);
     this.#taskNames = this.#tasksListFlat.map((t) => t.name);
     this.emitter = new EventsBus();
-    this.#initialChecksList = initialChecksList;
+    this.#initialChecksList = options?.initialChecksList || [];
 
     // set default trace level if not provided in the run book
     if (!this.runBook.trace) this.runBook.trace = "error";
@@ -96,10 +101,10 @@ export class Automatiqal {
 
     // if QSEoW - set up Qlik Repo client
     if (runBook.edition == "windows") {
-      if (httpsAgent) {
+      if (options?.httpsAgent) {
         this.#restInstance = new QlikRepoApi.client({
           port: runBook.environment.port,
-          httpsAgent: httpsAgent,
+          httpsAgent: options.httpsAgent,
           host: runBook.environment.host,
           proxy: runBook.environment.proxy ? runBook.environment.proxy : "",
           authentication: runBook.environment.authentication,

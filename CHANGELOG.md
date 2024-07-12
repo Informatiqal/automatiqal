@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.1] - 2024-07-12
+
+- `httpsAgent`, `initialChecksList` and `disableSchemaValidation` are now provided as `options` (instead of named parameters)
+- runbook schema update
+
+## [0.4.0] - 2024-07-11
+
+- Loops - allow task to be ran multiple times with different values [#241](https://github.com/Informatiqal/automatiqal/issues/241)
+
 ## [0.3.11] - 2024-06-06
 
 - dependency updates
