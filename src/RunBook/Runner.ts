@@ -151,9 +151,15 @@ export class Runner {
       } else {
         let taskResultPostLoop: IRunBookResult[][] = [];
 
-        for (let i = 0; i < t.loop.length; i++) {
-          const loopedData = await this.runTaskLoop(t, i, data, t.loop[i]);
-          taskResultPostLoop.push(loopedData);
+        if (t.loop.length == 0) {
+          const task = new Task(t, this.instance, data);
+          const taskResult = await task.process();
+          taskResultPostLoop.push(taskResult);
+        } else {
+          for (let i = 0; i < t.loop.length; i++) {
+            const loopedData = await this.runTaskLoop(t, i, data, t.loop[i]);
+            taskResultPostLoop.push(loopedData);
+          }
         }
 
         taskResults = taskResultPostLoop.flat();

@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.3] - 2024-07-15
+
+- dependency updates
+
+## [0.4.2] - 2024-07-15
+
+- fix bug for non-loop and non-parallel tasks
+- dependency updates
+
 ## [0.4.1] - 2024-07-12
 
 - `httpsAgent`, `initialChecksList` and `disableSchemaValidation` are now provided as `options` (instead of named parameters)

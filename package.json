@@ -1,6 +1,6 @@
 {
   "name": "automatiqal",
-  "version": "0.4.1",
+  "version": "0.4.3",
   "description": "Automate Qlik deployments, management and administration",
   "author": {
     "email": "info@informatiqal.com",
@@ -72,8 +72,8 @@
     "vitest": "^1.5.1"
   },
   "dependencies": {
-    "@informatiqal/automatiqal-schema": "^0.10.3",
-    "ajv": "^8.16.0",
+    "@informatiqal/automatiqal-schema": "^0.12.2",
+    "ajv": "^8.17.1",
     "ajv-errors": "^3.0.0",
     "events": "^3.3.0",
     "qlik-repo-api": "^0.13.1",
