@@ -72,7 +72,7 @@
     "vitest": "^1.5.1"
   },
   "dependencies": {
-    "@informatiqal/automatiqal-schema": "^0.10.3",
+    "@informatiqal/automatiqal-schema": "^0.12.0",
     "ajv": "^8.16.0",
     "ajv-errors": "^3.0.0",
     "events": "^3.3.0",
