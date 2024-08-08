@@ -1,5 +1,6 @@
 import { QlikRepoApi } from "qlik-repo-api";
 import { randomUUID } from "crypto";
+import { ILoop, IRunBook, ITask } from "./RunBook.interfaces";
 import ivm, { Reference } from "isolated-vm";
 import { IRunBook, ITask } from "./RunBook.interfaces";
 import { Task } from "./Task";
@@ -123,6 +124,8 @@ export class Runner {
 
   private async taskProcessing(t: ITask) {
     if (!t.operation) throw new CustomError(1012, t.name, { arg1: t.name });
+    if (!t.loop) t.loop = [];
+
     try {
       // TODO: data should have type!
       // get the data for the object on which the operation will be performed
@@ -151,42 +154,61 @@ export class Runner {
         totalSeconds: -1,
       };
 
-      const regex1 = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
       // check for inline variables inside the task details
+      const regex1 = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
       if (t.details && regex1.test(JSON.stringify(t.details))) {
         t.details = this.replaceInlineVariables(t.details, t.name);
       }
 
       t = this.replaceSpecialVariables(t);
 
-      const task = new Task(t, this.instance, data);
+      const result: ITaskResult = {
+        task: this.maskSensitiveData(t),
+        timings: {} as ITaskTimings,
+        data: {} as any,
+        status: "Completed",
+      };
+
       timings.start = new Date().toISOString();
 
-      await task.process().then((taskResult) => {
-        timings.end = new Date().toISOString();
-        timings.totalSeconds =
-          (new Date(timings.end).getTime() -
-            new Date(timings.start).getTime()) /
-          1000;
+      let taskResults: IRunBookResult[] = [];
 
-        const result: ITaskResult = {
-          task: this.maskSensitiveData(t),
-          timings: timings,
-          // by default all sensitive data will be automatically masked
-          // unless the task options specifically disables this behavior
-          // aka: options.unmaskSecrets == true
-          data:
-            t.options && t.options?.unmaskSecrets == true
-              ? taskResult
-              : this.maskSensitiveDataDetails(taskResult, t.operation),
-          status: "Completed",
-        };
-        this.emitter.emit("task:result", result);
-        this.emitter.emit("runbook:log", `${task.task.name} complete`);
-        this.taskResults.push(result);
-        this.emitter.emit("runbook:result", this.taskResults);
-        return result;
-      });
+      // loop through all values and execute the task again
+      if (t.options?.loopParallel == true) {
+        taskResults = await Promise.all(
+          t.loop.map((loopValue, i) => {
+            return this.runTaskLoop(t, i, data, loopValue);
+          })
+        ).then((r) => r.flat());
+      } else {
+        let taskResultPostLoop: IRunBookResult[][] = [];
+
+        if (t.loop.length == 0) {
+          const task = new Task(t, this.instance, data);
+          const taskResult = await task.process();
+          taskResultPostLoop.push(taskResult);
+        } else {
+          for (let i = 0; i < t.loop.length; i++) {
+            const loopedData = await this.runTaskLoop(t, i, data, t.loop[i]);
+            taskResultPostLoop.push(loopedData);
+          }
+        }
+
+        taskResults = taskResultPostLoop.flat();
+      }
+
+      timings.end = new Date().toISOString();
+      timings.totalSeconds =
+        (new Date(timings.end).getTime() - new Date(timings.start).getTime()) /
+        1000;
+
+      result.timings = timings;
+      result.data = taskResults.flat();
+
+      this.emitter.emit("task:result", result);
+      this.emitter.emit("runbook:log", `${t.name} complete`);
+      this.taskResults.push(result);
+      this.emitter.emit("runbook:result", this.taskResults);
     } catch (e) {
       this.taskResults.push({
         task: this.maskSensitiveData(t),
@@ -215,6 +237,80 @@ export class Runner {
 
       if (!t.onError) throw e;
     }
+  }
+
+  private async runTaskLoop(t: ITask, i: number, data: any, loopValue: ILoop) {
+    const taskWithReplacedLoopVariables = this.replaceLoopVariablesInTask(
+      t,
+      loopValue,
+      i
+    );
+    const task = new Task(taskWithReplacedLoopVariables, this.instance, data);
+
+    const taskResult = await task.process();
+
+    // by default all sensitive data will be automatically masked
+    // unless the task options specifically disables this behavior
+    // aka: options.unmaskSecrets == true
+    const dataToReturn =
+      t.options && t.options?.unmaskSecrets == true
+        ? taskResult
+        : this.maskSensitiveDataDetails(taskResult, t.operation);
+
+    return dataToReturn;
+  }
+
+  private replaceLoopVariablesInTask(
+    task: ITask,
+    loopValue: ILoop,
+    index: number
+  ) {
+    // get all instances of something between {{ and }}
+    const regex = new RegExp(/(?<={{)(.*?)(?=}})/gm);
+    // make the task string
+    const taskStringTemplate = JSON.stringify(task);
+    // find all instances of loop variables into the stringified task
+    const loopVariables = [...taskStringTemplate.matchAll(regex)];
+
+    // if loop is defined but not loop variables are found - throw an error
+    if (loopVariables.length == 0)
+      throw new CustomError(1027, "RunBook", {
+        arg1: task.name,
+      });
+
+    let taskString = taskStringTemplate;
+
+    // loop through all loop variables instances
+    loopVariables.map((v) => {
+      const value = v[0].trim();
+      // if index then replace the content with the current loop index
+      if (value == "index")
+        taskString = taskString.replaceAll(`{{${v[0]}}}`, index as any);
+
+      // if item then replace the content with the current loop value
+      if (value == "item")
+        taskString = taskString.replaceAll(`{{${v[0]}}}`, loopValue as any);
+
+      // if starts with item. then the loop values are in object format
+      if (value.startsWith("item.")) {
+        // get the property name
+        const b = value.replace("item.", "");
+
+        // if the current loop value dont have the provided property - throw an error
+        if (!loopValue.hasOwnProperty(b))
+          throw new CustomError(1028, "RunBook", {
+            arg1: task.name,
+            arg2: b,
+          });
+
+        // replace all instances with the loop value property
+        taskString = taskString.replaceAll(`{{${v[0]}}}`, loopValue[b]);
+      }
+    });
+
+    const newTask = JSON.parse(taskString) as ITask;
+
+    return newTask;
   }
 
   // if at least one of the details prop values

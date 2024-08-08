@@ -44,6 +44,8 @@ export class CustomError extends Error {
     1024: `Source for inline task contains more than one ID. Task %{arg1}. Inline variable %{arg2}`,
     1025: `Task names should not contain # symbol. Please rename the following task(s): %{arg1}`,
     1026: `Missing/incorrect property when extracting inline variable value from task "%{arg1}" - %{arg2}`,
+    1027: `Loop property is present in task "%{arg1}" but no loop variables are used. Either use the variables or remove the loop.`,
+    1028: `Property "%{arg2}" to not exists in loop values. In task "%{arg1}"`,
   };
 
   constructor(code: number, taskName: string, params?: IErrorParams) {
