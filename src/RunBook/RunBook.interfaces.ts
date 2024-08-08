@@ -319,18 +319,19 @@ export interface IRunBook {
   description?: string;
   edition: QlikEditions;
   trace?: TraceLevels;
-  environment: {
-    host: string;
-    port?: number;
-    proxy?: string;
-    authentication: IConfig["authentication"];
-    // | IHeaderConfig
-    // | IJWTConfig
-    // | ISessionConfig
-    // | ITicketConfig
-    // | ICertUser
-    // | ISaaSToken;
-  };
+  environment:
+    | {
+        host: string;
+        port?: number;
+        proxy?: string;
+        authentication: IConfig["authentication"];
+      }
+    // | {
+    //     host: string;
+    //     port?: number;
+    //     proxy?: string;
+    //     authentication: IConfig["authentication"];
+    //   }[];
   tasks: ITask[];
 }
 
