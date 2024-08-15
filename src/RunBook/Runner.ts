@@ -1,8 +1,6 @@
 import { QlikRepoApi } from "qlik-repo-api";
 import { randomUUID } from "crypto";
 import { ILoop, IRunBook, ITask } from "./RunBook.interfaces";
-import ivm, { Reference } from "isolated-vm";
-import { IRunBook, ITask } from "./RunBook.interfaces";
 import { Task } from "./Task";
 import { Debugger } from "../util/Debugger";
 import { EventsBus } from "../util/EventBus";
@@ -77,14 +75,18 @@ export class Runner {
           }
 
           try {
-            whenSkip = await this.evaluateWhenCondition(jsCondition);
+            const evaluateCondition = function (condition) {
+              return new Function("return (" + condition + ")")();
+            };
+
+            whenSkip = evaluateCondition(jsCondition);
           } catch (e) {
             throw new Error(
               `Error evaluating the "where" filter for task "${t.name}"`
             );
           }
 
-          t.skip = whenSkip;
+          t.skip = !whenSkip;
         }
       }
 
@@ -584,56 +586,31 @@ export class Runner {
             //@ts-ignore
             const p = taskResult.data.map((d) => d.details[realProp]);
 
-            parsedJsElements = parsedJsElements.replaceAll(
-              `$$\{${ic}}`,
-              // `"${taskResult.data[0].details[prop]}"`
-              `['${[...p].join("','")}']`
-            );
+            // once we have the values
+            // check if they are strings or numbers
+            // if numbers then join them directly
+            // if not then wrap them in single quote before joining
+            const IsNumericString =
+              p.filter(function (i) {
+                return isNaN(i);
+              }).length > 0;
 
-            // let b = `$$\{${ic}}.includes('${prop}')`
-
-            // parsedJsElements = parsedJsElements.replace(
-            //   `$$\{${ic}}.includes('${prop}')`,
-            //   `${p}.some(res => s.includes(res))`
-            // );
-
-            let a = 1;
-
-            // "$${Get some apps#name}.includes('temp')"
-            // "$${Get some apps#name}.includes('temp') && $${Get some apps#name} == 'temp'"
+            if (IsNumericString) {
+              parsedJsElements = parsedJsElements.replaceAll(
+                `$$\{${ic}}`,
+                `['${[...p].join("','")}']`
+              );
+            } else {
+              parsedJsElements = parsedJsElements.replaceAll(
+                `$$\{${ic}}`,
+                `[${[...p].join(",")}]`
+              );
+            }
           }
         }
       });
     }
 
-    let a = 1;
     return parsedJsElements;
-  }
-
-  private async evaluateWhenCondition(jsCondition: string) {
-    const isolate = new ivm.Isolate();
-    const context = await isolate.createContext();
-    const jail = context.global;
-    await jail.set(
-      "whenCondition",
-      new ivm.Reference(function () {
-        return `() => { if(${jsCondition}) { return true } else { return false } }`;
-      })
-    );
-
-    const fn = await context.eval(
-      `(async function untrusted() {
-            const condition = whenCondition.applySync();
-            const evalResult = eval(condition);
-            return evalResult();
-        })`,
-      { reference: true }
-    );
-
-    const value = (await fn.apply(undefined, [], {
-      result: { promise: true },
-    })) as boolean;
-
-    return !value;
   }
 }

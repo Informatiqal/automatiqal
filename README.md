@@ -10,7 +10,7 @@ NOT AFFILIATED WITH QLIK
 
 ---
 
-## For detailed documentation please check out the [Wiki section](https://github.com/Informatiqal/automatiqal/wiki)
+## For detailed documentation please check out the [user documentation](https://docs.informatiqal.com/automatiqal/)
 
 ---
 
