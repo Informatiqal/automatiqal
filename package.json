@@ -61,7 +61,7 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.6",
-    "@types/node": "22.3.0",
+    "@types/node": "22.5.0",
     "@types/uuid": "^10.0.0",
     "ajv": "^8.17.1",
     "ajv-errors": "^3.0.0",
@@ -71,11 +71,11 @@
     "nyc": "17.0.0",
     "qlik-repo-api": "^0.13.1",
     "qlik-saas-api": "^0.18.3",
-    "rollup": "^4.20.0",
-    "rollup-plugin-delete": "2.0.0",
+    "rollup": "^4.21.0",
+    "rollup-plugin-delete": "^1.2.0",
     "ts-node": "10.9.2",
     "tslib": "2.6.3",
-    "typedoc": "0.26.5",
+    "typedoc": "0.26.6",
     "typescript": "^5.0.4",
     "vitest": "^1.5.1"
   }
