@@ -71,10 +71,10 @@
     "nyc": "17.0.0",
     "qlik-repo-api": "^0.13.2",
     "qlik-saas-api": "^0.18.4",
-    "rollup": "^4.21.0",
+    "rollup": "^4.21.1",
     "rollup-plugin-delete": "^1.2.0",
     "ts-node": "10.9.2",
-    "tslib": "2.6.3",
+    "tslib": "2.7.0",
     "typedoc": "0.26.6",
     "typescript": "^5.0.4",
     "vitest": "^1.5.1"

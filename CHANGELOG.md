@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.5.0] - 2024-08-15
+## [0.5.0] - 2024-08-26
 
 - task conditions - specify conditions when the task to be ran [#230](https://github.com/Informatiqal/automatiqal/issues/230)
 - dependency updates
