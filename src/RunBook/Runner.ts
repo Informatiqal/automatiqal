@@ -6,6 +6,7 @@ import { Debugger } from "../util/Debugger";
 import { EventsBus } from "../util/EventBus";
 import { CustomError } from "../util/CustomError";
 import { Operations } from "../util/operations/index";
+import { parseFilter } from "@informatiqal/filter-parser";
 
 export interface IRunBookResult {
   task: string;
@@ -55,7 +56,40 @@ export class Runner {
   async start(): Promise<ITaskResult[]> {
     //return await Promise.all(
     // this.runBook.tasks.forEach(async (t) => {
+
     for (let t of this.runBook.tasks) {
+      // parse the "when" condition only if "skip"
+      // is not explicitly defined
+      // aka "skip" is with higher priority
+      if (!Object.hasOwnProperty("skip")) {
+        let whenSkip = false;
+        if (t.when) {
+          let jsCondition = "";
+
+          try {
+            jsCondition = this.parseWhenCondition(t.when);
+          } catch (e) {
+            throw new Error(
+              `Error parsing the "where" filter for task "${t.name}"`
+            );
+          }
+
+          try {
+            const evaluateCondition = function (condition) {
+              return new Function("return (" + condition + ")")();
+            };
+
+            whenSkip = evaluateCondition(jsCondition);
+          } catch (e) {
+            throw new Error(
+              `Error evaluating the "where" filter for task "${t.name}"`
+            );
+          }
+
+          t.skip = !whenSkip;
+        }
+      }
+
       if (!t.skip) await this.taskProcessing(t);
     }
 
@@ -499,5 +533,84 @@ export class Runner {
 
       return taskResult;
     }
+  }
+
+  private parseWhenCondition(conditions: string) {
+    let parsedJsElements = parseFilter(conditions) as string;
+
+    const regEx = /(?<=\$\${)(.*?)(?=})/g;
+
+    const inlineConditions: string[] = Array.from(
+      new Set(parsedJsElements.match(regEx))
+    );
+
+    if (inlineConditions.length > 0) {
+      inlineConditions.map((ic) => {
+        let taskName = ic;
+        let prop = "";
+        let type = "";
+
+        if (ic.indexOf("|") > 0)
+          [taskName, prop, type = "logical"] = ic.split("|");
+        if (ic.indexOf("#") > 0)
+          [taskName, prop, type = "property"] = ic.split("#");
+
+        const taskResult = this.taskResults.filter(
+          (r) => r.task.name == taskName
+        )[0];
+
+        if (prop) {
+          const realProp = prop.endsWith("!")
+            ? prop.substring(0, prop.length - 1)
+            : prop;
+
+          if (type == "logical") {
+            if (realProp == "length") {
+              if (Array.isArray(taskResult.data)) {
+                parsedJsElements = parsedJsElements.replaceAll(
+                  `$$\{${ic}}`,
+                  `${taskResult.data.length}`
+                );
+              }
+            }
+
+            if (prop == "skip") {
+              parsedJsElements = parsedJsElements.replaceAll(
+                `$$\{${ic}}`,
+                `${taskResult.task.skip || false}`
+              );
+            }
+          }
+
+          if (type == "property") {
+            //@ts-ignore
+            const p = taskResult.data.map((d) => d.details[realProp]);
+
+            // once we have the values
+            // check if they are strings or numbers
+            // if numbers then join them directly
+            // if not then wrap them in single quote before joining
+            const IsNumericString =
+              p.filter(function (i) {
+                return isNaN(i);
+              }).length > 0;
+
+            if (IsNumericString) {
+              parsedJsElements = parsedJsElements.replaceAll(
+                `$$\{${ic}}`,
+                `['${[...p].join("','")}']`
+              );
+            } else {
+              parsedJsElements = parsedJsElements.replaceAll(
+                `$$\{${ic}}`,
+                `[${[...p].join(",")}]`
+              );
+            }
+          }
+        }
+      });
+    }
+
+    return parsedJsElements;
   }
 }

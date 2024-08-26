@@ -290,14 +290,18 @@ export class Automatiqal {
   // if the inline variables task names exists in the runbook
   // https://github.com/Informatiqal/automatiqal-cli/issues/92
   #checkMissingInlineVariableTask() {
-    const regEx = /(?<=\$\${)(.*?)(?=})/;
+    const regEx = /(?<=\$\${)(.*?)(?=})/g;
     if (regEx.test(JSON.stringify(this.#tasksListFlat))) {
       const inlineSourceTaskNames = Array.from(
         new Set(JSON.stringify(this.#tasksListFlat).match(regEx))
       );
 
       const missingTasks = inlineSourceTaskNames.filter((i) => {
-        const [inlineTaskName, _] = i.split("#");
+        let inlineTaskName = i;
+
+        if (i.indexOf("#") > -1) inlineTaskName = i.split("#")[0];
+        if (i.indexOf("|") > -1) inlineTaskName = i.split("|")[0];
+
         return !this.#taskNames.includes(inlineTaskName);
       });
 
