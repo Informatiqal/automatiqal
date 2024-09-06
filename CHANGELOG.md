@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.1] - 2024-09-06
+
+- schema and composite triggers - `create`, `get` and `getAll` operations included
+- dependency updates
+
+
 ## [0.5.0] - 2024-08-26
 
 - task conditions - specify conditions when the task to be ran [#230](https://github.com/Informatiqal/automatiqal/issues/230)

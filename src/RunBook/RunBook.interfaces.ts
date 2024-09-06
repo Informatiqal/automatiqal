@@ -16,6 +16,8 @@ import {
   IDataConnectionCreate,
   IDataConnectionUpdate,
   IExtensionImport,
+  ITaskUpdateTriggerSchema,
+  ITaskUpdateTriggerComposite,
 } from "qlik-repo-api/dist/types/interfaces";
 
 import { IDataConnectionsCreate } from "qlik-saas-api/dist/modules/DataConnections";
@@ -180,12 +182,11 @@ export type WinOperations =
   | "contentLibrary.create"
   | "contentLibrary.update"
   | "contentLibrary.remove"
+  | "compositeTrigger.create"
+  | "compositeTrigger.get"
+  | "compositeTrigger.getAll"
   | "compositeTrigger.remove"
   | "compositeTrigger.update"
-  | "compositeTrigger.create"
-  | "schemaTrigger.remove"
-  | "schemaTrigger.update"
-  | "schemaTrigger.create"
   | "customProperty.get"
   | "customProperty.getAll"
   | "customProperty.create"
@@ -219,6 +220,11 @@ export type WinOperations =
   | "reloadTask.update"
   | "reloadTask.waitExecution"
   | "reloadTask.remove"
+  | "schemaTrigger.create"
+  | "schemaTrigger.get"
+  | "schemaTrigger.getAll"
+  | "schemaTrigger.remove"
+  | "schemaTrigger.update"
   | "stream.create"
   | "stream.get"
   | "stream.getAll"
@@ -383,6 +389,10 @@ export type TaskDetails =
   | IAppPublish_SaaS
   | IAppRePublish
   | IAppCopy
+  | ITaskUpdateTriggerSchema
+  | ITaskCreateTriggerSchema
+  | ITaskUpdateTriggerComposite
+  | ITaskCreateTriggerComposite
   | IOriginCreate
   | IWebHookCreate
   | IWebHookUpdate
