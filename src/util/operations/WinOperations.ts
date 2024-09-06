@@ -89,6 +89,18 @@ const compositeTrigger: IWinOperation[] = [
     type: "CompositeTrigger",
     isPlural: true,
   },
+  {
+    name: "compositeTrigger.get",
+    isNonSource: false,
+    type: "CompositeTrigger",
+    isPlural: true,
+  },
+  {
+    name: "compositeTrigger.getAll",
+    isNonSource: true,
+    type: "CompositeTrigger",
+    isPlural: true,
+  },
 ];
 
 const schemaTrigger: IWinOperation[] = [
@@ -106,6 +118,18 @@ const schemaTrigger: IWinOperation[] = [
   },
   {
     name: "schemaTrigger.create",
+    isNonSource: true,
+    type: "SchemaTrigger",
+    isPlural: true,
+  },
+  {
+    name: "schemaTrigger.get",
+    isNonSource: false,
+    type: "SchemaTrigger",
+    isPlural: true,
+  },
+  {
+    name: "schemaTrigger.getAll",
     isNonSource: true,
     type: "SchemaTrigger",
     isPlural: true,

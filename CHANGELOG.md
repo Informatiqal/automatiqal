@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.5.2] - 2024-09-06
+
+- and actually enabling the operations from 0.5.1
+
 ## [0.5.1] - 2024-09-06
 
 - schema and composite triggers - `create`, `get` and `getAll` operations included
