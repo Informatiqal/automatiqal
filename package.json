@@ -72,7 +72,7 @@
     "qlik-repo-api": "^0.13.3",
     "qlik-saas-api": "^0.18.4",
     "rollup": "^4.21.2",
-    "rollup-plugin-delete": "^1.2.0",
+    "rollup-plugin-delete": "^2.0.0",
     "ts-node": "10.9.2",
     "tslib": "2.7.0",
     "typedoc": "0.26.6",
