@@ -304,7 +304,17 @@ export interface ITask {
     tagOperation?: TAddRemoveSet;
     customPropertyOperation?: TAddRemoveSet;
     unmaskSecrets?: boolean;
+    /**
+     * applied if "loop" is used. 
+     * Loop through the values in parallel or in sequence
+     * default is "false"
+     */
     loopParallel?: boolean;
+    /**
+     * process entities in parallel or sequence
+     * default is "true"
+     */
+    parallel?: boolean;
   };
   location?: string;
   details?: TaskDetails;
@@ -325,19 +335,18 @@ export interface IRunBook {
   description?: string;
   edition: QlikEditions;
   trace?: TraceLevels;
-  environment:
-    | {
-        host: string;
-        port?: number;
-        proxy?: string;
-        authentication: IConfig["authentication"];
-      }
-    // | {
-    //     host: string;
-    //     port?: number;
-    //     proxy?: string;
-    //     authentication: IConfig["authentication"];
-    //   }[];
+  environment: {
+    host: string;
+    port?: number;
+    proxy?: string;
+    authentication: IConfig["authentication"];
+  };
+  // | {
+  //     host: string;
+  //     port?: number;
+  //     proxy?: string;
+  //     authentication: IConfig["authentication"];
+  //   }[];
   tasks: ITask[];
 }
 

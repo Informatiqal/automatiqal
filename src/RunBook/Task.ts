@@ -132,17 +132,36 @@ export class Task {
       );
     }
 
+    let taskResults: IRunBookResult[] = [];
+
     // if the previous data is an array
-    // loop though all elements and call the method in each element
-    return await Promise.all(
-      this.objectsData.data.map(async (obj) =>
-        op.hasOwnProperty("realOperation")
+    if (this.task.options.parallel == true) {
+      // if parallel == true then run in all at the same time
+      taskResults = await Promise.all(
+        this.objectsData.data.map((obj, i) => {
+          return op.hasOwnProperty("realOperation")
+            ? ""
+            : op.hasOwnProperty("subTaskGroup")
+            ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
+            : obj[a[1]](this.task.details, this.task.options);
+        })
+      );
+    } else {
+      // if parallel == false then run in sequence
+      for (let i = 0; i < this.objectsData.data.length; i++) {
+        const obj = this.objectsData.data[i];
+
+        const taskResult = await (op.hasOwnProperty("realOperation")
           ? ""
           : op.hasOwnProperty("subTaskGroup")
           ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
-          : obj[a[1]](this.task.details, this.task.options)
-      )
-    );
+          : obj[a[1]](this.task.details, this.task.options));
+
+        taskResults.push(taskResult);
+      }
+    }
+
+    return taskResults;
   }
 
   private taskDataChecks(): void {
