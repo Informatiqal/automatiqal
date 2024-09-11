@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.0] - 2024-09-11
+
+- Option to set concurrency - process task entities N at the time (rolling N) [#262](https://github.com/Informatiqal/automatiqal/issues/262)
+
 ## [0.6.0] - 2024-09-11
 
 - Option to set parallel or sequence execution for task entities [#261](https://github.com/Informatiqal/automatiqal/issues/261)
