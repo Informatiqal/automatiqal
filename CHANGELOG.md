@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.6.0] - 2024-09-XX
+## [0.6.0] - 2024-09-11
 
 - Option to set parallel or sequence execution for task entities [#261](https://github.com/Informatiqal/automatiqal/issues/261)
 - dependency updates
