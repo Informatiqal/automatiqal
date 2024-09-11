@@ -305,7 +305,7 @@ export interface ITask {
     customPropertyOperation?: TAddRemoveSet;
     unmaskSecrets?: boolean;
     /**
-     * applied if "loop" is used. 
+     * applied if "loop" is used.
      * Loop through the values in parallel or in sequence
      * default is "false"
      */
@@ -315,6 +315,12 @@ export interface ITask {
      * default is "true"
      */
     parallel?: boolean;
+    /**
+     * if parallel == true then this option
+     * will make sure that the task entries are process N at the time.
+     * rolling N
+     */
+    concurrency?: number;
   };
   location?: string;
   details?: TaskDetails;

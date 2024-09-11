@@ -1,3 +1,4 @@
+import pLimit from "p-limit";
 import { IRunBookResult } from "./Runner";
 import { ITask } from "./RunBook.interfaces";
 import { CustomError } from "../util/CustomError";
@@ -136,16 +137,33 @@ export class Task {
 
     // if the previous data is an array
     if (this.task.options.parallel == true) {
-      // if parallel == true then run in all at the same time
-      taskResults = await Promise.all(
-        this.objectsData.data.map((obj, i) => {
-          return op.hasOwnProperty("realOperation")
-            ? ""
-            : op.hasOwnProperty("subTaskGroup")
-            ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
-            : obj[a[1]](this.task.details, this.task.options);
-        })
-      );
+      if (this.task.options.concurrency > -1) {
+        const limit = pLimit(this.task.options.concurrency);
+
+        const input: IRunBookResult[] = this.objectsData.data.map((obj, i) =>
+          limit(() =>
+            op.hasOwnProperty("realOperation")
+              ? ""
+              : op.hasOwnProperty("subTaskGroup")
+              ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
+              : obj[a[1]](this.task.details, this.task.options)
+          )
+        );
+
+        taskResults = await Promise.all(input);
+      } else {
+        // if parallel == true and no concurrency or batch
+        // then run in all at the same time
+        taskResults = await Promise.all(
+          this.objectsData.data.map((obj, i) => {
+            return op.hasOwnProperty("realOperation")
+              ? ""
+              : op.hasOwnProperty("subTaskGroup")
+              ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
+              : obj[a[1]](this.task.details, this.task.options);
+          })
+        );
+      }
     } else {
       // if parallel == false then run in sequence
       for (let i = 0; i < this.objectsData.data.length; i++) {

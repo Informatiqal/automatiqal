@@ -50,6 +50,7 @@ export class Runner {
     unmaskSecrets: false,
     loopParallel: false,
     parallel: false,
+    concurrency: -1,
   };
 
   // private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/; // match values - $${xxxx}
@@ -195,7 +196,7 @@ export class Runner {
       let taskResults: IRunBookResult[] = [];
 
       // loop through all values and execute the task again
-      if (t.options.loopParallel == true) {
+      if (t.loop.length > 0 && t.options.loopParallel == true) {
         taskResults = await Promise.all(
           t.loop.map((loopValue, i) => {
             return this.runTaskLoop(t, i, data, loopValue);
