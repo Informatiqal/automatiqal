@@ -38,6 +38,20 @@ export class Runner {
   private today: string;
   private increment: number = 1;
   private operations: Operations;
+  private taskDefaultOptions: ITask["options"] = {
+    appendCustomProperties: true,
+    appendTags: true,
+    multiple: false,
+    allowZero: false,
+    whitelistOperation: "add",
+    virtualProxiesOperation: "add",
+    tagOperation: "add",
+    customPropertyOperation: "add",
+    unmaskSecrets: false,
+    loopParallel: false,
+    parallel: false,
+  };
+
   // private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/; // match values - $${xxxx}
   // TODO: how to re-use the regex? issue when using in multiple places when defined here
   // private inlineVariablesRegex = new RegExp(/(?<=\$\${)(.*?)(?=})/gm); // match ALL values - $${xxxx}
@@ -127,6 +141,11 @@ export class Runner {
   private async taskProcessing(t: ITask) {
     if (!t.operation) throw new CustomError(1012, t.name, { arg1: t.name });
     if (!t.loop) t.loop = [];
+    if (t.options) {
+      t.options = { ...this.taskDefaultOptions, ...t.options };
+    } else {
+      t.options = { ...this.taskDefaultOptions };
+    }
 
     try {
       // TODO: data should have type!
@@ -176,7 +195,7 @@ export class Runner {
       let taskResults: IRunBookResult[] = [];
 
       // loop through all values and execute the task again
-      if (t.options?.loopParallel == true) {
+      if (t.options.loopParallel == true) {
         taskResults = await Promise.all(
           t.loop.map((loopValue, i) => {
             return this.runTaskLoop(t, i, data, loopValue);
@@ -255,7 +274,7 @@ export class Runner {
     // unless the task options specifically disables this behavior
     // aka: options.unmaskSecrets == true
     const dataToReturn =
-      t.options && t.options?.unmaskSecrets == true
+      t.options.unmaskSecrets == true
         ? taskResult
         : this.maskSensitiveDataDetails(taskResult, t.operation);
 

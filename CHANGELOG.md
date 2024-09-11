@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.0] - 2024-09-11
+
+- Option to set parallel or sequence execution for task entities [#261](https://github.com/Informatiqal/automatiqal/issues/261)
+- dependency updates
+
 ## [0.5.2] - 2024-09-06
 
 - and actually enabling the operations from 0.5.1
@@ -8,7 +13,6 @@
 
 - schema and composite triggers - `create`, `get` and `getAll` operations included
 - dependency updates
-
 
 ## [0.5.0] - 2024-08-26
 
