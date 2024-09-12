@@ -321,6 +321,15 @@ export interface ITask {
      * rolling N
      */
     concurrency?: number;
+    /**
+     * if parallel == true then this option
+     * process the task entities in batches. Each batch
+     * will start once all entities are processed from the
+     * previous batch. 
+     * 
+     * THE TASKS IN EACH BATCH ARE PROCESSED IN PARALLEL!
+     */
+    batch?: number;
   };
   location?: string;
   details?: TaskDetails;

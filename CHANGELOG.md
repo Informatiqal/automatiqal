@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.8.0] - 2024-09-12
+
+- Option to set batch processing for task entities [#263](https://github.com/Informatiqal/automatiqal/issues/263)
+
 ## [0.7.0] - 2024-09-11
 
 - Option to set concurrency - process task entities N at the time (rolling N) [#262](https://github.com/Informatiqal/automatiqal/issues/262)

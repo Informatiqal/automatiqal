@@ -135,37 +135,8 @@ export class Task {
 
     let taskResults: IRunBookResult[] = [];
 
-    // if the previous data is an array
-    if (this.task.options.parallel == true) {
-      if (this.task.options.concurrency > -1) {
-        const limit = pLimit(this.task.options.concurrency);
-
-        const input: IRunBookResult[] = this.objectsData.data.map((obj, i) =>
-          limit(() =>
-            op.hasOwnProperty("realOperation")
-              ? ""
-              : op.hasOwnProperty("subTaskGroup")
-              ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
-              : obj[a[1]](this.task.details, this.task.options)
-          )
-        );
-
-        taskResults = await Promise.all(input);
-      } else {
-        // if parallel == true and no concurrency or batch
-        // then run in all at the same time
-        taskResults = await Promise.all(
-          this.objectsData.data.map((obj, i) => {
-            return op.hasOwnProperty("realOperation")
-              ? ""
-              : op.hasOwnProperty("subTaskGroup")
-              ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
-              : obj[a[1]](this.task.details, this.task.options);
-          })
-        );
-      }
-    } else {
-      // if parallel == false then run in sequence
+    // if parallel is set to FALSE
+    if (this.task.options.parallel == false) {
       for (let i = 0; i < this.objectsData.data.length; i++) {
         const obj = this.objectsData.data[i];
 
@@ -177,9 +148,79 @@ export class Task {
 
         taskResults.push(taskResult);
       }
+
+      return taskResults;
     }
 
-    return taskResults;
+    // below are the cases when parallel is set to TRUE
+
+    // parallel is true but nothing else is set
+    if (
+      this.task.options.parallel == true &&
+      this.task.options.concurrency == 0 &&
+      this.task.options.batch == 0
+    ) {
+      taskResults = await Promise.all(
+        this.objectsData.data.map((obj, i) => {
+          return op.hasOwnProperty("realOperation")
+            ? ""
+            : op.hasOwnProperty("subTaskGroup")
+            ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
+            : obj[a[1]](this.task.details, this.task.options);
+        })
+      );
+
+      return taskResults;
+    }
+
+    // parallel is true and batch is defined
+    if (this.task.options.parallel == true && this.task.options.batch > 0) {
+      const batchSize = this.task.options.batch;
+
+      const batchedTasks: IRunBookResult[][] = Array.from(
+        { length: Math.ceil(this.objectsData.data.length / batchSize) },
+        (_, i) =>
+          this.objectsData.data.slice(i * batchSize, i * batchSize + batchSize)
+      );
+
+      for (let i = 0; i < batchedTasks.length; i++) {
+        const results = await Promise.all(
+          batchedTasks[i].map((obj, i) => {
+            return op.hasOwnProperty("realOperation")
+              ? ""
+              : op.hasOwnProperty("subTaskGroup")
+              ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
+              : obj[a[1]](this.task.details, this.task.options);
+          })
+        );
+
+        taskResults = [...taskResults, ...results];
+      }
+
+      return taskResults;
+    }
+
+    // parallel is true and concurrency is set
+    if (
+      this.task.options.parallel == true &&
+      this.task.options.concurrency > 0
+    ) {
+      const limit = pLimit(this.task.options.concurrency);
+
+      const input: IRunBookResult[] = this.objectsData.data.map((obj, i) =>
+        limit(() =>
+          op.hasOwnProperty("realOperation")
+            ? ""
+            : op.hasOwnProperty("subTaskGroup")
+            ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
+            : obj[a[1]](this.task.details, this.task.options)
+        )
+      );
+
+      taskResults = await Promise.all(input);
+
+      return taskResults;
+    }
   }
 
   private taskDataChecks(): void {
