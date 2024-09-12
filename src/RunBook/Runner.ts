@@ -50,7 +50,8 @@ export class Runner {
     unmaskSecrets: false,
     loopParallel: false,
     parallel: false,
-    concurrency: -1,
+    concurrency: 0,
+    batch: 0,
   };
 
   // private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/; // match values - $${xxxx}
