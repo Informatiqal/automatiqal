@@ -1,6 +1,6 @@
 {
   "name": "automatiqal",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Automate Qlik deployments, management and administration",
   "author": {
     "email": "info@informatiqal.com",
@@ -55,7 +55,7 @@
   },
   "homepage": "https://informatiqal.com/automatiqal/",
   "devDependencies": {
-    "@informatiqal/automatiqal-schema": "^0.14.0",
+    "@informatiqal/automatiqal-schema": "^0.16.1",
     "@informatiqal/filter-parser": "^0.1.0",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.1.0",

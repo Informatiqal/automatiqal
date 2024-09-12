@@ -2,8 +2,7 @@
 
 ## [0.8.1] - 2024-09-12
 
-- custom banner and engine health operations enabled
-- dependency updates
+- updated to the latest schema
 
 ## [0.8.0] - 2024-09-12
 
