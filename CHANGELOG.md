@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.8.1] - 2024-09-12
+
+- custom banner and engine health operations enabled
+- dependency updates
+
 ## [0.8.0] - 2024-09-12
 
 - Option to set batch processing for task entities [#263](https://github.com/Informatiqal/automatiqal/issues/263)

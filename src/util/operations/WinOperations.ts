@@ -399,6 +399,42 @@ const stream: IWinOperation[] = [
   { name: "stream.update", isNonSource: false, type: "Stream" },
 ];
 
+const customBanner: IWinOperation[] = [
+  {
+    name: "customBannerMessage.create",
+    isNonSource: true,
+    type: "CustomBanner",
+    isPlural: true,
+  },
+  { name: "customBannerMessage.get", isNonSource: false, type: "CustomBanner" },
+  {
+    name: "customBannerMessage.getAll",
+    isNonSource: true,
+    type: "CustomBanner",
+    isPlural: true,
+  },
+  { name: "customBannerMessage.remove", isNonSource: false, type: "CustomBanner" },
+  { name: "customBannerMessage.update", isNonSource: false, type: "CustomBanner" },
+];
+
+const engineHealth: IWinOperation[] = [
+  {
+    name: "engineHealth.create",
+    isNonSource: true,
+    type: "EngineHealth",
+    isPlural: true,
+  },
+  { name: "engineHealth.get", isNonSource: false, type: "EngineHealth" },
+  {
+    name: "engineHealth.getAll",
+    isNonSource: true,
+    type: "EngineHealth",
+    isPlural: true,
+  },
+  { name: "engineHealth.remove", isNonSource: false, type: "EngineHealth" },
+  { name: "engineHealth.update", isNonSource: false, type: "EngineHealth" },
+];
+
 const systemRule: IWinOperation[] = [
   {
     name: "systemRule.create",
@@ -526,8 +562,10 @@ const winOperations: IWinOperation[] = [
   ...certificate,
   ...contentLibrary,
   ...compositeTrigger,
+  ...customBanner,
   ...customProperty,
   ...dataConnection,
+  ...engineHealth,
   ...extension,
   ...externalTask,
   ...node,

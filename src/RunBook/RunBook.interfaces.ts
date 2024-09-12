@@ -18,6 +18,9 @@ import {
   IExtensionImport,
   ITaskUpdateTriggerSchema,
   ITaskUpdateTriggerComposite,
+  ICustomBannerCreate,
+  IEngineHealthCreate,
+  IEngineHealthUpdate,
 } from "qlik-repo-api/dist/types/interfaces";
 
 import { IDataConnectionsCreate } from "qlik-saas-api/dist/modules/DataConnections";
@@ -187,6 +190,16 @@ export type WinOperations =
   | "compositeTrigger.getAll"
   | "compositeTrigger.remove"
   | "compositeTrigger.update"
+  | "customBannerMessage.get"
+  | "customBannerMessage.getAll"
+  | "customBannerMessage.create"
+  | "customBannerMessage.update"
+  | "customBannerMessage.remove"
+  | "engineHealth.get"
+  | "engineHealth.getAll"
+  | "engineHealth.create"
+  | "engineHealth.update"
+  | "engineHealth.remove"
   | "customProperty.get"
   | "customProperty.getAll"
   | "customProperty.create"
@@ -325,8 +338,8 @@ export interface ITask {
      * if parallel == true then this option
      * process the task entities in batches. Each batch
      * will start once all entities are processed from the
-     * previous batch. 
-     * 
+     * previous batch.
+     *
      * THE TASKS IN EACH BATCH ARE PROCESSED IN PARALLEL!
      */
     batch?: number;
@@ -382,6 +395,9 @@ export type TaskDetails =
   | IAppUpload
   | ISystemRuleCreate
   | ISystemRuleUpdate
+  | ICustomBannerCreate
+  | IEngineHealthCreate
+  | IEngineHealthUpdate
   | ICustomPropertyCreate
   | ICustomPropertyUpdate
   | ICertificateExportParameters
