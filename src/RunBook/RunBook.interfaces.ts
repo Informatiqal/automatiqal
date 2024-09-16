@@ -352,7 +352,9 @@ export interface ITask {
     ignore?: boolean;
     tasks?: ITask[];
   };
-  loop?: ILoop[];
+  loop?: {
+    values: ILoop[];
+  };
 }
 
 export type TraceLevels = "error" | "debug";

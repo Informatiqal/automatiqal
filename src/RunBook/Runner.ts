@@ -142,7 +142,11 @@ export class Runner {
 
   private async taskProcessing(t: ITask) {
     if (!t.operation) throw new CustomError(1012, t.name, { arg1: t.name });
-    if (!t.loop) t.loop = [];
+    if (!t.loop) {
+      t.loop = {
+        values: [],
+      };
+    }
     if (t.options) {
       t.options = { ...this.taskDefaultOptions, ...t.options };
     } else {
@@ -197,22 +201,27 @@ export class Runner {
       let taskResults: IRunBookResult[] = [];
 
       // loop through all values and execute the task again
-      if (t.loop.length > 0 && t.options.loopParallel == true) {
+      if (t.loop.values.length > 0 && t.options.loopParallel == true) {
         taskResults = await Promise.all(
-          t.loop.map((loopValue, i) => {
+          t.loop.values.map((loopValue, i) => {
             return this.runTaskLoop(t, i, data, loopValue);
           })
         ).then((r) => r.flat());
       } else {
         let taskResultPostLoop: IRunBookResult[][] = [];
 
-        if (t.loop.length == 0) {
+        if (t.loop.values.length == 0) {
           const task = new Task(t, this.instance, data);
           const taskResult = await task.process();
           taskResultPostLoop.push(taskResult);
         } else {
-          for (let i = 0; i < t.loop.length; i++) {
-            const loopedData = await this.runTaskLoop(t, i, data, t.loop[i]);
+          for (let i = 0; i < t.loop.values.length; i++) {
+            const loopedData = await this.runTaskLoop(
+              t,
+              i,
+              data,
+              t.loop.values[i]
+            );
             taskResultPostLoop.push(loopedData);
           }
         }
@@ -268,6 +277,18 @@ export class Runner {
       loopValue,
       i
     );
+    // delete taskWithReplacedLoopVariables.loop;
+
+    if (!data || data.data.length == 0)
+      data = !taskWithReplacedLoopVariables.source
+        ? await this.getFilterItems(taskWithReplacedLoopVariables).catch((e) => {
+            throw new CustomError(1011, taskWithReplacedLoopVariables.name, {
+              arg1: taskWithReplacedLoopVariables.name,
+              arg2: e.message,
+            });
+          })
+        : this.taskResults.find((a) => a.task.name == taskWithReplacedLoopVariables.source);
+
     const task = new Task(taskWithReplacedLoopVariables, this.instance, data);
 
     const taskResult = await task.process();

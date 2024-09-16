@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.8.2] - 2024-09-16
+
+- change in loop logic to work with the new structure
+- dependency updates
+
 ## [0.8.1] - 2024-09-12
 
 - updated to the latest schema
