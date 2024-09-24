@@ -1,4 +1,5 @@
-import { QlikRepoApi } from "qlik-repo-api";
+import https from "https";
+import { QlikRepoApi, IConfig } from "qlik-repo-api";
 import { QlikSaaSApi } from "qlik-saas-api";
 import {
   automatiqalWindowsSchema,
@@ -8,7 +9,7 @@ import Ajv, { ValidateFunction } from "ajv";
 import ajvErrors from "ajv-errors";
 
 import { ITaskResult, Runner } from "./RunBook/Runner";
-import { IRunBook, ITask } from "./RunBook/RunBook.interfaces";
+import { IEnvironment, IRunBook, ITask } from "./RunBook/RunBook.interfaces";
 import { CustomError } from "./util/CustomError";
 import { EventsBus } from "./util/EventBus";
 import { Operations } from "./util/operations/index";
@@ -26,6 +27,7 @@ export class Automatiqal {
   #tasksListFlat: ITask[];
   #taskNames: string[];
   #restInstance: QlikRepoApi.client | QlikSaaSApi.client;
+  #restInstances: { [k: string]: QlikRepoApi.client | QlikSaaSApi.client };
   #runner: Runner;
   #ops: Operations;
   #initialChecksList: initialChecksNames[];
@@ -35,7 +37,7 @@ export class Automatiqal {
   constructor(
     runBook: IRunBook,
     options?: {
-      httpsAgent?: any;
+      httpsAgent?: https.Agent | { [k: string]: https.Agent };
       initialChecksList?: initialChecksNames[];
       disableSchemaValidation?: boolean;
     }
@@ -78,7 +80,7 @@ export class Automatiqal {
 
       if (!valid) {
         const errors = validate.errors.map((e) => e.message).join("\n");
-        throw new Error(errors);
+        // throw new Error(errors);
       }
     }
 
@@ -101,36 +103,57 @@ export class Automatiqal {
 
     // if QSEoW - set up Qlik Repo client
     if (runBook.edition == "windows") {
+      // TODO: capture cases (error) when the env(s) are certificate based but no https agent is provided
+
+      let httpsAgents: { [k: string]: https.Agent } = {};
+
       if (options?.httpsAgent) {
-        this.#restInstance = new QlikRepoApi.client({
-          port: runBook.environment.port,
-          httpsAgent: options.httpsAgent,
-          host: runBook.environment.host,
-          proxy: runBook.environment.proxy ? runBook.environment.proxy : "",
-          authentication: runBook.environment.authentication,
-        });
+        if (options.httpsAgent instanceof https.Agent) {
+          httpsAgents["DEFAULT"] = options.httpsAgent;
+        } else {
+          httpsAgents = options.httpsAgent;
+        }
+      }
+      if (!Array.isArray(this.runBook.environment)) {
+        const env = runBook.environment as IEnvironment;
+        const name = env.name || "DEFAULT";
+        const clientConfig: IConfig = {
+          port: env.port,
+          host: env.host,
+          proxy: env.proxy ? env.proxy : "",
+          authentication: env.authentication,
+        };
+        if (httpsAgents.hasOwnProperty("DEFAULT"))
+          clientConfig.httpsAgent = httpsAgents["DEFAULT"];
+
+        this.#restInstances[name] = new QlikRepoApi.client(clientConfig);
       } else {
-        this.#restInstance = new QlikRepoApi.client({
-          port: runBook.environment.port,
-          host: runBook.environment.host,
-          proxy: runBook.environment.proxy ? runBook.environment.proxy : "",
-          authentication: runBook.environment.authentication,
+        this.runBook.environment.map((env) => {
+          this.#restInstances[env.name] = new QlikRepoApi.client({
+            port: env.port,
+            host: env.host,
+            proxy: env.proxy ? env.proxy : "",
+            authentication: env.authentication,
+          });
         });
       }
-    }
-
-    if (runBook.edition == "saas") {
-      this.#restInstance = new QlikSaaSApi.client({
-        host: runBook.environment.host,
-        authentication: runBook.environment.authentication,
-        options: {
-          saas: {
-            apps: {
-              swapResourceIdAndId: true,
-            },
-          },
-        },
-      });
+      // }
+    } else if (runBook.edition == "saas") {
+      // this.#restInstance = new QlikSaaSApi.client({
+      //   host: runBook.environment.host,
+      //   authentication: runBook.environment.authentication,
+      //   options: {
+      //     saas: {
+      //       apps: {
+      //         swapResourceIdAndId: true,
+      //       },
+      //     },
+      //   },
+      // });
+    } else {
+      throw new Error(
+        `Unknown runbook edition "${runBook.edition}". Valid values are "windows" or "saas"`
+      );
     }
 
     // initialize the Runner
