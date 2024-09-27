@@ -26,8 +26,8 @@ export class Automatiqal {
   runBook: IRunBook;
   #tasksListFlat: ITask[];
   #taskNames: string[];
-  #restInstance: QlikRepoApi.client | QlikSaaSApi.client;
-  #restInstances: { [k: string]: QlikRepoApi.client | QlikSaaSApi.client };
+  #defaultRestInstance: QlikRepoApi.client | QlikSaaSApi.client;
+  #restInstances: { [k: string]: QlikRepoApi.client | QlikSaaSApi.client } = {};
   #runner: Runner;
   #ops: Operations;
   #initialChecksList: initialChecksNames[];
@@ -114,30 +114,49 @@ export class Automatiqal {
           httpsAgents = options.httpsAgent;
         }
       }
+
       if (!Array.isArray(this.runBook.environment)) {
         const env = runBook.environment as IEnvironment;
         const name = env.name || "DEFAULT";
-        const clientConfig: IConfig = {
+
+        let clientConfig: IConfig = {
           port: env.port,
           host: env.host,
           proxy: env.proxy ? env.proxy : "",
           authentication: env.authentication,
         };
-        if (httpsAgents.hasOwnProperty("DEFAULT"))
-          clientConfig.httpsAgent = httpsAgents["DEFAULT"];
+
+        if (httpsAgents.hasOwnProperty(name))
+          clientConfig["httpsAgent"] = httpsAgents[name];
 
         this.#restInstances[name] = new QlikRepoApi.client(clientConfig);
+        this.#defaultRestInstance = this.#restInstances[name];
       } else {
+        let hasDefaultEnvironment = false;
+
         this.runBook.environment.map((env) => {
-          this.#restInstances[env.name] = new QlikRepoApi.client({
+          let clientConfig: IConfig = {
             port: env.port,
             host: env.host,
             proxy: env.proxy ? env.proxy : "",
             authentication: env.authentication,
-          });
+          };
+
+          if (httpsAgents.hasOwnProperty(env.name))
+            clientConfig["httpsAgent"] = httpsAgents[env.name];
+
+          this.#restInstances[env.name] = new QlikRepoApi.client(clientConfig);
+          if (env.hasOwnProperty("default") && env.default == true) {
+            this.#defaultRestInstance = this.#restInstances[env.name];
+            hasDefaultEnvironment = true;
+          }
+
+          if (hasDefaultEnvironment == false)
+            throw new Error(
+              "Multiple environments were specified but none of them is set as default"
+            );
         });
       }
-      // }
     } else if (runBook.edition == "saas") {
       // this.#restInstance = new QlikSaaSApi.client({
       //   host: runBook.environment.host,
@@ -156,8 +175,14 @@ export class Automatiqal {
       );
     }
 
+    this.#checkTaskEnvironment();
+
     // initialize the Runner
-    this.#runner = new Runner(this.runBook, this.#restInstance);
+    this.#runner = new Runner(
+      this.runBook,
+      this.#restInstances,
+      this.#defaultRestInstance
+    );
   }
 
   async run(): Promise<ITaskResult[]> {
@@ -288,6 +313,18 @@ export class Automatiqal {
     if (duplicateTasks.length > 0)
       throw new CustomError(1002, "RunBook", {
         arg1: duplicateTasks.join(", "),
+      });
+  }
+
+  #checkTaskEnvironment(): void {
+    const missingEnv = this.#tasksListFlat
+      .filter((t) => t.hasOwnProperty("environment"))
+      .filter((t) => !this.#restInstances[t.environment])
+      .map((t) => t.name);
+
+    if (missingEnv.length > 0)
+      throw new CustomError(1029, "RunBook", {
+        arg1: missingEnv.join(", "),
       });
   }
 
