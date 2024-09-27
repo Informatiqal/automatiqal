@@ -306,6 +306,10 @@ export interface ITask {
    * the condition provided here
    */
   when?: string;
+  /**
+   * Name of the environment on which the task should be ran
+   */
+  environment?: string;
   //   onError?: ITask[];
   options?: {
     appendCustomProperties?: boolean;
@@ -360,17 +364,21 @@ export interface ITask {
 export type TraceLevels = "error" | "debug";
 export type QlikEditions = "saas" | "windows";
 
+export interface IEnvironment {
+  name: string;
+  host: string;
+  default?: boolean;
+  port?: number;
+  proxy?: string;
+  authentication: IConfig["authentication"];
+}
+
 export interface IRunBook {
   name: string;
   description?: string;
   edition: QlikEditions;
   trace?: TraceLevels;
-  environment: {
-    host: string;
-    port?: number;
-    proxy?: string;
-    authentication: IConfig["authentication"];
-  };
+  environment: IEnvironment | IEnvironment[];
   // | {
   //     host: string;
   //     port?: number;

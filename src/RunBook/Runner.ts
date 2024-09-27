@@ -7,6 +7,7 @@ import { EventsBus } from "../util/EventBus";
 import { CustomError } from "../util/CustomError";
 import { Operations } from "../util/operations/index";
 import { parseFilter } from "@informatiqal/filter-parser";
+import { QlikSaaSApi } from "qlik-saas-api";
 
 export interface IRunBookResult {
   task: string;
@@ -31,7 +32,8 @@ export interface ITaskResult {
 
 export class Runner {
   runBook: IRunBook;
-  instance: QlikRepoApi.client;
+  instances: { [k: string]: QlikRepoApi.client | QlikSaaSApi.client };
+  defaultInstance: QlikRepoApi.client | QlikSaaSApi.client;
   debug: Debugger;
   private taskResults: ITaskResult[];
   private emitter: EventsBus;
@@ -57,9 +59,14 @@ export class Runner {
   // private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/; // match values - $${xxxx}
   // TODO: how to re-use the regex? issue when using in multiple places when defined here
   // private inlineVariablesRegex = new RegExp(/(?<=\$\${)(.*?)(?=})/gm); // match ALL values - $${xxxx}
-  constructor(runBook: IRunBook, instance) {
+  constructor(
+    runBook: IRunBook,
+    instances: { [k: string]: QlikRepoApi.client | QlikSaaSApi.client },
+    defaultInstance: QlikRepoApi.client | QlikSaaSApi.client
+  ) {
     this.runBook = runBook;
-    this.instance = instance;
+    this.instances = instances;
+    this.defaultInstance = defaultInstance;
     this.taskResults = [];
     this.emitter = new EventsBus();
     this.debug = new Debugger(this.runBook.trace, this.emitter);
@@ -130,9 +137,17 @@ export class Runner {
 
     const taskOperationMeta = this.operations.ops.filter(task.operation);
 
-    const data = await this.instance[`${a[0]}`].getFilter({
-      filter: task.filter,
-    });
+    let data = [];
+
+    if (!task.environment) {
+      data = await this.defaultInstance[`${a[0]}`].getFilter({
+        filter: task.filter,
+      });
+    } else {
+      data = await this.instances[task.environment][`${a[0]}`].getFilter({
+        filter: task.filter,
+      });
+    }
 
     // taskOperationMeta.realOperation ?await this.instance
 
@@ -211,7 +226,11 @@ export class Runner {
         let taskResultPostLoop: IRunBookResult[][] = [];
 
         if (t.loop.values.length == 0) {
-          const task = new Task(t, this.instance, data);
+          const task = t.name
+            ? new Task(t, this.instances[t.environment], data)
+            : new Task(t, this.defaultInstance, data);
+
+          // const task = new Task(t, this.instance, data);
           const taskResult = await task.process();
           taskResultPostLoop.push(taskResult);
         } else {
@@ -281,15 +300,25 @@ export class Runner {
 
     if (!data || data.data.length == 0)
       data = !taskWithReplacedLoopVariables.source
-        ? await this.getFilterItems(taskWithReplacedLoopVariables).catch((e) => {
-            throw new CustomError(1011, taskWithReplacedLoopVariables.name, {
-              arg1: taskWithReplacedLoopVariables.name,
-              arg2: e.message,
-            });
-          })
-        : this.taskResults.find((a) => a.task.name == taskWithReplacedLoopVariables.source);
+        ? await this.getFilterItems(taskWithReplacedLoopVariables).catch(
+            (e) => {
+              throw new CustomError(1011, taskWithReplacedLoopVariables.name, {
+                arg1: taskWithReplacedLoopVariables.name,
+                arg2: e.message,
+              });
+            }
+          )
+        : this.taskResults.find(
+            (a) => a.task.name == taskWithReplacedLoopVariables.source
+          );
 
-    const task = new Task(taskWithReplacedLoopVariables, this.instance, data);
+    const task = taskWithReplacedLoopVariables.name
+      ? new Task(
+          taskWithReplacedLoopVariables,
+          this.instances[taskWithReplacedLoopVariables.environment],
+          data
+        )
+      : new Task(taskWithReplacedLoopVariables, this.defaultInstance, data);
 
     const taskResult = await task.process();
 
