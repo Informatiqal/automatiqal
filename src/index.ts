@@ -80,7 +80,7 @@ export class Automatiqal {
 
       if (!valid) {
         const errors = validate.errors.map((e) => e.message).join("\n");
-        // throw new Error(errors);
+        throw new Error(errors);
       }
     }
 

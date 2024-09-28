@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.9.1] - 2024-09-28
+
+- updated to the latest schema
+
 ## [0.9.0] - 2024-09-27
 
 - ability to specify multiple environments and https agents. The environments then can be specified on task level. Then the task will be ran against the specified environment. Think about migrating/moving entities between the environments, creating the same entities into multiple environments etc. [#239](https://github.com/Informatiqal/automatiqal/issues/239)
