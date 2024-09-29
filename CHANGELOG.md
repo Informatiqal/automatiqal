@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.9.2] - 2024-09-29
+
+- initial check - presence of multiple or missing default environment when multiple environments are provided
+
 ## [0.9.1] - 2024-09-28
 
 - updated to the latest schema

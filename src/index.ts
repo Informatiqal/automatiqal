@@ -101,6 +101,8 @@ export class Automatiqal {
     // perform obvious checks before execution
     this.initialChecks();
 
+    this.#checkDefaultEnvironments();
+
     // if QSEoW - set up Qlik Repo client
     if (runBook.edition == "windows") {
       // TODO: capture cases (error) when the env(s) are certificate based but no https agent is provided
@@ -326,6 +328,26 @@ export class Automatiqal {
       throw new CustomError(1029, "RunBook", {
         arg1: missingEnv.join(", "),
       });
+  }
+
+  /**
+   * check for multiple or missing default environments
+   */
+  #checkDefaultEnvironments(): void {
+    if (Array.isArray(this.runBook.environment)) {
+      const defaultEnv = this.runBook.environment.filter(
+        (env) => env.default == true
+      );
+
+      if (defaultEnv.length == 0)
+        throw new Error(
+          "Multiple environments are provided but no environment is set as default."
+        );
+      if (defaultEnv.length > 1)
+        throw new Error(
+          "More than one environment is specified as default. Only one environment can be default"
+        );
+    }
   }
 
   #checkMissingSource() {
