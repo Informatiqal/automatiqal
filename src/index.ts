@@ -32,6 +32,7 @@ export class Automatiqal {
   #ops: Operations;
   #initialChecksList: initialChecksNames[];
   emitter: EventsBus;
+  dryRun: boolean = false;
   // #inlineVariablesRegex = new RegExp(/(?<=\$\${)(.*?)(?=})/g); // match ALL values - $${xxxx}
 
   constructor(
@@ -40,8 +41,12 @@ export class Automatiqal {
       httpsAgent?: https.Agent | { [k: string]: https.Agent };
       initialChecksList?: initialChecksNames[];
       disableSchemaValidation?: boolean;
+      dryRun?: boolean;
     }
   ) {
+    if (options && options.hasOwnProperty("dryRun"))
+      this.dryRun = options.dryRun;
+
     const ajv = new Ajv({
       allErrors: true,
       strict: true,
@@ -183,7 +188,8 @@ export class Automatiqal {
     this.#runner = new Runner(
       this.runBook,
       this.#restInstances,
-      this.#defaultRestInstance
+      this.#defaultRestInstance,
+      this.dryRun
     );
   }
 

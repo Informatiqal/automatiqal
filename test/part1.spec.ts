@@ -37,6 +37,9 @@ describe("General", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -47,7 +50,9 @@ describe("General", function () {
       ],
     };
 
-    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const automatiqal = new Automatiqal(runbook, {
+      httpsAgent: httpsAgentCert,
+    });
     const result = await automatiqal.run();
 
     expect(result.length).to.be.equal(1);
@@ -64,6 +69,9 @@ describe("General", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [],
@@ -72,7 +80,9 @@ describe("General", function () {
     let isNothingToProcessError = false;
 
     try {
-      const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+      const automatiqal = new Automatiqal(runbook, {
+        httpsAgent: httpsAgentCert,
+      });
     } catch (e) {
       if (e.message.indexOf("Nothing to process") > -1)
         isNothingToProcessError = true;
@@ -93,6 +103,9 @@ describe("OnError", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -111,7 +124,9 @@ describe("OnError", function () {
       ],
     };
 
-    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const automatiqal = new Automatiqal(runbook, {
+      httpsAgent: httpsAgentCert,
+    });
 
     const result = await automatiqal.run();
 
@@ -130,6 +145,9 @@ describe("OnError", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -151,7 +169,9 @@ describe("OnError", function () {
     let catchError = "";
 
     try {
-      const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+      const automatiqal = new Automatiqal(runbook, {
+        httpsAgent: httpsAgentCert,
+      });
 
       const result = await automatiqal.run();
     } catch (e) {
@@ -171,6 +191,9 @@ describe("OnError", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -190,7 +213,9 @@ describe("OnError", function () {
       ],
     };
 
-    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const automatiqal = new Automatiqal(runbook, {
+      httpsAgent: httpsAgentCert,
+    });
 
     const result = await automatiqal.run();
 
@@ -210,6 +235,9 @@ describe("Multiple objects", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -224,7 +252,9 @@ describe("Multiple objects", function () {
     let multiplesError = "";
 
     try {
-      const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+      const automatiqal = new Automatiqal(runbook, {
+        httpsAgent: httpsAgentCert,
+      });
 
       await automatiqal.run();
     } catch (e) {
@@ -246,6 +276,9 @@ describe("Multiple objects", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -263,7 +296,9 @@ describe("Multiple objects", function () {
     let multiplesError = "";
 
     try {
-      const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+      const automatiqal = new Automatiqal(runbook, {
+        httpsAgent: httpsAgentCert,
+      });
 
       await automatiqal.run();
     } catch (e) {
@@ -277,7 +312,7 @@ describe("Multiple objects", function () {
 });
 
 describe("Variables usage", function () {
-  it("Special variables", async function () { 
+  it("Special variables", async function () {
     const runbook: IRunBook = {
       name: "Simple runbook",
       edition: "windows",
@@ -287,6 +322,9 @@ describe("Variables usage", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -312,7 +350,9 @@ describe("Variables usage", function () {
       ],
     };
 
-    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const automatiqal = new Automatiqal(runbook, {
+      httpsAgent: httpsAgentCert,
+    });
     const result = await automatiqal.run();
 
     expect(result.length).to.be.equal(2);
@@ -353,6 +393,9 @@ describe("Variables usage", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -372,7 +415,9 @@ describe("Variables usage", function () {
       ],
     };
 
-    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const automatiqal = new Automatiqal(runbook, {
+      httpsAgent: httpsAgentCert,
+    });
     const result = await automatiqal.run();
 
     expect(result.length).to.be.equal(2);
@@ -394,6 +439,9 @@ describe("Variables usage", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -426,7 +474,9 @@ describe("Variables usage", function () {
       ],
     };
 
-    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const automatiqal = new Automatiqal(runbook, {
+      httpsAgent: httpsAgentCert,
+    });
     const result = await automatiqal.run();
 
     const streamName = ((result[0].data as IRunBookResult).details as IStream)
@@ -453,6 +503,9 @@ describe("Custom properties", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -496,7 +549,9 @@ describe("Custom properties", function () {
       ],
     };
 
-    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const automatiqal = new Automatiqal(runbook, {
+      httpsAgent: httpsAgentCert,
+    });
     const result = await automatiqal.run();
 
     const customPropsCountBase = (result[0].data[0].details as IStream)
@@ -522,6 +577,9 @@ describe("Custom properties", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -543,7 +601,9 @@ describe("Custom properties", function () {
       ],
     };
 
-    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const automatiqal = new Automatiqal(runbook, {
+      httpsAgent: httpsAgentCert,
+    });
     const result = await automatiqal.run();
 
     const customPropsCountSet = (result[0].data[0] as IStream).customProperties
@@ -567,6 +627,9 @@ describe("Custom properties", function () {
           authentication: {
             user_dir: `${process.env.TEST_USER_DIR}`,
             user_name: `${process.env.TEST_USER_ID}`,
+            //@ts-ignore
+            cert: "",
+            key: "",
           },
         },
         tasks: [
@@ -585,7 +648,9 @@ describe("Custom properties", function () {
         ],
       };
 
-      const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+      const automatiqal = new Automatiqal(runbook, {
+        httpsAgent: httpsAgentCert,
+      });
       const result = await automatiqal.run();
     } catch (e) {
       error = e.message;
@@ -609,6 +674,9 @@ describe("Custom properties", function () {
           authentication: {
             user_dir: `${process.env.TEST_USER_DIR}`,
             user_name: `${process.env.TEST_USER_ID}`,
+            //@ts-ignore
+            cert: "",
+            key: "",
           },
         },
         tasks: [
@@ -627,7 +695,9 @@ describe("Custom properties", function () {
         ],
       };
 
-      const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+      const automatiqal = new Automatiqal(runbook, {
+        httpsAgent: httpsAgentCert,
+      });
       const result = await automatiqal.run();
     } catch (e) {
       error = e.message;
@@ -648,6 +718,9 @@ describe("Tags", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -683,7 +756,9 @@ describe("Tags", function () {
       ],
     };
 
-    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const automatiqal = new Automatiqal(runbook, {
+      httpsAgent: httpsAgentCert,
+    });
     const result = await automatiqal.run();
 
     const tagsCountBase = (result[0].data[0].details as IStream).tags.length;
@@ -706,6 +781,9 @@ describe("Tags", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -724,7 +802,9 @@ describe("Tags", function () {
       ],
     };
 
-    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const automatiqal = new Automatiqal(runbook, {
+      httpsAgent: httpsAgentCert,
+    });
     const result = await automatiqal.run();
 
     const tagsCountSet = (result[0].data[0] as IStream).tags.length;
@@ -747,6 +827,9 @@ describe("Tags", function () {
           authentication: {
             user_dir: `${process.env.TEST_USER_DIR}`,
             user_name: `${process.env.TEST_USER_ID}`,
+            //@ts-ignore
+            cert: "",
+            key: "",
           },
         },
         tasks: [
@@ -765,7 +848,9 @@ describe("Tags", function () {
         ],
       };
 
-      const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+      const automatiqal = new Automatiqal(runbook, {
+        httpsAgent: httpsAgentCert,
+      });
       const result = await automatiqal.run();
     } catch (e) {
       error = e.message;
@@ -788,6 +873,9 @@ describe("Upload content", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -807,7 +895,9 @@ describe("Upload content", function () {
       ],
     };
 
-    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const automatiqal = new Automatiqal(runbook, {
+      httpsAgent: httpsAgentCert,
+    });
     const result = await automatiqal.run();
 
     expect((result[0].data as any).details.hasOwnProperty("id")).to.be.true;
@@ -827,6 +917,9 @@ describe("Upload content", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -846,7 +939,9 @@ describe("Upload content", function () {
       ],
     };
 
-    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const automatiqal = new Automatiqal(runbook, {
+      httpsAgent: httpsAgentCert,
+    });
     const result = await automatiqal.run();
 
     expect((result[0].data as any).details.hasOwnProperty("id")).to.be.true;
@@ -868,6 +963,9 @@ describe("Upload content", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -886,7 +984,9 @@ describe("Upload content", function () {
       ],
     };
 
-    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const automatiqal = new Automatiqal(runbook, {
+      httpsAgent: httpsAgentCert,
+    });
     const result = await automatiqal.run();
 
     expect((result[0].data as any).details.hasOwnProperty("id")).to.be.true;
@@ -907,6 +1007,9 @@ describe("Upload content", function () {
         authentication: {
           user_dir: `${process.env.TEST_USER_DIR}`,
           user_name: `${process.env.TEST_USER_ID}`,
+          //@ts-ignore
+          cert: "",
+          key: "",
         },
       },
       tasks: [
@@ -925,7 +1028,9 @@ describe("Upload content", function () {
       ],
     };
 
-    const automatiqal = new Automatiqal(runbook, httpsAgentCert);
+    const automatiqal = new Automatiqal(runbook, {
+      httpsAgent: httpsAgentCert,
+    });
     const result = await automatiqal.run();
 
     expect((result[0].data as any).details.hasOwnProperty("id")).to.be.true;
