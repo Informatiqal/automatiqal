@@ -215,7 +215,10 @@ export class Runner {
 
         return;
       } else {
-        t.operation = `${t.operation.split(".")[0]}.get` as any;
+        const [entity, operation] = t.operation.split(".");
+
+        if (operation != "get" && operation != "getAll")
+          t.operation = `${entity}.get` as any;
       }
     }
 
@@ -277,7 +280,7 @@ export class Runner {
         let taskResultPostLoop: IRunBookResult[][] = [];
 
         if (t.loop.values.length == 0) {
-          const task = t.name
+          const task = t.environment
             ? new Task(t, this.instances[t.environment], data)
             : new Task(t, this.defaultInstance, data);
 
