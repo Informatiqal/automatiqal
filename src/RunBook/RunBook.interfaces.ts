@@ -482,7 +482,8 @@ export type TaskDetails =
     }[]
   | {
       location: string;
-    };
+    }
+  | { names: string[] };
 // };
 
 export interface IAppPublish {

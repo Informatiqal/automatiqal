@@ -6,6 +6,7 @@ interface IWinOperation {
   sensitiveProperty?: string[];
   subTaskGroup?: string;
   realOperation?: string;
+  dryRun?: "ignore";
 }
 
 const about: IWinOperation[] = [
@@ -27,13 +28,26 @@ const app: IWinOperation[] = [
   { name: "app.remove", isNonSource: false, type: "App" },
   { name: "app.switch", isNonSource: false, type: "App" },
   { name: "app.update", isNonSource: false, type: "App" },
-  { name: "app.upload", isNonSource: true, type: "App", isPlural: true },
-  { name: "app.uploadMany", isNonSource: true, type: "App", isPlural: true },
+  {
+    name: "app.upload",
+    isNonSource: true,
+    type: "App",
+    isPlural: true,
+    dryRun: "ignore",
+  },
+  {
+    name: "app.uploadMany",
+    isNonSource: true,
+    type: "App",
+    isPlural: true,
+    dryRun: "ignore",
+  },
   {
     name: "app.uploadAndReplace",
     isNonSource: true,
     type: "App",
     isPlural: true,
+    dryRun: "ignore",
   },
 ];
 
@@ -57,6 +71,7 @@ const customProperty: IWinOperation[] = [
     isNonSource: true,
     type: "CustomProperty",
     isPlural: true,
+    dryRun: "ignore",
   },
   {
     name: "customProperty.update",
@@ -88,6 +103,7 @@ const compositeTrigger: IWinOperation[] = [
     isNonSource: true,
     type: "CompositeTrigger",
     isPlural: true,
+    dryRun: "ignore",
   },
   {
     name: "compositeTrigger.get",
@@ -121,6 +137,7 @@ const schemaTrigger: IWinOperation[] = [
     isNonSource: true,
     type: "SchemaTrigger",
     isPlural: true,
+    dryRun: "ignore",
   },
   {
     name: "schemaTrigger.get",
@@ -149,12 +166,14 @@ const contentLibrary: IWinOperation[] = [
     isNonSource: false,
     type: "ContentLibrary",
     isPlural: false,
+    dryRun: "ignore",
   },
   {
     name: "contentLibrary.importFileMany",
     isNonSource: false,
     type: "ContentLibrary",
     isPlural: false,
+    dryRun: "ignore",
   },
   {
     name: "contentLibrary.removeFile",
@@ -172,6 +191,7 @@ const contentLibrary: IWinOperation[] = [
     name: "contentLibrary.importForApp",
     isNonSource: false,
     type: "ContentLibrary",
+    dryRun: "ignore",
   },
   { name: "contentLibrary.export", isNonSource: false, type: "ContentLibrary" },
   {
@@ -184,6 +204,7 @@ const contentLibrary: IWinOperation[] = [
     isNonSource: true,
     type: "ContentLibrary",
     isPlural: true,
+    dryRun: "ignore",
   },
   { name: "contentLibrary.update", isNonSource: false, type: "ContentLibrary" },
   {
@@ -213,6 +234,7 @@ const dataConnection: IWinOperation[] = [
     type: "DataConnection",
     isPlural: true,
     sensitiveProperty: ["password"],
+    dryRun: "ignore",
   },
   {
     name: "dataConnection.remove",
@@ -248,6 +270,7 @@ const extension: IWinOperation[] = [
     type: "Extension",
     isPlural: true,
     sensitiveProperty: ["password"],
+    dryRun: "ignore",
   },
   {
     name: "extension.remove",
@@ -278,18 +301,21 @@ const externalTask: IWinOperation[] = [
     isNonSource: false,
     type: "ExternalTask",
     isPlural: false,
+    dryRun: "ignore",
   },
   {
     name: "externalTask.addTriggerMany",
     isNonSource: false,
     type: "ExternalTask",
     isPlural: false,
+    dryRun: "ignore",
   },
   {
     name: "externalTask.create",
     isNonSource: true,
     type: "ExternalTask",
     isPlural: true,
+    dryRun: "ignore",
   },
   {
     name: "externalTask.get",
@@ -308,12 +334,14 @@ const externalTask: IWinOperation[] = [
     isNonSource: false,
     type: "ExternalTask",
     isPlural: false,
+    dryRun: "ignore",
   },
   {
     name: "externalTask.startSynchronous",
     isNonSource: false,
     type: "ExternalTask",
     isPlural: false,
+    dryRun: "ignore",
   },
   {
     name: "externalTask.update",
@@ -326,6 +354,7 @@ const externalTask: IWinOperation[] = [
     isNonSource: false,
     type: "ExternalTask",
     isPlural: false,
+    dryRun: "ignore",
   },
   {
     name: "externalTask.remove",
@@ -346,6 +375,7 @@ const reloadTask: IWinOperation[] = [
     isNonSource: true,
     type: "ReloadTask",
     isPlural: true,
+    dryRun: "ignore",
   },
   {
     name: "reloadTask.remove",
@@ -370,12 +400,14 @@ const reloadTask: IWinOperation[] = [
     isNonSource: false,
     type: "ReloadTask",
     isPlural: false,
+    dryRun: "ignore",
   },
   {
     name: "reloadTask.startSynchronous",
     isNonSource: false,
     type: "ReloadTask",
     isPlural: false,
+    dryRun: "ignore",
   },
   {
     name: "reloadTask.update",
@@ -388,11 +420,18 @@ const reloadTask: IWinOperation[] = [
     isNonSource: false,
     type: "ReloadTask",
     isPlural: false,
+    dryRun: "ignore",
   },
 ];
 
 const stream: IWinOperation[] = [
-  { name: "stream.create", isNonSource: true, type: "Stream", isPlural: true },
+  {
+    name: "stream.create",
+    isNonSource: true,
+    type: "Stream",
+    isPlural: true,
+    dryRun: "ignore",
+  },
   { name: "stream.get", isNonSource: false, type: "Stream" },
   { name: "stream.getAll", isNonSource: true, type: "Stream", isPlural: true },
   { name: "stream.remove", isNonSource: false, type: "Stream" },
@@ -405,6 +444,7 @@ const customBanner: IWinOperation[] = [
     isNonSource: true,
     type: "CustomBanner",
     isPlural: true,
+    dryRun: "ignore",
   },
   { name: "customBannerMessage.get", isNonSource: false, type: "CustomBanner" },
   {
@@ -413,8 +453,16 @@ const customBanner: IWinOperation[] = [
     type: "CustomBanner",
     isPlural: true,
   },
-  { name: "customBannerMessage.remove", isNonSource: false, type: "CustomBanner" },
-  { name: "customBannerMessage.update", isNonSource: false, type: "CustomBanner" },
+  {
+    name: "customBannerMessage.remove",
+    isNonSource: false,
+    type: "CustomBanner",
+  },
+  {
+    name: "customBannerMessage.update",
+    isNonSource: false,
+    type: "CustomBanner",
+  },
 ];
 
 const engineHealth: IWinOperation[] = [
@@ -423,6 +471,7 @@ const engineHealth: IWinOperation[] = [
     isNonSource: true,
     type: "EngineHealth",
     isPlural: true,
+    dryRun: "ignore",
   },
   { name: "engineHealth.get", isNonSource: false, type: "EngineHealth" },
   {
@@ -441,6 +490,7 @@ const systemRule: IWinOperation[] = [
     isNonSource: true,
     type: "SystemRule",
     isPlural: true,
+    dryRun: "ignore",
   },
   {
     name: "systemRule.get",
@@ -465,6 +515,7 @@ const systemRule: IWinOperation[] = [
     isNonSource: true,
     type: "SystemRule",
     isPlural: true,
+    dryRun: "ignore",
   },
   {
     name: "systemRule.update",
@@ -475,8 +526,20 @@ const systemRule: IWinOperation[] = [
 ];
 
 const tag: IWinOperation[] = [
-  { name: "tag.create", isNonSource: true, type: "Tag", isPlural: true },
-  { name: "tag.createMany", isNonSource: true, type: "Tag", isPlural: true },
+  {
+    name: "tag.create",
+    isNonSource: true,
+    type: "Tag",
+    isPlural: true,
+    dryRun: "ignore",
+  },
+  {
+    name: "tag.createMany",
+    isNonSource: true,
+    type: "Tag",
+    isPlural: true,
+    dryRun: "ignore",
+  },
   { name: "tag.remove", isNonSource: false, type: "Tag" },
   { name: "tag.update", isNonSource: false, type: "Tag" },
 ];
@@ -499,18 +562,21 @@ const task: IWinOperation[] = [
     isNonSource: false,
     type: "Task",
     isPlural: false,
+    dryRun: "ignore",
   },
   {
     name: "task.startSynchronous",
     isNonSource: false,
     type: "Task",
     isPlural: false,
+    dryRun: "ignore",
   },
   {
     name: "task.stop",
     isNonSource: false,
     type: "Task",
     isPlural: false,
+    dryRun: "ignore",
   },
 ];
 
@@ -533,6 +599,7 @@ const virtualProxy: IWinOperation[] = [
     type: "VirtualProxy",
     isPlural: true,
     sensitiveProperty: ["jwtPublicKeyCertificate", "oidcClientSecret"],
+    dryRun: "ignore",
   },
   {
     name: "virtualProxy.remove",
@@ -551,7 +618,13 @@ const virtualProxy: IWinOperation[] = [
 const user: IWinOperation[] = [
   { name: "user.get", isNonSource: false, type: "User", isPlural: true },
   { name: "user.getAll", isNonSource: true, type: "User", isPlural: true },
-  { name: "user.create", isNonSource: true, type: "User", isPlural: true },
+  {
+    name: "user.create",
+    isNonSource: true,
+    type: "User",
+    isPlural: true,
+    dryRun: "ignore",
+  },
   { name: "user.remove", isNonSource: false, type: "User" },
   { name: "user.update", isNonSource: false, type: "User" },
 ];
@@ -584,6 +657,7 @@ export class WinOperations {
   nonSourceOperations: string[];
   nonSourceOperationsPlural: string[];
   sensitiveDataOperations: string[];
+  dryRunIgnoreOperations: string[];
   names: string[];
   allOperations: IWinOperation[];
   opTypes: { [key: string]: string };
@@ -611,6 +685,10 @@ export class WinOperations {
     this.sensitiveDataOperations = winOperations
       .filter((o) => o.hasOwnProperty("sensitiveProperty"))
       .map((t) => t.name);
+
+    this.dryRunIgnoreOperations = this.allOperations
+      .filter((f) => f.dryRun && f.dryRun == "ignore")
+      .map((f) => f.name);
   }
 
   filter(name: string) {

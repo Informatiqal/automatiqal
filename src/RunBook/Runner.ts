@@ -8,6 +8,7 @@ import { CustomError } from "../util/CustomError";
 import { Operations } from "../util/operations/index";
 import { parseFilter } from "@informatiqal/filter-parser";
 import { QlikSaaSApi } from "qlik-saas-api";
+import { WinOperations } from "../util/operations/WinOperations";
 
 export interface IRunBookResult {
   task: string;
@@ -35,6 +36,7 @@ export class Runner {
   instances: { [k: string]: QlikRepoApi.client | QlikSaaSApi.client };
   defaultInstance: QlikRepoApi.client | QlikSaaSApi.client;
   debug: Debugger;
+  private winOperations: WinOperations;
   private taskResults: ITaskResult[];
   private emitter: EventsBus;
   private today: string;
@@ -55,14 +57,15 @@ export class Runner {
     concurrency: 0,
     batch: 0,
   };
-
+  dryRun: boolean;
   // private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/; // match values - $${xxxx}
   // TODO: how to re-use the regex? issue when using in multiple places when defined here
   // private inlineVariablesRegex = new RegExp(/(?<=\$\${)(.*?)(?=})/gm); // match ALL values - $${xxxx}
   constructor(
     runBook: IRunBook,
     instances: { [k: string]: QlikRepoApi.client | QlikSaaSApi.client },
-    defaultInstance: QlikRepoApi.client | QlikSaaSApi.client
+    defaultInstance: QlikRepoApi.client | QlikSaaSApi.client,
+    dryRun: boolean
   ) {
     this.runBook = runBook;
     this.instances = instances;
@@ -71,6 +74,8 @@ export class Runner {
     this.emitter = new EventsBus();
     this.debug = new Debugger(this.runBook.trace, this.emitter);
     this.operations = Operations.getInstance();
+    this.dryRun = dryRun;
+    this.winOperations = new WinOperations();
 
     const date = new Date();
     this.today = date.toISOString().split("T")[0].replace(/-/gi, "");
@@ -168,6 +173,55 @@ export class Runner {
       t.options = { ...this.taskDefaultOptions };
     }
 
+    // part of the dryRun logic. Since during dry run all tasks are converted to xxx.get
+    // but still want to report/display as the original operation
+    const taskRealOperation = t.operation;
+
+    if (this.dryRun) {
+      t.options = { allowZero: true, multiple: true };
+      if (t.details) delete t.details;
+
+      // NOTE: If the task is going to create/upload a resource then just return an empty array
+      if (this.winOperations.dryRunIgnoreOperations.indexOf(t.operation) > -1) {
+        const timings: ITaskTimings = {
+          start: null,
+          end: null,
+          totalSeconds: -1,
+        };
+
+        const result: ITaskResult = {
+          task: this.maskSensitiveData(t),
+          timings: {} as ITaskTimings,
+          data: {} as any,
+          status: "Completed",
+        };
+
+        result.task.operation = taskRealOperation;
+
+        timings.start = new Date().toISOString();
+        timings.end = new Date().toISOString();
+        timings.totalSeconds =
+          (new Date(timings.end).getTime() -
+            new Date(timings.start).getTime()) /
+          1000;
+
+        result.timings = timings;
+        result.data = [];
+
+        this.emitter.emit("task:result", result);
+        this.emitter.emit("runbook:log", `${t.name} complete`);
+        this.taskResults.push(result);
+        this.emitter.emit("runbook:result", this.taskResults);
+
+        return;
+      } else {
+        const [entity, operation] = t.operation.split(".");
+
+        if (operation != "get" && operation != "getAll")
+          t.operation = `${entity}.get` as any;
+      }
+    }
+
     try {
       // TODO: data should have type!
       // get the data for the object on which the operation will be performed
@@ -226,7 +280,7 @@ export class Runner {
         let taskResultPostLoop: IRunBookResult[][] = [];
 
         if (t.loop.values.length == 0) {
-          const task = t.name
+          const task = t.environment
             ? new Task(t, this.instances[t.environment], data)
             : new Task(t, this.defaultInstance, data);
 
@@ -256,17 +310,24 @@ export class Runner {
       result.timings = timings;
       result.data = taskResults.flat();
 
+      result.task.operation = taskRealOperation;
+
       this.emitter.emit("task:result", result);
       this.emitter.emit("runbook:log", `${t.name} complete`);
       this.taskResults.push(result);
       this.emitter.emit("runbook:result", this.taskResults);
     } catch (e) {
-      this.taskResults.push({
+      const result: ITaskResult = {
         task: this.maskSensitiveData(t),
         status: "Error",
         data: [],
         timings: { start: "", end: "", totalSeconds: -1 },
-      });
+      };
+
+      result.task.operation = taskRealOperation;
+
+      this.taskResults.push(result);
+
       this.emitter.emit("runbook:result", this.taskResults);
 
       // ignore the error and continue with the next task
