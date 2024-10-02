@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.10.0] - 2024-10-02
+
+- ability to perform dry run [#6](https://github.com/Informatiqal/automatiqal/issues/6)
+- dependency updates
+
 ## [0.9.2] - 2024-09-29
 
 - initial check - presence of multiple or missing default environment when multiple environments are provided

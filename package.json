@@ -1,6 +1,6 @@
 {
   "name": "automatiqal",
-  "version": "0.9.2",
+  "version": "0.10.0",
   "description": "Automate Qlik deployments, management and administration",
   "author": {
     "email": "info@informatiqal.com",
@@ -71,7 +71,7 @@
     "p-limit": "^6.1.0",
     "qlik-repo-api": "^0.15.1",
     "qlik-saas-api": "^0.18.4",
-    "rollup": "^4.22.5",
+    "rollup": "^4.24.0",
     "rollup-plugin-delete": "^2.1.0",
     "ts-node": "10.9.2",
     "tslib": "2.7.0",
