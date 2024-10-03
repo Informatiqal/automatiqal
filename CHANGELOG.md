@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.10.3] - 2024-10-03
+
+- **FIX** if task have a `source` but the sourced task is skipped due to `when` condition then the current task should be skipped as well (since its source is not ran) [#279](https://github.com/Informatiqal/automatiqal/issues/279)
+
 ## [0.10.0] - 2024-10-02
 
 - ability to perform dry run [#6](https://github.com/Informatiqal/automatiqal/issues/6)

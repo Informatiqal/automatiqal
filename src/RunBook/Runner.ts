@@ -89,7 +89,7 @@ export class Runner {
       // parse the "when" condition only if "skip"
       // is not explicitly defined
       // aka "skip" is with higher priority
-      if (!Object.hasOwnProperty("skip")) {
+      if (!t.hasOwnProperty("skip")) {
         let whenSkip = false;
         if (t.when) {
           let jsCondition = "";
@@ -115,6 +115,24 @@ export class Runner {
           }
 
           t.skip = !whenSkip;
+        }
+      }
+
+      // check if the sourced task is with skip = true
+      // if yes then set skip = true for the current task as well
+      if (t.source) {
+        const sourcedTask = this.runBook.tasks.filter(
+          (ts) => t.source == ts.name
+        );
+
+        // NOTE: (temporary) until pre-set skip tasks are no longer removed from the start
+        // if the sourced task is not present in the runbook anymore
+        // (probably was removed because initially skip was true for it)
+        // then skip the current one as well
+        if (sourcedTask.length == 0) {
+          t.skip = true;
+        } else {
+          if (sourcedTask[0].skip == true) t.skip = true;
         }
       }
 
