@@ -517,16 +517,14 @@ export class Automatiqal {
   #flatTask(tasks: ITask[]) {
     let flatTasks: ITask[] = [];
     for (let task of tasks) {
-      if (!task.skip) {
-        flatTasks.push(task);
+      // if skip is not explicitly set
+      // then set it to false
+      if (!task.hasOwnProperty("skip")) task.skip = false;
 
-        if (
-          task.onError &&
-          task.onError.tasks &&
-          task.onError.tasks.length > 0
-        ) {
-          flatTasks = [...flatTasks, ...this.#flatTask(task.onError.tasks)];
-        }
+      flatTasks.push(task);
+
+      if (task.onError && task.onError.tasks && task.onError.tasks.length > 0) {
+        flatTasks = [...flatTasks, ...this.#flatTask(task.onError.tasks)];
       }
     }
 

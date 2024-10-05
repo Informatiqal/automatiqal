@@ -29,6 +29,7 @@ export interface ITaskResult {
   task: ITask;
   timings: ITaskTimings;
   status: "Completed" | "Error" | "Skip" | "Error (Force exit)";
+  skipReason?: "WhenCondition" | "Preset" | "SourceSkipped";
 }
 
 export class Runner {
@@ -86,10 +87,29 @@ export class Runner {
     // this.runBook.tasks.forEach(async (t) => {
 
     for (let t of this.runBook.tasks) {
+      // if task is preset to be skipped
+      // then just emit the event and do not process it further
+      if (t.hasOwnProperty("skip") && t.skip == true) {
+        const result: ITaskResult = {
+          task: this.maskSensitiveData(t),
+          timings: {} as ITaskTimings,
+          data: {} as any,
+          status: "Skip",
+          skipReason: "Preset",
+        };
+
+        this.emitter.emit("task:result", result);
+        this.emitter.emit("runbook:log", `${t.name} skipped`);
+        this.taskResults.push(result);
+        this.emitter.emit("runbook:result", this.taskResults);
+
+        continue;
+      }
+
       // parse the "when" condition only if "skip"
       // is not explicitly defined
       // aka "skip" is with higher priority
-      if (!t.hasOwnProperty("skip")) {
+      if (!t.hasOwnProperty("skip") || t.skip == false) {
         let whenSkip = false;
         if (t.when) {
           let jsCondition = "";
@@ -115,28 +135,55 @@ export class Runner {
           }
 
           t.skip = !whenSkip;
+
+          // if the "when" condition yeld skip to be true
+          // then just emit and do not process the task any further
+          if (t.skip == true) {
+            const result: ITaskResult = {
+              task: this.maskSensitiveData(t),
+              timings: {} as ITaskTimings,
+              data: {} as any,
+              status: "Skip",
+              skipReason: "WhenCondition",
+            };
+
+            this.emitter.emit("task:result", result);
+            this.emitter.emit("runbook:log", `${t.name} skipped`);
+            this.taskResults.push(result);
+            this.emitter.emit("runbook:result", this.taskResults);
+
+            continue;
+          }
         }
       }
 
       // check if the sourced task is with skip = true
-      // if yes then set skip = true for the current task as well
+      // if yes then set skip = true for the current task
+      // emit the event and do not process the task further
       if (t.source) {
         const sourcedTask = this.runBook.tasks.filter(
           (ts) => t.source == ts.name
-        );
+        )[0];
 
-        // NOTE: (temporary) until pre-set skip tasks are no longer removed from the start
-        // if the sourced task is not present in the runbook anymore
-        // (probably was removed because initially skip was true for it)
-        // then skip the current one as well
-        if (sourcedTask.length == 0) {
-          t.skip = true;
-        } else {
-          if (sourcedTask[0].skip == true) t.skip = true;
+        if (sourcedTask.skip == true) {
+          const result: ITaskResult = {
+            task: this.maskSensitiveData(t),
+            timings: {} as ITaskTimings,
+            data: {} as any,
+            status: "Skip",
+            skipReason: "SourceSkipped",
+          };
+
+          this.emitter.emit("task:result", result);
+          this.emitter.emit("runbook:log", `${t.name} skipped`);
+          this.taskResults.push(result);
+          this.emitter.emit("runbook:result", this.taskResults);
+
+          continue;
         }
       }
 
-      if (!t.skip) await this.taskProcessing(t);
+      if (t.skip == false) await this.taskProcessing(t);
     }
 
     return this.taskResults;
@@ -180,6 +227,7 @@ export class Runner {
 
   private async taskProcessing(t: ITask) {
     if (!t.operation) throw new CustomError(1012, t.name, { arg1: t.name });
+
     if (!t.loop) {
       t.loop = {
         values: [],
@@ -212,6 +260,7 @@ export class Runner {
           timings: {} as ITaskTimings,
           data: {} as any,
           status: "Completed",
+          // skipReason: "",
         };
 
         result.task.operation = taskRealOperation;
