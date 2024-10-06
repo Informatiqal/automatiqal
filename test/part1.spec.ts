@@ -56,7 +56,7 @@ describe("General", function () {
     const result = await automatiqal.run();
 
     expect(result.length).to.be.equal(1);
-    expect(result[0].data).to.haveOwnProperty("buildVersion");
+    expect(result[0].data[0]).to.haveOwnProperty("buildVersion");
   });
 
   it("No tasks defined or tasks prop missing", async function () {
@@ -132,7 +132,7 @@ describe("OnError", function () {
 
     expect(result[0].status).to.be.equal("Error");
     expect(result.length).to.be.equal(2);
-    expect(result[1].data).to.haveOwnProperty("buildVersion");
+    expect(result[1].data[0]).to.haveOwnProperty("buildVersion");
   });
 
   it("Force exit", async function () {
@@ -220,7 +220,7 @@ describe("OnError", function () {
     const result = await automatiqal.run();
 
     expect(result[0].status).to.be.equal("Error");
-    expect(result[1].data).to.haveOwnProperty("buildVersion");
+    expect(result[1].data[0]).to.haveOwnProperty("buildVersion");
   });
 });
 
@@ -356,29 +356,29 @@ describe("Variables usage", function () {
     const result = await automatiqal.run();
 
     expect(result.length).to.be.equal(2);
-    expect(result[1].data).to.be.equal(204);
+    expect(result[1].data[0]).to.be.equal(204);
     expect(
-      ((result[0].data as IRunBookResult).details as ICustomPropertyCondensed)
+      ((result[0].data[0] as IRunBookResult).details as ICustomPropertyCondensed)
         .choiceValues.length
     ).to.be.equal(5);
     expect(
-      ((result[0].data as IRunBookResult).details as ICustomPropertyCondensed)
+      ((result[0].data[0] as IRunBookResult).details as ICustomPropertyCondensed)
         .choiceValues[0].length
     ).to.be.equal(14);
     expect(
-      ((result[0].data as IRunBookResult).details as ICustomPropertyCondensed)
+      ((result[0].data[0] as IRunBookResult).details as ICustomPropertyCondensed)
         .choiceValues[1].length
     ).to.be.equal(8);
     expect(
-      ((result[0].data as IRunBookResult).details as ICustomPropertyCondensed)
+      ((result[0].data[0] as IRunBookResult).details as ICustomPropertyCondensed)
         .choiceValues[2].length
     ).to.be.equal(32);
     expect(
-      ((result[0].data as IRunBookResult).details as ICustomPropertyCondensed)
+      ((result[0].data[0] as IRunBookResult).details as ICustomPropertyCondensed)
         .choiceValues[3]
     ).to.be.equal("1");
     expect(
-      ((result[0].data as IRunBookResult).details as ICustomPropertyCondensed)
+      ((result[0].data[0] as IRunBookResult).details as ICustomPropertyCondensed)
         .choiceValues[4]
     ).to.be.equal("2");
   });
@@ -422,7 +422,7 @@ describe("Variables usage", function () {
 
     expect(result.length).to.be.equal(2);
     expect(
-      ((result[0].data as IRunBookResult).details as ICustomProperty)
+      ((result[0].data[0] as IRunBookResult).details as ICustomProperty)
         .choiceValues.length
     ).to.be.equal(1);
     expect((result[1].data as []).length).to.be.equal(1);
@@ -479,15 +479,15 @@ describe("Variables usage", function () {
     });
     const result = await automatiqal.run();
 
-    const streamName = ((result[0].data as IRunBookResult).details as IStream)
+    const streamName = ((result[0].data[0] as IRunBookResult).details as IStream)
       .name;
     const customPropertyName = (
-      (result[0].data as IRunBookResult).details as ICustomProperty
+      (result[0].data[0] as IRunBookResult).details as ICustomProperty
     ).name;
 
     expect(result.length).to.be.equal(4);
     expect(customPropertyName).to.be.equal(streamName);
-    expect(result[2].data).to.be.equal(204);
+    expect(result[2].data[0]).to.be.equal(204);
     expect(result[3].data[0]).to.be.equal(204);
   });
 });
@@ -900,9 +900,9 @@ describe("Upload content", function () {
     });
     const result = await automatiqal.run();
 
-    expect((result[0].data as any).details.hasOwnProperty("id")).to.be.true;
-    expect((result[0].data as any).details.fileSize).to.be.greaterThan(0);
-    expect(result[1].data).to.be.equal(204);
+    expect((result[0].data[0] as any).details.hasOwnProperty("id")).to.be.true;
+    expect((result[0].data[0] as any).details.fileSize).to.be.greaterThan(0);
+    expect(result[1].data[0]).to.be.equal(204);
   });
 
   it("Upload app (ReadStream)", async function () {
@@ -944,9 +944,9 @@ describe("Upload content", function () {
     });
     const result = await automatiqal.run();
 
-    expect((result[0].data as any).details.hasOwnProperty("id")).to.be.true;
-    expect((result[0].data as any).details.fileSize).to.be.greaterThan(0);
-    expect(result[1].data).to.be.equal(204);
+    expect((result[0].data[0] as any).details.hasOwnProperty("id")).to.be.true;
+    expect((result[0].data[0] as any).details.fileSize).to.be.greaterThan(0);
+    expect(result[1].data[0]).to.be.equal(204);
   });
 
   it("Upload extension (Buffer)", async function () {
@@ -989,8 +989,8 @@ describe("Upload content", function () {
     });
     const result = await automatiqal.run();
 
-    expect((result[0].data as any).details.hasOwnProperty("id")).to.be.true;
-    expect(result[1].data).to.be.equal(204);
+    expect((result[0].data[0] as any).details.hasOwnProperty("id")).to.be.true;
+    expect(result[1].data[0]).to.be.equal(204);
   });
 
   it("Upload extension (ReadStream)", async function () {
@@ -1033,7 +1033,7 @@ describe("Upload content", function () {
     });
     const result = await automatiqal.run();
 
-    expect((result[0].data as any).details.hasOwnProperty("id")).to.be.true;
-    expect(result[1].data).to.be.equal(204);
+    expect((result[0].data[0] as any).details.hasOwnProperty("id")).to.be.true;
+    expect(result[1].data[0]).to.be.equal(204);
   });
 });
