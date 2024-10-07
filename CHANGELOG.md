@@ -1,6 +1,10 @@
 # Changelog
 
-## [0.10.3] - 2024-10-03
+## [0.10.2] - 2024-10-03
+
+- skipped tasks are no longer removed from the workflow. Instead they are emitted but with `skipReason` property populated [#278](https://github.com/Informatiqal/automatiqal/issues/278)
+
+## [0.10.1] - 2024-10-03
 
 - **FIX** if task have a `source` but the sourced task is skipped due to `when` condition then the current task should be skipped as well (since its source is not ran) [#279](https://github.com/Informatiqal/automatiqal/issues/279)
 
