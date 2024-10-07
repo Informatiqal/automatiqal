@@ -29,7 +29,7 @@ export interface ITaskResult {
   task: ITask;
   timings: ITaskTimings;
   status: "Completed" | "Error" | "Skip" | "Error (Force exit)";
-  skipReason?: "WhenCondition" | "Preset" | "SourceSkipped";
+  skipReason?: "When condition" | "Preset" | "Source skipped";
 }
 
 export class Runner {
@@ -144,7 +144,7 @@ export class Runner {
               timings: {} as ITaskTimings,
               data: {} as any,
               status: "Skip",
-              skipReason: "WhenCondition",
+              skipReason: "When condition",
             };
 
             this.emitter.emit("task:result", result);
@@ -171,7 +171,7 @@ export class Runner {
             timings: {} as ITaskTimings,
             data: {} as any,
             status: "Skip",
-            skipReason: "SourceSkipped",
+            skipReason: "Source skipped",
           };
 
           this.emitter.emit("task:result", result);
