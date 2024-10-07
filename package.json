@@ -1,6 +1,6 @@
 {
   "name": "automatiqal",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "Automate Qlik deployments, management and administration",
   "author": {
     "email": "info@informatiqal.com",
@@ -75,7 +75,7 @@
     "rollup-plugin-delete": "^2.1.0",
     "ts-node": "10.9.2",
     "tslib": "2.7.0",
-    "typedoc": "0.26.7",
+    "typedoc": "0.26.8",
     "typescript": "^5.0.4",
     "vitest": "^1.5.1"
   }
