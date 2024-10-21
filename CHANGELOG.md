@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.11.0] - 2024-10-21
+
+- implement `pause` operation [#286](https://github.com/Informatiqal/automatiqal/issues/286)
+- dependency updates
+
 ## [0.10.2] - 2024-10-03
 
 - skipped tasks are no longer removed from the workflow. Instead they are emitted but with `skipReason` property populated [#278](https://github.com/Informatiqal/automatiqal/issues/278)

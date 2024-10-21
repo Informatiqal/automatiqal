@@ -9,7 +9,12 @@ import Ajv, { ValidateFunction } from "ajv";
 import ajvErrors from "ajv-errors";
 
 import { ITaskResult, Runner } from "./RunBook/Runner";
-import { IEnvironment, IRunBook, ITask } from "./RunBook/RunBook.interfaces";
+import {
+  IEnvironment,
+  IRunBook,
+  ITask,
+  ITaskFull,
+} from "./RunBook/RunBook.interfaces";
 import { CustomError } from "./util/CustomError";
 import { EventsBus } from "./util/EventBus";
 import { Operations } from "./util/operations/index";
@@ -91,7 +96,9 @@ export class Automatiqal {
 
     this.runBook = runBook;
     this.#tasksListFlat = this.#flatTask(this.runBook.tasks);
-    this.#taskNames = this.#tasksListFlat.map((t) => t.name);
+    this.#taskNames = this.#tasksListFlat
+      .filter((t) => t.operation != "pause")
+      .map((t) => (t as ITaskFull).name);
     this.emitter = new EventsBus();
     this.#initialChecksList = options?.initialChecksList || [];
 
@@ -309,8 +316,10 @@ export class Automatiqal {
   }
 
   #checkDuplicateTasks(): void {
+    // exclude the pause operations from duplicate name check
     const duplicateTasks = this.#tasksListFlat
-      .map((t) => `"${t.name}"`)
+      .filter((t) => t.operation.toLowerCase() != "pause")
+      .map((t) => `"${(t as ITaskFull).name}"`)
       .filter(
         (
           (s) => (v) =>
@@ -327,8 +336,8 @@ export class Automatiqal {
   #checkTaskEnvironment(): void {
     const missingEnv = this.#tasksListFlat
       .filter((t) => t.hasOwnProperty("environment"))
-      .filter((t) => !this.#restInstances[t.environment])
-      .map((t) => t.name);
+      .filter((t) => !this.#restInstances[(t as ITaskFull).environment])
+      .map((t) => (t as ITaskFull).name);
 
     if (missingEnv.length > 0)
       throw new CustomError(1029, "RunBook", {
@@ -358,7 +367,8 @@ export class Automatiqal {
 
   #checkMissingSource() {
     const missingSource = this.#tasksListFlat
-      .filter((t) => !t.source && !t.filter)
+      .filter((t) => t.operation != "pause")
+      .filter((t) => !(t as ITaskFull).source && !(t as ITaskFull).filter)
       .map((t) => {
         const i = this.#ops.ops.nonSourceOperations.indexOf(t.operation);
 
@@ -366,8 +376,8 @@ export class Automatiqal {
 
         return { name: "EXISTS" } as ITask;
       })
-      .filter((t) => t.name != "EXISTS")
-      .map((t) => `"${t.name}"`);
+      .filter((t) => (t as ITaskFull).name != "EXISTS")
+      .map((t) => `"${(t as ITaskFull).name}"`);
 
     if (missingSource.length > 0)
       throw new CustomError(1014, "RunBook", {
@@ -409,7 +419,8 @@ export class Automatiqal {
 
         return { name: "EXISTS" } as ITask;
       })
-      .filter((t) => t.name != "EXISTS")
+      .filter((t) => t.operation != "pause")
+      .filter((t) => (t as ITaskFull).name != "EXISTS")
       .map((t) => `"${t.operation}"`);
 
     if (nonExistingOps.length > 0)
@@ -419,9 +430,9 @@ export class Automatiqal {
   }
 
   #checkForHashInTaskNames() {
-    const taskNamesWithHash = this.#tasksListFlat.filter(
-      (t) => t.name.indexOf("#") > -1
-    );
+    const taskNamesWithHash = this.#tasksListFlat
+      .filter((t) => t.operation != "pause")
+      .filter((t) => (t as ITaskFull).name.indexOf("#") > -1);
 
     if (taskNamesWithHash.length > 0)
       throw new CustomError(1015, "RunBook", {
@@ -472,22 +483,23 @@ export class Automatiqal {
     const tasksReturnTypes = this.#ops.ops.opTypes;
 
     const opMismatchTasks = this.#tasksListFlat
+      .filter((t) => t.operation != "pause")
       .filter((t) => t.hasOwnProperty("source"))
       .filter((t) => {
-        const sourceTask = this.#tasksListFlat.filter(
-          (ts) => ts.name == t.source
-        )[0];
+        const sourceTask = this.#tasksListFlat
+          .filter((t) => t.operation != "pause")
+          .filter((ts) => (ts as ITaskFull).name == (t as ITaskFull).source)[0];
 
         if (!sourceTask)
           throw new CustomError(1018, "RunBook", {
-            arg1: t.source,
+            arg1: (t as ITaskFull).source,
           });
 
         const sourceReturnType = tasksReturnTypes[sourceTask.operation];
 
         return sourceReturnType != tasksReturnTypes[t.operation];
       })
-      .map((t) => `"${t.name}"`);
+      .map((t) => `"${(t as ITaskFull).name}"`);
 
     if (opMismatchTasks.length > 0) {
       throw new CustomError(1016, "RunBook", {
@@ -500,13 +512,14 @@ export class Automatiqal {
   // https://github.com/Informatiqal/automatiqal-cli/issues/92#issuecomment-1296805065
   #checkValidTaskName() {
     const nonValidTaskNames = this.#tasksListFlat
+      .filter((t) => t.operation != "pause")
       .map((t) => {
-        if (t.name.indexOf("#") > -1) return t;
+        if ((t as ITaskFull).name.indexOf("#") > -1) return t;
 
         return { name: "VALID" } as ITask;
       })
-      .filter((t) => t.name != "VALID")
-      .map((t) => `"${t.name}"`);
+      .filter((t) => (t as ITaskFull).name != "VALID")
+      .map((t) => `"${(t as ITaskFull).name}"`);
 
     if (nonValidTaskNames.length > 0)
       throw new CustomError(1022, "RunBook", {
@@ -523,8 +536,15 @@ export class Automatiqal {
 
       flatTasks.push(task);
 
-      if (task.onError && task.onError.tasks && task.onError.tasks.length > 0) {
-        flatTasks = [...flatTasks, ...this.#flatTask(task.onError.tasks)];
+      if (
+        task.hasOwnProperty("onError") &&
+        (task as ITaskFull).onError.tasks &&
+        (task as ITaskFull).onError.tasks.length > 0
+      ) {
+        flatTasks = [
+          ...flatTasks,
+          ...this.#flatTask((task as ITaskFull).onError.tasks),
+        ];
       }
     }
 

@@ -8,6 +8,10 @@ interface ISaaSOperation {
   realOperation?: string;
 }
 
+const pause: ISaaSOperation[] = [
+  { name: "pause", isNonSource: true, type: "Pause" },
+];
+
 const apiKey: ISaaSOperation[] = [
   { name: "apiKey.get", isNonSource: false, type: "ApiKey" },
   { name: "apiKey.getAll", isNonSource: true, type: "ApiKey", isPlural: true },
@@ -345,6 +349,7 @@ const saasOperations: ISaaSOperation[] = [
   ...user,
   ...webHooks,
   ...webIntegrations,
+  ...pause,
 ];
 
 export class SaaSOperations {

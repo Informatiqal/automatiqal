@@ -9,6 +9,10 @@ interface IWinOperation {
   dryRun?: "ignore";
 }
 
+const pause: IWinOperation[] = [
+  { name: "pause", isNonSource: true, type: "Pause" },
+];
+
 const about: IWinOperation[] = [
   { name: "about.apiDefaults", isNonSource: true, type: "About" },
   { name: "about.apiDescription", isNonSource: true, type: "About" },
@@ -651,6 +655,7 @@ const winOperations: IWinOperation[] = [
   ...virtualProxy,
   ...user,
   ...proxy,
+  ...pause,
 ];
 
 export class WinOperations {
