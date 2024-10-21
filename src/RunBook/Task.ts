@@ -1,6 +1,6 @@
 import pLimit from "p-limit";
 import { IRunBookResult } from "./Runner";
-import { ITask } from "./RunBook.interfaces";
+import { ITask, ITaskFull } from "./RunBook.interfaces";
 import { CustomError } from "../util/CustomError";
 import { Debugger } from "../util/Debugger";
 import { Operations } from "../util/operations/index";
@@ -8,13 +8,13 @@ import { QlikRepoApi } from "qlik-repo-api";
 import { QlikSaaSApi } from "qlik-saas-api";
 
 export class Task {
-  task: ITask;
+  task: ITaskFull;
   instance: QlikRepoApi.client | QlikSaaSApi.client;
   objectsData?: any; // IRunBookResult;
   debug: Debugger;
   private isNoSource: boolean;
   private operations: Operations;
-  constructor(task: ITask, instance: any, objectsData?: IRunBookResult) {
+  constructor(task: ITaskFull, instance: any, objectsData?: IRunBookResult) {
     this.task = task;
     this.instance = instance;
     this.objectsData = objectsData;

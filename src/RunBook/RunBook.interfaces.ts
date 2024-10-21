@@ -150,7 +150,8 @@ export type SaaSOperations =
   | "webIntegration.getAll"
   | "webIntegration.remove"
   | "webIntegration.create"
-  | "webIntegration.update";
+  | "webIntegration.update"
+  | "pause";
 
 export type WinOperations =
   | "about.apiDefaults"
@@ -270,7 +271,8 @@ export type WinOperations =
   | "user.remove"
   | "user.update"
   | "continue"
-  | "debug";
+  | "debug"
+  | "pause";
 
 export type TAddRemoveSet = "add" | "remove" | "set";
 
@@ -279,7 +281,9 @@ export type ILoop =
   | number
   | { [k: string]: string | number | boolean };
 
-export interface ITask {
+export type ITask = ITaskFull | ITaskPause;
+
+export interface ITaskFull {
   /**
    * Unique name of the task
    */
@@ -358,7 +362,23 @@ export interface ITask {
   };
   loop?: {
     values: ILoop[];
+    /**
+     * Wait X number of seconds after each iteration
+     */
+    pause?: number;
   };
+}
+
+export interface ITaskPause {
+  operation: "pause";
+  skip?: boolean;
+  /**
+   * Determine if the task to be skipped or not based on
+   * the condition provided here
+   */
+  when?: string;
+  details: { seconds: number };
+  name?: string;
 }
 
 export type TraceLevels = "error" | "debug";
@@ -483,8 +503,11 @@ export type TaskDetails =
   | {
       location: string;
     }
-  | { names: string[] };
-// };
+  | { names: string[] }
+  /**
+   * Number of seconds to pause
+   */
+  | { seconds: number };
 
 export interface IAppPublish {
   name?: string;

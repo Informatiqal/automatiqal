@@ -1,6 +1,12 @@
 import { QlikRepoApi } from "qlik-repo-api";
 import { randomUUID } from "crypto";
-import { ILoop, IRunBook, ITask } from "./RunBook.interfaces";
+import {
+  ILoop,
+  IRunBook,
+  ITask,
+  ITaskFull,
+  ITaskPause,
+} from "./RunBook.interfaces";
 import { Task } from "./Task";
 import { Debugger } from "../util/Debugger";
 import { EventsBus } from "../util/EventBus";
@@ -43,7 +49,7 @@ export class Runner {
   private today: string;
   private increment: number = 1;
   private operations: Operations;
-  private taskDefaultOptions: ITask["options"] = {
+  private taskDefaultOptions: ITaskFull["options"] = {
     appendCustomProperties: true,
     appendTags: true,
     multiple: false,
@@ -87,6 +93,8 @@ export class Runner {
     // this.runBook.tasks.forEach(async (t) => {
 
     for (let t of this.runBook.tasks) {
+      if (t.operation == "pause")
+        t.name = `Pause (${(t as ITaskPause).details.seconds}s)`;
       // if task is preset to be skipped
       // then just emit the event and do not process it further
       if (t.hasOwnProperty("skip") && t.skip == true) {
@@ -160,9 +168,9 @@ export class Runner {
       // check if the sourced task is with skip = true
       // if yes then set skip = true for the current task
       // emit the event and do not process the task further
-      if (t.source) {
+      if ((t as ITaskFull).source) {
         const sourcedTask = this.runBook.tasks.filter(
-          (ts) => t.source == ts.name
+          (ts) => (t as ITaskFull).source == ts.name
         )[0];
 
         if (sourcedTask.skip == true) {
@@ -181,6 +189,35 @@ export class Runner {
 
           continue;
         }
+      }
+
+      if (t.operation == "pause") {
+        const timings: ITaskTimings = {
+          start: null,
+          end: null,
+          totalSeconds: -1,
+        };
+
+        timings.start = new Date().toISOString();
+
+        const seconds = await this.pause((t.details as any).seconds.toString());
+
+        timings.end = new Date().toISOString();
+        timings.totalSeconds = seconds;
+
+        const result: ITaskResult = {
+          task: t,
+          timings: timings,
+          data: [],
+          status: "Completed",
+        };
+
+        this.emitter.emit("task:result", result);
+        this.emitter.emit("runbook:log", `${t.name} complete`);
+        this.taskResults.push(result);
+        this.emitter.emit("runbook:result", this.taskResults);
+
+        continue;
       }
 
       if (t.skip == false) await this.taskProcessing(t);
@@ -209,13 +246,15 @@ export class Runner {
 
     let data = [];
 
-    if (!task.environment) {
+    if (!(task as ITaskFull).environment && task.operation != "pause") {
       data = await this.defaultInstance[`${a[0]}`].getFilter({
-        filter: task.filter,
+        filter: (task as ITaskFull).filter,
       });
     } else {
-      data = await this.instances[task.environment][`${a[0]}`].getFilter({
-        filter: task.filter,
+      data = await this.instances[(task as ITaskFull).environment][
+        `${a[0]}`
+      ].getFilter({
+        filter: (task as ITaskFull).filter,
       });
     }
 
@@ -228,15 +267,18 @@ export class Runner {
   private async taskProcessing(t: ITask) {
     if (!t.operation) throw new CustomError(1012, t.name, { arg1: t.name });
 
-    if (!t.loop) {
-      t.loop = {
+    if (!(t as ITaskFull).loop) {
+      (t as ITaskFull).loop = {
         values: [],
       };
     }
-    if (t.options) {
-      t.options = { ...this.taskDefaultOptions, ...t.options };
+    if ((t as ITaskFull).options) {
+      (t as ITaskFull).options = {
+        ...this.taskDefaultOptions,
+        ...(t as ITaskFull).options,
+      };
     } else {
-      t.options = { ...this.taskDefaultOptions };
+      (t as ITaskFull).options = { ...this.taskDefaultOptions };
     }
 
     // part of the dryRun logic. Since during dry run all tasks are converted to xxx.get
@@ -244,7 +286,7 @@ export class Runner {
     const taskRealOperation = t.operation;
 
     if (this.dryRun) {
-      t.options = { allowZero: true, multiple: true };
+      (t as ITaskFull).options = { allowZero: true, multiple: true };
       if (t.details) delete t.details;
 
       // NOTE: If the task is going to create/upload a resource then just return an empty array
@@ -297,18 +339,24 @@ export class Runner {
 
       // check for inline variables inside the filter
       const regex = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
-      if (t.filter && regex.test(t.filter)) {
-        t.filter = this.replaceInlineVariables(t.filter, t.name);
+      if ((t as ITaskFull).filter && regex.test((t as ITaskFull).filter)) {
+        (t as ITaskFull).filter = this.replaceInlineVariables(
+          (t as ITaskFull).filter,
+          t.name
+        );
       }
 
-      const data = !t.source
-        ? await this.getFilterItems(t).catch((e) => {
-            throw new CustomError(1011, t.name, {
-              arg1: t.name,
-              arg2: e.message,
-            });
-          })
-        : this.taskResults.find((a) => a.task.name == t.source);
+      const data =
+        !(t as ITaskFull).source && t.operation != "pause"
+          ? await this.getFilterItems(t).catch((e) => {
+              throw new CustomError(1011, t.name, {
+                arg1: t.name,
+                arg2: e.message,
+              });
+            })
+          : this.taskResults.find(
+              (a) => a.task.name == (t as ITaskFull).source
+            );
 
       // process the task, push the result to taskResult variable
       const timings: ITaskTimings = {
@@ -337,32 +385,44 @@ export class Runner {
       let taskResults: IRunBookResult[] = [];
 
       // loop through all values and execute the task again
-      if (t.loop.values.length > 0 && t.options.loopParallel == true) {
+      if (
+        (t as ITaskFull).loop &&
+        (t as ITaskFull).loop.values.length > 0 &&
+        (t as ITaskFull).options.loopParallel == true
+      ) {
         taskResults = await Promise.all(
-          t.loop.values.map((loopValue, i) => {
+          (t as ITaskFull).loop.values.map((loopValue, i) => {
             return this.runTaskLoop(t, i, data, loopValue);
           })
         ).then((r) => r.flat());
       } else {
         let taskResultPostLoop: IRunBookResult[][] = [];
 
-        if (t.loop.values.length == 0) {
-          const task = t.environment
-            ? new Task(t, this.instances[t.environment], data)
-            : new Task(t, this.defaultInstance, data);
+        if ((t as ITaskFull).loop.values.length == 0) {
+          const task = (t as ITaskFull).environment
+            ? new Task(
+                t as ITaskFull,
+                this.instances[(t as ITaskFull).environment],
+                data
+              )
+            : new Task(t as ITaskFull, this.defaultInstance, data);
 
           // const task = new Task(t, this.instance, data);
           const taskResult = await task.process();
           taskResultPostLoop.push(taskResult);
         } else {
-          for (let i = 0; i < t.loop.values.length; i++) {
+          for (let i = 0; i < (t as ITaskFull).loop.values.length; i++) {
             const loopedData = await this.runTaskLoop(
               t,
               i,
               data,
-              t.loop.values[i]
+              (t as ITaskFull).loop.values[i]
             );
+
             taskResultPostLoop.push(loopedData);
+
+            if ((t as ITaskFull).loop.hasOwnProperty("pause"))
+              await this.pause((t.details as any).seconds.toString());
           }
         }
 
@@ -399,22 +459,27 @@ export class Runner {
 
       // ignore the error and continue with the next task
       // (outside the onError block)
-      if (t.onError && t.onError.ignore) return;
+      if ((t as ITaskFull).onError && (t as ITaskFull).onError.ignore) return;
       // if ignore is specifically set to false - throw the error
-      if (t.onError && t.onError.ignore == false) throw e;
+      if ((t as ITaskFull).onError && (t as ITaskFull).onError.ignore == false)
+        throw e;
 
       // throw custom error if onError.exit is provided
-      if (t.onError && t.onError.exit) throw new CustomError(1017, t.name);
+      if ((t as ITaskFull).onError && (t as ITaskFull).onError.exit)
+        throw new CustomError(1017, t.name);
 
       // if there are any tasks specified in onError block
       // loop through them and run them as regular tasks
-      if (t.onError && t.onError.tasks?.length > 0) {
-        for (let onErrorTask of t.onError.tasks) {
+      if (
+        (t as ITaskFull).onError &&
+        (t as ITaskFull).onError.tasks?.length > 0
+      ) {
+        for (let onErrorTask of (t as ITaskFull).onError.tasks) {
           if (!onErrorTask.skip) await this.taskProcessing(onErrorTask);
         }
       }
 
-      if (!t.onError) throw e;
+      if (!(t as ITaskFull).onError) throw e;
     }
   }
 
@@ -427,7 +492,7 @@ export class Runner {
     // delete taskWithReplacedLoopVariables.loop;
 
     if (!data || data.data.length == 0)
-      data = !taskWithReplacedLoopVariables.source
+      data = !(taskWithReplacedLoopVariables as ITaskFull).source
         ? await this.getFilterItems(taskWithReplacedLoopVariables).catch(
             (e) => {
               throw new CustomError(1011, taskWithReplacedLoopVariables.name, {
@@ -437,16 +502,23 @@ export class Runner {
             }
           )
         : this.taskResults.find(
-            (a) => a.task.name == taskWithReplacedLoopVariables.source
+            (a) =>
+              a.task.name == (taskWithReplacedLoopVariables as ITaskFull).source
           );
 
     const task = taskWithReplacedLoopVariables.name
       ? new Task(
-          taskWithReplacedLoopVariables,
-          this.instances[taskWithReplacedLoopVariables.environment],
+          taskWithReplacedLoopVariables as ITaskFull,
+          this.instances[
+            (taskWithReplacedLoopVariables as ITaskFull).environment
+          ],
           data
         )
-      : new Task(taskWithReplacedLoopVariables, this.defaultInstance, data);
+      : new Task(
+          taskWithReplacedLoopVariables as ITaskFull,
+          this.defaultInstance,
+          data
+        );
 
     const taskResult = await task.process();
 
@@ -454,7 +526,7 @@ export class Runner {
     // unless the task options specifically disables this behavior
     // aka: options.unmaskSecrets == true
     const dataToReturn =
-      t.options.unmaskSecrets == true
+      (t as ITaskFull).options.unmaskSecrets == true
         ? taskResult
         : this.maskSensitiveDataDetails(taskResult, t.operation);
 
@@ -811,5 +883,13 @@ export class Runner {
     }
 
     return parsedJsElements;
+  }
+
+  async pause(seconds: string) {
+    const numSeconds = parseFloat(seconds) * 1000;
+
+    await new Promise((resolve) => setTimeout(resolve, numSeconds));
+
+    return numSeconds;
   }
 }
