@@ -1,6 +1,6 @@
 {
   "name": "automatiqal",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "description": "Automate Qlik deployments, management and administration",
   "author": {
     "email": "info@informatiqal.com",
@@ -61,7 +61,7 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.3.0",
     "@rollup/plugin-typescript": "^12.1.1",
-    "@types/node": "22.7.7",
+    "@types/node": "22.7.9",
     "@types/uuid": "^10.0.0",
     "ajv": "^8.17.1",
     "ajv-errors": "^3.0.0",

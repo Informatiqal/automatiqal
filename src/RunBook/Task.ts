@@ -248,7 +248,7 @@ export class Task {
       throw new CustomError(1003, this.task.name, { arg1: this.task.name });
 
     // if no objects are found throw an error
-    if (this.objectsData.data.length == 0) {
+    if (this.objectsData.data.length == 0 && !this.task.onError) {
       if (!this.task.options)
         throw new CustomError(1004, this.task.name, { arg1: this.task.name });
 

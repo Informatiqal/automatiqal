@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.11.1] - 2024-10-24
+
+- for tasks with no data first check if there is `onError` block before throw an error
+- if no `https.Agent` is presented for an environment then auto assign the minimum one
+- dependency updates
+
 ## [0.11.0] - 2024-10-21
 
 - implement `pause` operation [#286](https://github.com/Informatiqal/automatiqal/issues/286)

@@ -140,8 +140,13 @@ export class Automatiqal {
           authentication: env.authentication,
         };
 
-        if (httpsAgents.hasOwnProperty(name))
+        if (httpsAgents.hasOwnProperty(name)) {
           clientConfig["httpsAgent"] = httpsAgents[name];
+        } else {
+          clientConfig["httpsAgent"] = new https.Agent({
+            rejectUnauthorized: false,
+          });
+        }
 
         this.#restInstances[name] = new QlikRepoApi.client(clientConfig);
         this.#defaultRestInstance = this.#restInstances[name];
