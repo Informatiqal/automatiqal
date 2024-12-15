@@ -59,7 +59,7 @@
     "@informatiqal/filter-parser": "^0.1.0",
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "^12.1.1",
     "@types/node": "22.7.9",
     "@types/uuid": "^10.0.0",
