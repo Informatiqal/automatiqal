@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.11.2] - 2025-06-16
+
+- dependency updates
+
 ## [0.11.1] - 2024-10-24
 
 - for tasks with no data first check if there is `onError` block before throw an error

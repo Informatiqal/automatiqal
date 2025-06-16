@@ -1,5 +1,6 @@
 import https from "https";
-import { QlikRepoApi, IConfig } from "qlik-repo-api";
+import { QlikRepoApi } from "qlik-repo-api";
+import { IConfig } from "qlik-rest-api/dist/interfaces/interfaces";
 import { QlikSaaSApi } from "qlik-saas-api";
 import {
   automatiqalWindowsSchema,
