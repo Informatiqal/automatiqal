@@ -266,6 +266,7 @@ export class Runner {
 
   private async taskProcessing(t: ITask) {
     if (!t.operation) throw new CustomError(1012, t.name, { arg1: t.name });
+    let hasOriginalLoop = (t as ITaskFull).loop ? true : false;
 
     if (!(t as ITaskFull).loop) {
       (t as ITaskFull).loop = {
@@ -350,7 +351,7 @@ export class Runner {
 
       // if task dont have loop then get its data
       // otherwise the data will be defined in the loop section
-      if (!(t as ITaskFull).hasOwnProperty("loop")) {
+      if (!hasOriginalLoop) {
         data =
           !(t as ITaskFull).source && t.operation != "pause"
             ? await this.getFilterItems(t).catch((e) => {

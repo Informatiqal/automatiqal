@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.11.4] - 2025-06-23
+
+- fix issue with tasks without loop [#300](https://github.com/Informatiqal/automatiqal/issues/300)
+
 ## [0.11.3] - 2025-06-16
 
 - fix issue with loop values inside filter [#299](https://github.com/Informatiqal/automatiqal/issues/299)
