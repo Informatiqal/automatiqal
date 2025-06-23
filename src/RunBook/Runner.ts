@@ -346,18 +346,23 @@ export class Runner {
         );
       }
 
-      const data =
-        !(t as ITaskFull).source && t.operation != "pause"
-          ? await this.getFilterItems(t).catch((e) => {
-              throw new CustomError(1011, t.name, {
-                arg1: t.name,
-                arg2: e.message,
-              });
-            })
-          : this.taskResults.find(
-              (a) => a.task.name == (t as ITaskFull).source
-            );
+      let data: IRunBookResult = undefined;
 
+      // if task dont have loop then get its data
+      // otherwise the data will be defined in the loop section
+      if (!(t as ITaskFull).hasOwnProperty("loop")) {
+        data =
+          !(t as ITaskFull).source && t.operation != "pause"
+            ? await this.getFilterItems(t).catch((e) => {
+                throw new CustomError(1011, t.name, {
+                  arg1: t.name,
+                  arg2: e.message,
+                });
+              })
+            : this.taskResults.find(
+                (a) => a.task.name == (t as ITaskFull).source
+              );
+      }
       // process the task, push the result to taskResult variable
       const timings: ITaskTimings = {
         start: null,

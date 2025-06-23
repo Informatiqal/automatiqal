@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.11.3] - 2025-06-16
+
+- fix issue with loop values inside filter [#299](https://github.com/Informatiqal/automatiqal/issues/299)
+- dependency updates
+
 ## [0.11.2] - 2025-06-16
 
 - dependency updates
