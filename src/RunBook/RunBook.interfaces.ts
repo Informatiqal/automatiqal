@@ -315,6 +315,7 @@ export interface ITaskFull {
    */
   environment?: string;
   //   onError?: ITask[];
+  export?: ITaskExportCSV | ITaskExportJSON | { location: string };
   options?: {
     appendCustomProperties?: boolean;
     appendTags?: boolean;
@@ -367,6 +368,17 @@ export interface ITaskFull {
      */
     pause?: number;
   };
+}
+
+export interface ITaskExportCSV {
+  location: string;
+  format: "csv";
+  columns?: string[];
+}
+
+export interface ITaskExportJSON {
+  location: string;
+  format: "json";
 }
 
 export interface ITaskPause {

@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.11.5] - 2025-06-26
+
+- dependency updates
+
 ## [0.11.4] - 2025-06-23
 
 - fix issue with tasks without loop [#300](https://github.com/Informatiqal/automatiqal/issues/300)
