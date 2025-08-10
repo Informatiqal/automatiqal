@@ -55,7 +55,7 @@
   },
   "homepage": "https://informatiqal.com/automatiqal/",
   "devDependencies": {
-    "@informatiqal/automatiqal-schema": "^0.19.0",
+    "@informatiqal/automatiqal-schema": "^0.20.0",
     "@informatiqal/filter-parser": "^0.1.0",
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-json": "^6.1.0",
