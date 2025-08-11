@@ -418,6 +418,18 @@ export interface IRunBook {
   //     authentication: IConfig["authentication"];
   //   }[];
   tasks: ITask[];
+  /**
+   * List of constants/variables to use inside tasks
+   */
+  constants?: {
+    [k: string]:
+      | string
+      | number
+      | boolean
+      | {
+          [v: string]: number;
+        };
+  };
 }
 
 export interface IAppUpload {

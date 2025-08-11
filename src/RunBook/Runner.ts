@@ -11,7 +11,7 @@ import { Task } from "./Task";
 import { Debugger } from "../util/Debugger";
 import { EventsBus } from "../util/EventBus";
 import { CustomError } from "../util/CustomError";
-import { Operations } from "../util/operations/index";
+import { Operations, replaceInlineConstants } from "../util/operations/index";
 import { parseFilter } from "@informatiqal/filter-parser";
 import { QlikSaaSApi } from "qlik-saas-api";
 import { WinOperations } from "../util/operations/WinOperations";
@@ -375,6 +375,12 @@ export class Runner {
       const regex1 = new RegExp(/(?<=\$\${)(.*?)(?=})/gm);
       if (t.details && regex1.test(JSON.stringify(t.details))) {
         t.details = this.replaceInlineVariables(t.details, t.name);
+      }
+
+      // check for inline constants definitions in the whole task
+      const regex2 = new RegExp(/(?<=\${)(.*?)(?=})/gm);
+      if (regex2.test(JSON.stringify(t))) {
+        t = replaceInlineConstants(t, t.name, this.runBook.constants);
       }
 
       t = this.replaceSpecialVariables(t);
