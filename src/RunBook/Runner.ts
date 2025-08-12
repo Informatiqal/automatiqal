@@ -226,7 +226,20 @@ export class Runner {
     return this.taskResults;
   }
 
-  private async getFilterItems(task: ITask): Promise<any> {
+  private async getFilterItems(taskOriginal: ITask): Promise<any> {
+    let task = {} as ITask;
+
+    const regex2 = new RegExp(/(?<=\${)(.*?)(?=})/gm);
+    if (regex2.test(JSON.stringify(taskOriginal))) {
+      task = replaceInlineConstants(
+        taskOriginal,
+        taskOriginal.name,
+        this.runBook.constants
+      );
+    } else {
+      task = taskOriginal;
+    }
+
     const a = task.operation.split(".");
 
     if (this.operations.ops.nonSourceOperations.indexOf(task.operation) > -1)
@@ -273,6 +286,7 @@ export class Runner {
         values: [],
       };
     }
+
     if ((t as ITaskFull).options) {
       (t as ITaskFull).options = {
         ...this.taskDefaultOptions,
@@ -378,9 +392,14 @@ export class Runner {
       }
 
       // check for inline constants definitions in the whole task
-      const regex2 = new RegExp(/(?<=\${)(.*?)(?=})/gm);
-      if (regex2.test(JSON.stringify(t))) {
-        t = replaceInlineConstants(t, t.name, this.runBook.constants);
+      // but only if the task dont have a loop property
+      // if loop property exists then the constants have to be
+      // determent on each iteration
+      if ((t as ITaskFull).loop.values.length == 0) {
+        const regex2 = new RegExp(/(?<=\${)(.*?)(?=})/gm);
+        if (regex2.test(JSON.stringify(t))) {
+          t = replaceInlineConstants(t, t.name, this.runBook.constants);
+        }
       }
 
       t = this.replaceSpecialVariables(t);
@@ -496,11 +515,21 @@ export class Runner {
   }
 
   private async runTaskLoop(t: ITask, i: number, data: any, loopValue: ILoop) {
-    const taskWithReplacedLoopVariables = this.replaceLoopVariablesInTask(
+    let taskWithReplacedLoopVariables = this.replaceLoopVariablesInTask(
       t,
       loopValue,
       i
     );
+
+    const regex2 = new RegExp(/(?<=\${)(.*?)(?=})/gm);
+    if (regex2.test(JSON.stringify(taskWithReplacedLoopVariables))) {
+      taskWithReplacedLoopVariables = replaceInlineConstants(
+        taskWithReplacedLoopVariables,
+        taskWithReplacedLoopVariables.name,
+        this.runBook.constants
+      );
+    }
+
     // delete taskWithReplacedLoopVariables.loop;
 
     if (!data || data.data.length == 0)
@@ -556,12 +585,6 @@ export class Runner {
     const taskStringTemplate = JSON.stringify(task);
     // find all instances of loop variables into the stringified task
     const loopVariables = [...taskStringTemplate.matchAll(regex)];
-
-    // if loop is defined but not loop variables are found - throw an error
-    if (loopVariables.length == 0)
-      throw new CustomError(1027, "RunBook", {
-        arg1: task.name,
-      });
 
     let taskString = taskStringTemplate;
 
