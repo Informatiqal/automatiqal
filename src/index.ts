@@ -18,7 +18,7 @@ import {
 } from "./RunBook/RunBook.interfaces";
 import { CustomError } from "./util/CustomError";
 import { EventsBus } from "./util/EventBus";
-import { Operations } from "./util/operations/index";
+import { Operations, replaceInlineConstants } from "./util/operations/index";
 
 export type initialChecksNames =
   | "checkDuplicateTasks"
@@ -26,7 +26,8 @@ export type initialChecksNames =
   | "checkMissingSource"
   | "checkCustomPropertiesName"
   | "checkCorrectSource"
-  | "checkValidTaskName";
+  | "checkValidTaskName"
+  | "checkMissingConstants";
 
 export class Automatiqal {
   runBook: IRunBook;
@@ -129,6 +130,12 @@ export class Automatiqal {
           httpsAgents = options.httpsAgent;
         }
       }
+
+      this.runBook.environment = replaceInlineConstants(
+        this.runBook.environment,
+        "Environment global config",
+        this.runBook.constants
+      );
 
       if (!Array.isArray(this.runBook.environment)) {
         const env = runBook.environment as IEnvironment;
@@ -268,6 +275,12 @@ export class Automatiqal {
       } catch (e) {
         errors.push(e.context);
       }
+
+      try {
+        this.#checkMissingConstants();
+      } catch (e) {
+        errors.push(e.context);
+      }
     } else {
       if (this.#initialChecksList.includes("checkDuplicateTasks")) {
         try {
@@ -312,6 +325,14 @@ export class Automatiqal {
       if (this.#initialChecksList.includes("checkValidTaskName")) {
         try {
           this.#checkValidTaskName();
+        } catch (e) {
+          errors.push(e.context);
+        }
+      }
+
+      if (this.#initialChecksList.includes("checkMissingConstants")) {
+        try {
+          this.#checkMissingConstants();
         } catch (e) {
           errors.push(e.context);
         }
@@ -413,6 +434,37 @@ export class Automatiqal {
         throw new CustomError(1020, "RunBook", {
           arg1: missingTasks.join(", "),
         });
+    }
+  }
+
+  #checkMissingConstants() {
+    const regEx = /(?<=\${)(.*?)(?=})/g;
+    const regEx1 = /(?<=\${)(.*?)(?=})/g;
+    if (regEx.test(JSON.stringify(this.runBook))) {
+      // constants were used but no constants section is defined
+      if (!this.runBook.constants) {
+        const usedConstants = [
+          ...JSON.stringify(this.runBook).matchAll(regEx1),
+        ].map((c) => c[0].trim());
+
+        throw new CustomError(1031, "RunBook", {
+          arg1: usedConstants.join(", "),
+        });
+      } else {
+        // used constants that are not defined in constants section
+        const usedConstants = [
+          ...JSON.stringify(this.runBook).matchAll(regEx1),
+        ].map((c) => c[0].trim());
+
+        const missingDefinitions = usedConstants.filter(
+          (c) => !this.runBook.constants[c]
+        );
+
+        if (missingDefinitions.length > 0)
+          throw new CustomError(1032, "RunBook", {
+            arg1: missingDefinitions.join(", "),
+          });
+      }
     }
   }
 

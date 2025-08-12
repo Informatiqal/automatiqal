@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.0] - 2025-08-12
+
+- New config section `constants`. Re-use values across the runbook [#302](https://github.com/Informatiqal/automatiqal/issues/302)
+- Allow `loop` tasks to use `constants` section [#301](https://github.com/Informatiqal/automatiqal/issues/301)
+- The `constants` section allow usage for `weighted` values. Weight can be specified for each value. When the constant is used then random value will be picked, based on the weight
+- dependency updates
+
 ## [0.11.5] - 2025-06-26
 
 - dependency updates

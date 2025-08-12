@@ -47,6 +47,9 @@ export class CustomError extends Error {
     1027: `Loop property is present in task "%{arg1}" but no loop variables are used. Either use the variables or remove the loop.`,
     1028: `Property "%{arg2}" to not exists in loop values. In task "%{arg1}"`,
     1029: `Environments specified in the following tasks do not exists: "%{arg1}"`,
+    1030: `Constant "%{arg1}" is not defined`,
+    1031: `Constants sections is not defined but constants definitions were found - %{arg1}`,
+    1032: `Constant(s) not defined: %{arg1}`,
   };
 
   constructor(code: number, taskName: string, params?: IErrorParams) {

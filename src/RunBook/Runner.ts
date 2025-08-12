@@ -11,7 +11,7 @@ import { Task } from "./Task";
 import { Debugger } from "../util/Debugger";
 import { EventsBus } from "../util/EventBus";
 import { CustomError } from "../util/CustomError";
-import { Operations } from "../util/operations/index";
+import { Operations, replaceInlineConstants } from "../util/operations/index";
 import { parseFilter } from "@informatiqal/filter-parser";
 import { QlikSaaSApi } from "qlik-saas-api";
 import { WinOperations } from "../util/operations/WinOperations";
@@ -226,7 +226,20 @@ export class Runner {
     return this.taskResults;
   }
 
-  private async getFilterItems(task: ITask): Promise<any> {
+  private async getFilterItems(taskOriginal: ITask): Promise<any> {
+    let task = {} as ITask;
+
+    const regex2 = new RegExp(/(?<=\${)(.*?)(?=})/gm);
+    if (regex2.test(JSON.stringify(taskOriginal))) {
+      task = replaceInlineConstants(
+        taskOriginal,
+        taskOriginal.name,
+        this.runBook.constants
+      );
+    } else {
+      task = taskOriginal;
+    }
+
     const a = task.operation.split(".");
 
     if (this.operations.ops.nonSourceOperations.indexOf(task.operation) > -1)
@@ -270,9 +283,10 @@ export class Runner {
 
     if (!(t as ITaskFull).loop) {
       (t as ITaskFull).loop = {
-        values: [],
+        values: [0],
       };
     }
+
     if ((t as ITaskFull).options) {
       (t as ITaskFull).options = {
         ...this.taskDefaultOptions,
@@ -391,11 +405,7 @@ export class Runner {
       let taskResults: IRunBookResult[] = [];
 
       // loop through all values and execute the task again
-      if (
-        (t as ITaskFull).loop &&
-        (t as ITaskFull).loop.values.length > 0 &&
-        (t as ITaskFull).options.loopParallel == true
-      ) {
+      if ((t as ITaskFull).options.loopParallel == true) {
         taskResults = await Promise.all(
           (t as ITaskFull).loop.values.map((loopValue, i) => {
             return this.runTaskLoop(t, i, data, loopValue);
@@ -404,32 +414,18 @@ export class Runner {
       } else {
         let taskResultPostLoop: IRunBookResult[][] = [];
 
-        if ((t as ITaskFull).loop.values.length == 0) {
-          const task = (t as ITaskFull).environment
-            ? new Task(
-                t as ITaskFull,
-                this.instances[(t as ITaskFull).environment],
-                data
-              )
-            : new Task(t as ITaskFull, this.defaultInstance, data);
+        for (let i = 0; i < (t as ITaskFull).loop.values.length; i++) {
+          const loopedData = await this.runTaskLoop(
+            t,
+            i,
+            data,
+            (t as ITaskFull).loop.values[i]
+          );
 
-          // const task = new Task(t, this.instance, data);
-          const taskResult = await task.process();
-          taskResultPostLoop.push(taskResult);
-        } else {
-          for (let i = 0; i < (t as ITaskFull).loop.values.length; i++) {
-            const loopedData = await this.runTaskLoop(
-              t,
-              i,
-              data,
-              (t as ITaskFull).loop.values[i]
-            );
+          taskResultPostLoop.push(loopedData);
 
-            taskResultPostLoop.push(loopedData);
-
-            if ((t as ITaskFull).loop.hasOwnProperty("pause"))
-              await this.pause((t.details as any).seconds.toString());
-          }
+          if ((t as ITaskFull).loop.hasOwnProperty("pause"))
+            await this.pause((t.details as any).seconds.toString());
         }
 
         taskResults = taskResultPostLoop.flat();
@@ -490,11 +486,21 @@ export class Runner {
   }
 
   private async runTaskLoop(t: ITask, i: number, data: any, loopValue: ILoop) {
-    const taskWithReplacedLoopVariables = this.replaceLoopVariablesInTask(
+    let taskWithReplacedLoopVariables = this.replaceLoopVariablesInTask(
       t,
       loopValue,
       i
     );
+
+    const regex2 = new RegExp(/(?<=\${)(.*?)(?=})/gm);
+    if (regex2.test(JSON.stringify(taskWithReplacedLoopVariables))) {
+      taskWithReplacedLoopVariables = replaceInlineConstants(
+        taskWithReplacedLoopVariables,
+        taskWithReplacedLoopVariables.name,
+        this.runBook.constants
+      );
+    }
+
     // delete taskWithReplacedLoopVariables.loop;
 
     if (!data || data.data.length == 0)
@@ -550,12 +556,6 @@ export class Runner {
     const taskStringTemplate = JSON.stringify(task);
     // find all instances of loop variables into the stringified task
     const loopVariables = [...taskStringTemplate.matchAll(regex)];
-
-    // if loop is defined but not loop variables are found - throw an error
-    if (loopVariables.length == 0)
-      throw new CustomError(1027, "RunBook", {
-        arg1: task.name,
-      });
 
     let taskString = taskStringTemplate;
 
