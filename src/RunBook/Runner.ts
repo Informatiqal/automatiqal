@@ -283,7 +283,7 @@ export class Runner {
 
     if (!(t as ITaskFull).loop) {
       (t as ITaskFull).loop = {
-        values: [],
+        values: [0],
       };
     }
 
@@ -391,17 +391,6 @@ export class Runner {
         t.details = this.replaceInlineVariables(t.details, t.name);
       }
 
-      // check for inline constants definitions in the whole task
-      // but only if the task dont have a loop property
-      // if loop property exists then the constants have to be
-      // determent on each iteration
-      if ((t as ITaskFull).loop.values.length == 0) {
-        const regex2 = new RegExp(/(?<=\${)(.*?)(?=})/gm);
-        if (regex2.test(JSON.stringify(t))) {
-          t = replaceInlineConstants(t, t.name, this.runBook.constants);
-        }
-      }
-
       t = this.replaceSpecialVariables(t);
 
       const result: ITaskResult = {
@@ -416,11 +405,7 @@ export class Runner {
       let taskResults: IRunBookResult[] = [];
 
       // loop through all values and execute the task again
-      if (
-        (t as ITaskFull).loop &&
-        (t as ITaskFull).loop.values.length > 0 &&
-        (t as ITaskFull).options.loopParallel == true
-      ) {
+      if ((t as ITaskFull).options.loopParallel == true) {
         taskResults = await Promise.all(
           (t as ITaskFull).loop.values.map((loopValue, i) => {
             return this.runTaskLoop(t, i, data, loopValue);
@@ -429,32 +414,18 @@ export class Runner {
       } else {
         let taskResultPostLoop: IRunBookResult[][] = [];
 
-        if ((t as ITaskFull).loop.values.length == 0) {
-          const task = (t as ITaskFull).environment
-            ? new Task(
-                t as ITaskFull,
-                this.instances[(t as ITaskFull).environment],
-                data
-              )
-            : new Task(t as ITaskFull, this.defaultInstance, data);
+        for (let i = 0; i < (t as ITaskFull).loop.values.length; i++) {
+          const loopedData = await this.runTaskLoop(
+            t,
+            i,
+            data,
+            (t as ITaskFull).loop.values[i]
+          );
 
-          // const task = new Task(t, this.instance, data);
-          const taskResult = await task.process();
-          taskResultPostLoop.push(taskResult);
-        } else {
-          for (let i = 0; i < (t as ITaskFull).loop.values.length; i++) {
-            const loopedData = await this.runTaskLoop(
-              t,
-              i,
-              data,
-              (t as ITaskFull).loop.values[i]
-            );
+          taskResultPostLoop.push(loopedData);
 
-            taskResultPostLoop.push(loopedData);
-
-            if ((t as ITaskFull).loop.hasOwnProperty("pause"))
-              await this.pause((t.details as any).seconds.toString());
-          }
+          if ((t as ITaskFull).loop.hasOwnProperty("pause"))
+            await this.pause((t.details as any).seconds.toString());
         }
 
         taskResults = taskResultPostLoop.flat();
