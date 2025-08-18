@@ -69,7 +69,7 @@
     "esm": "^3.2.25",
     "events": "^3.3.0",
     "p-limit": "^6.2.0",
-    "qlik-repo-api": "^0.15.2",
+    "qlik-repo-api": "^0.18.0",
     "qlik-saas-api": "^0.19.1",
     "rollup": "^4.46.2",
     "rollup-plugin-delete": "^3.0.1",
