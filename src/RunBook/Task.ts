@@ -90,8 +90,13 @@ export class Task {
           });
       }
 
+      const taskArguments = {
+        ...this.task.details,
+        filter: this.task.filter || undefined,
+      };
+
       return await this.instance[`${a[0]}s`]
-        [a[1]](this.task.details || {}, this.task.options)
+        [a[1]](taskArguments || {}, this.task.options)
         .catch((e) => {
           e.message = `REST communication error! ${e.message}`;
           e.stack = "";

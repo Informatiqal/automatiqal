@@ -503,7 +503,7 @@ export class Runner {
 
     // delete taskWithReplacedLoopVariables.loop;
 
-    if (!data || data.data.length == 0)
+    if (!data || t.operation != "selection.create" || data.data?.length == 0)
       data = !(taskWithReplacedLoopVariables as ITaskFull).source
         ? await this.getFilterItems(taskWithReplacedLoopVariables).catch(
             (e) => {
@@ -518,7 +518,7 @@ export class Runner {
               a.task.name == (taskWithReplacedLoopVariables as ITaskFull).source
           );
 
-    const task = taskWithReplacedLoopVariables.name
+    const task = (taskWithReplacedLoopVariables as ITaskFull).environment
       ? new Task(
           taskWithReplacedLoopVariables as ITaskFull,
           this.instances[

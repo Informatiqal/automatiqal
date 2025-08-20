@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.13.0] - 2025-08-20
+
+- Added support for the new `selection` methods - create selection and deleted all items in it
+- dependency updates
+
 ## [0.12.0] - 2025-08-12
 
 - New config section `constants`. Re-use values across the runbook [#302](https://github.com/Informatiqal/automatiqal/issues/302)

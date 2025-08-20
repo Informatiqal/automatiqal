@@ -157,6 +157,17 @@ const schemaTrigger: IWinOperation[] = [
   },
 ];
 
+const selection: IWinOperation[] = [
+  {
+    name: "selection.create",
+    isNonSource: true,
+    type: "Selection",
+    isPlural: true,
+  },
+  { name: "selection.remove", isNonSource: false, type: "Selection" },
+  { name: "selection.removeAllItems", isNonSource: false, type: "Selection" },
+];
+
 const contentLibrary: IWinOperation[] = [
   { name: "contentLibrary.get", isNonSource: false, type: "ContentLibrary" },
   {
@@ -648,6 +659,7 @@ const winOperations: IWinOperation[] = [
   ...node,
   ...reloadTask,
   ...schemaTrigger,
+  ...selection,
   ...stream,
   ...systemRule,
   ...tag,

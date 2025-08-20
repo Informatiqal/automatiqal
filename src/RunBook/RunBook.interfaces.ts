@@ -51,6 +51,7 @@ import {
   IAPIKeysConfigsUpdate,
 } from "qlik-saas-api/dist/modules/APIKeys";
 import { IncomingMessage } from "http";
+import { TSelectionAreas } from "qlik-repo-api/dist/index.doc";
 
 export type SaaSOperations =
   | "apiKey.get"
@@ -239,6 +240,9 @@ export type WinOperations =
   | "schemaTrigger.getAll"
   | "schemaTrigger.remove"
   | "schemaTrigger.update"
+  | "selection.create"
+  | "selection.remove"
+  | "selection.removeAllItems"
   | "stream.create"
   | "stream.get"
   | "stream.getAll"
@@ -531,7 +535,8 @@ export type TaskDetails =
   /**
    * Number of seconds to pause
    */
-  | { seconds: number };
+  | { seconds: number }
+  | { type: TSelectionAreas };
 
 export interface IAppPublish {
   name?: string;

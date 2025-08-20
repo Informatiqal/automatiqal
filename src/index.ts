@@ -91,7 +91,9 @@ export class Automatiqal {
       const valid = validate(runBook);
 
       if (!valid) {
-        const errors = validate.errors.map((e) => e.message).join("\n");
+        const errors = validate.errors
+          .map((e) => `${e.message} - ${e.instancePath}`)
+          .join("\n");
         throw new Error(errors);
       }
     }
