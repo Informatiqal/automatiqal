@@ -62,6 +62,9 @@ export class Runner {
     loopParallel: false,
     parallel: false,
   };
+  private runbookDefaultOptions = {
+    delay: 0,
+  };
   dryRun: boolean;
   // private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/; // match values - $${xxxx}
   // TODO: how to re-use the regex? issue when using in multiple places when defined here
@@ -73,6 +76,10 @@ export class Runner {
     dryRun: boolean
   ) {
     this.runBook = runBook;
+    this.runBook.options = {
+      ...this.runbookDefaultOptions,
+      ...this.runBook.options,
+    };
     this.instances = instances;
     this.defaultInstance = defaultInstance;
     this.taskResults = [];
@@ -86,9 +93,18 @@ export class Runner {
     this.today = date.toISOString().split("T")[0].replace(/-/gi, "");
   }
 
+  async delay(seconds: number) {
+    try {
+      const ms = seconds * 1000;
+      const delay = () => new Promise((resolve) => setTimeout(resolve, ms));
+
+      await delay().catch((e) => {});
+    } catch {}
+  }
+
   async start(): Promise<ITaskResult[]> {
-    //return await Promise.all(
-    // this.runBook.tasks.forEach(async (t) => {
+    // flag to control the global delay not executed for the first task
+    let isFirstTask = true;
 
     for (let t of this.runBook.tasks) {
       if (t.operation == "pause")
@@ -111,6 +127,14 @@ export class Runner {
 
         continue;
       }
+
+      // if global delay is specified and its not the first ever task
+      // then execute the delay
+      if (this.runBook.options.delay > 0 && isFirstTask == false) {
+        await this.delay(this.runBook.options.delay);
+      }
+
+      if (isFirstTask == true) isFirstTask = false;
 
       // parse the "when" condition only if "skip"
       // is not explicitly defined
