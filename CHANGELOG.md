@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.15.0] - 2025-09-15
+## [0.15.1] - 2025-09-15
 
 - [#313](https://github.com/Informatiqal/automatiqal/issues/313) Runbook option to specify global delay - wait X seconds **BEFORE** each task. The delay **won't be** executed before the first task.
 
