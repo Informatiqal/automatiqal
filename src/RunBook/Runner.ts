@@ -61,8 +61,6 @@ export class Runner {
     unmaskSecrets: false,
     loopParallel: false,
     parallel: false,
-    concurrency: 0,
-    batch: 0,
   };
   dryRun: boolean;
   // private inlineVariablesRegex = /(?<=\$\${)(.*?)(?=})/; // match values - $${xxxx}

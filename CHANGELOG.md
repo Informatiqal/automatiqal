@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.14.0] - 2025-09-15
+
+- [#310](https://github.com/Informatiqal/automatiqal/issues/310) `parallel`task option is enhancement. Ability to specify batch or concurrency processing option with optional delay (X seconds)
+- dependency updates
+
 ## [0.13.0] - 2025-08-20
 
 - Added support for the new `selection` methods - create selection and deleted all items in it
