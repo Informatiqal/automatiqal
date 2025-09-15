@@ -429,6 +429,9 @@ export interface IRunBook {
   description?: string;
   edition: QlikEditions;
   trace?: TraceLevels;
+  options?: {
+    delay?: number;
+  };
   environment: IEnvironment | IEnvironment[];
   // | {
   //     host: string;
