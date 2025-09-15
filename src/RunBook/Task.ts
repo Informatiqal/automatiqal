@@ -1,6 +1,10 @@
 import pLimit from "p-limit";
 import { IRunBookResult } from "./Runner";
-import { ITask, ITaskFull } from "./RunBook.interfaces";
+import {
+  ITaskFull,
+  ParallelBatch,
+  ParallelConcurrent,
+} from "./RunBook.interfaces";
 import { CustomError } from "../util/CustomError";
 import { Debugger } from "../util/Debugger";
 import { Operations } from "../util/operations/index";
@@ -161,9 +165,8 @@ export class Task {
 
     // parallel is true but nothing else is set
     if (
-      this.task.options.parallel == true &&
-      this.task.options.concurrency == 0 &&
-      this.task.options.batch == 0
+      this.task.options.hasOwnProperty("parallel") &&
+      this.task.options.parallel == true
     ) {
       taskResults = await Promise.all(
         this.objectsData.data.map((obj, i) => {
@@ -178,53 +181,45 @@ export class Task {
       return taskResults;
     }
 
-    // parallel is true and batch is defined
-    if (this.task.options.parallel == true && this.task.options.batch > 0) {
-      const batchSize = this.task.options.batch;
-
-      const batchedTasks: IRunBookResult[][] = Array.from(
-        { length: Math.ceil(this.objectsData.data.length / batchSize) },
-        (_, i) =>
-          this.objectsData.data.slice(i * batchSize, i * batchSize + batchSize)
+    // parallel batch is defined
+    if (
+      this.task.options.hasOwnProperty("parallel") &&
+      (this.task.options.parallel as ParallelBatch).batch
+    ) {
+      const results = await this.processBatch(
+        this.task.options.parallel as ParallelBatch
       );
 
-      for (let i = 0; i < batchedTasks.length; i++) {
-        const results = await Promise.all(
-          batchedTasks[i].map((obj, i) => {
-            return op.hasOwnProperty("realOperation")
-              ? ""
-              : op.hasOwnProperty("subTaskGroup")
-              ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
-              : obj[a[1]](this.task.details, this.task.options);
-          })
-        );
-
-        taskResults = [...taskResults, ...results];
-      }
+      taskResults = [...taskResults, ...results];
 
       return taskResults;
     }
 
-    // parallel is true and concurrency is set
+    // parallel concurrency is set
     if (
-      this.task.options.parallel == true &&
-      this.task.options.concurrency > 0
+      this.task.options.hasOwnProperty("parallel") &&
+      (this.task.options.parallel as ParallelConcurrent).concurrent
     ) {
-      const limit = pLimit(this.task.options.concurrency);
+      // if breakCount is NOT specified then run all operations respecting the
+      // concurrency value only
+      if (!this.task.options.parallel.hasOwnProperty("breakCount")) {
+        const result = await this.processConcurrentNoBreak(
+          this.task.options.parallel as ParallelConcurrent
+        );
+      }
 
-      const input: IRunBookResult[] = this.objectsData.data.map((obj, i) =>
-        limit(() =>
-          op.hasOwnProperty("realOperation")
-            ? ""
-            : op.hasOwnProperty("subTaskGroup")
-            ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
-            : obj[a[1]](this.task.details, this.task.options)
-        )
-      );
+      // if breakCount is specified then split the operations in batches.
+      // Each batch will respect "concurrency" value
+      // if "delay" is specified then it will be called after each batch is completed
+      if (this.task.options.parallel.hasOwnProperty("breakCount")) {
+        const results = await this.processConcurrentBreak(
+          this.task.options.parallel as ParallelConcurrent
+        );
 
-      taskResults = await Promise.all(input);
+        taskResults = [...taskResults, ...results];
 
-      return taskResults;
+        return taskResults;
+      }
     }
   }
 
@@ -278,5 +273,105 @@ export class Task {
         this.task.options.multiple == false)
     )
       throw new CustomError(1006, this.task.name, { arg1: this.task.name });
+  }
+
+  private async delay(seconds: number) {
+    try {
+      const ms = seconds * 1000;
+      const delay = () => new Promise((resolve) => setTimeout(resolve, ms));
+
+      await delay().catch((e) => {});
+    } catch {}
+  }
+
+  private async processBatch(options: ParallelBatch) {
+    const a = this.task.operation.split(".");
+    const op = this.operations.ops.filter(this.task.operation);
+    const batchSize = options.batch;
+
+    let taskResults: IRunBookResult[] = [];
+
+    const batchedTasks: IRunBookResult[][] = Array.from(
+      { length: Math.ceil(this.objectsData.data.length / batchSize) },
+      (_, i) =>
+        this.objectsData.data.slice(i * batchSize, i * batchSize + batchSize)
+    );
+
+    for (let i = 0; i < batchedTasks.length; i++) {
+      const results = await Promise.all(
+        batchedTasks[i].map((obj, i) => {
+          return op.hasOwnProperty("realOperation")
+            ? ""
+            : op.hasOwnProperty("subTaskGroup")
+            ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
+            : obj[a[1]](this.task.details, this.task.options);
+        })
+      );
+
+      if (options.delay) await this.delay(options.delay);
+
+      taskResults = [...taskResults, ...results];
+    }
+
+    return taskResults;
+  }
+
+  private async processConcurrentNoBreak(options: ParallelConcurrent) {
+    const a = this.task.operation.split(".");
+    const op = this.operations.ops.filter(this.task.operation);
+    const limit = pLimit(options.concurrent);
+
+    const input: IRunBookResult[] = this.objectsData.data.map((obj, i) =>
+      limit(() =>
+        op.hasOwnProperty("realOperation")
+          ? ""
+          : op.hasOwnProperty("subTaskGroup")
+          ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
+          : obj[a[1]](this.task.details, this.task.options)
+      )
+    );
+
+    const taskResults = await Promise.all(input);
+
+    return taskResults;
+  }
+
+  private async processConcurrentBreak(options: ParallelConcurrent) {
+    const a = this.task.operation.split(".");
+    const op = this.operations.ops.filter(this.task.operation);
+    let taskResults: IRunBookResult[] = [];
+
+    let batchSize = this.task.options.parallel["breakCount"];
+    // set breakCount/batchSize to 1 as a default
+    batchSize = batchSize < 1 ? 1 : batchSize;
+
+    if (batchSize < options.concurrent) options.concurrent = batchSize;
+
+    const batchedTasks: IRunBookResult[][] = Array.from(
+      { length: Math.ceil(this.objectsData.data.length / batchSize) },
+      (_, i) =>
+        this.objectsData.data.slice(i * batchSize, i * batchSize + batchSize)
+    );
+
+    for (let i = 0; i < batchedTasks.length; i++) {
+      const limit = pLimit(options.concurrent);
+      const input = batchedTasks[i].map((obj, i) =>
+        limit(() =>
+          op.hasOwnProperty("realOperation")
+            ? ""
+            : op.hasOwnProperty("subTaskGroup")
+            ? obj[op.subTaskGroup][a[1]](this.task.details, this.task.options)
+            : obj[a[1]](this.task.details, this.task.options)
+        )
+      );
+
+      const taskResultsLocal = await Promise.all(input);
+
+      taskResults = [...taskResults, ...taskResultsLocal];
+
+      if (options.delay) await this.delay(options.delay);
+    }
+
+    return taskResults;
   }
 }

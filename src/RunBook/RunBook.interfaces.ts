@@ -338,24 +338,9 @@ export interface ITaskFull {
     loopParallel?: boolean;
     /**
      * process entities in parallel or sequence
-     * default is "true"
+     * default is "false"
      */
-    parallel?: boolean;
-    /**
-     * if parallel == true then this option
-     * will make sure that the task entries are process N at the time.
-     * rolling N
-     */
-    concurrency?: number;
-    /**
-     * if parallel == true then this option
-     * process the task entities in batches. Each batch
-     * will start once all entities are processed from the
-     * previous batch.
-     *
-     * THE TASKS IN EACH BATCH ARE PROCESSED IN PARALLEL!
-     */
-    batch?: number;
+    parallel?: boolean | ParallelConcurrent | ParallelBatch;
   };
   location?: string;
   details?: TaskDetails;
@@ -372,6 +357,36 @@ export interface ITaskFull {
      */
     pause?: number;
   };
+}
+
+export interface ParallelBatch {
+  /**
+   * process the task entities in batches. Each batch
+   * will start once all entities are processed from the
+   * previous batch.
+   *
+   * THE TASKS IN EACH BATCH ARE PROCESSED IN PARALLEL!
+   */
+  batch: number;
+  concurrency?: never;
+  /** seconds to pause before the next batch execution */
+  delay?: number;
+}
+
+export interface ParallelConcurrent {
+  /**
+   * will make sure that the task entries are process N at the time.
+   * rolling N
+   */
+  concurrent: number;
+  /**
+   * after how many processed items the delay will occur
+   * in effect only if "delay" is specified
+   */
+  breakCount?: number;
+  batch?: never;
+  /** seconds to pause before the next execution */
+  delay?: number;
 }
 
 export interface ITaskExportCSV {
