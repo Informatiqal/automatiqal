@@ -1,6 +1,6 @@
 {
   "name": "automatiqal",
-  "version": "0.15.1",
+  "version": "0.15.2",
   "description": "Automate Qlik deployments, management and administration",
   "author": {
     "email": "info@informatiqal.com",
@@ -57,12 +57,11 @@
   "devDependencies": {
     "@informatiqal/automatiqal-schema": "^0.23.0",
     "@informatiqal/filter-parser": "^0.1.0",
-    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^16.0.1",
-    "@rollup/plugin-typescript": "^12.1.4",
-    "@types/node": "24.4.0",
-    "@types/uuid": "^10.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@types/node": "24.10.2",
     "ajv": "^8.17.1",
     "ajv-errors": "^3.0.0",
     "dotenv": "17.2.2",

@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.15.2] - 2025-12-09
+
+- emitter (for error) emits the task name as well
+- dependency updates
+
 ## [0.15.1] - 2025-09-15
 
 - [#313](https://github.com/Informatiqal/automatiqal/issues/313) Runbook option to specify global delay - wait X seconds **BEFORE** each task. The delay **won't be** executed before the first task.

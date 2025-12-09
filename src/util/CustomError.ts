@@ -82,6 +82,9 @@ export class CustomError extends Error {
     }
 
     this.emitter.emit("runbook:log", `FAILED! ${this.taskName}`);
-    this.emitter.emit("error", this.message);
+    this.emitter.emit("error", {
+      taskName: this.taskName,
+      message: this.message,
+    });
   }
 }
